@@ -13,6 +13,7 @@ import { StaffManager } from '@/components/business/StaffManager';
 import { HoursManager } from '@/components/business/HoursManager';
 import { BookingsManager } from '@/components/business/BookingsManager';
 import { BusinessAnalytics } from '@/components/business/BusinessAnalytics';
+import { StaffInviteManager } from '@/components/business/StaffInviteManager';
 
 export default function BusinessManage() {
   const { id } = useParams();
@@ -198,7 +199,8 @@ export default function BusinessManage() {
               <ServicesManager businessId={id!} />
             </TabsContent>
 
-            <TabsContent value="staff">
+            <TabsContent value="staff" className="space-y-4">
+              <StaffInviteManager businessId={id!} />
               <StaffManager businessId={id!} />
             </TabsContent>
 

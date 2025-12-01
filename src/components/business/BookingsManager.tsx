@@ -29,7 +29,7 @@ export function BookingsManager({ businessId }: BookingsManagerProps) {
           *,
           services (name, price, duration_minutes),
           staff (name),
-          profiles (full_name, phone, email)
+          profiles (full_name, phone)
         `)
         .eq('business_id', businessId)
         .order('booking_date', { ascending: false })
