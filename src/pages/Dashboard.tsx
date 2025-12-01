@@ -10,6 +10,7 @@ import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { useNavigate, Link } from 'react-router-dom';
+import { DemoDataSeeder } from '@/components/DemoDataSeeder';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -109,14 +110,19 @@ export default function Dashboard() {
               <h1 className="text-3xl font-bold">Dashboard</h1>
               <p className="text-muted-foreground">Welcome back, {profile?.full_name || 'User'}</p>
             </div>
-            {isBusinessOwner && businesses.length === 0 && (
-              <Button asChild>
-                <Link to="/business/new">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Business
-                </Link>
-              </Button>
-            )}
+            <div className="flex gap-2">
+              {isBusinessOwner && businesses.length === 0 && (
+                <>
+                  <DemoDataSeeder />
+                  <Button asChild>
+                    <Link to="/business/new">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Business
+                    </Link>
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
 
           <Tabs defaultValue="bookings" className="space-y-6">
