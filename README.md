@@ -1,4 +1,93 @@
-# Welcome to your Lovable project
+# Booksy Clone - Service Booking Platform
+
+A complete, production-ready service booking platform built with React, TypeScript, and Lovable Cloud. Book appointments with local businesses instantly!
+
+## 🌟 Features
+
+- ✅ **Client Booking System** - Search, browse, and book services
+- ✅ **Business Management** - Full dashboard for service providers
+- ✅ **Real-time Availability** - Live booking calendar
+- ✅ **Analytics Dashboard** - Track bookings and performance
+- ✅ **Staff Management** - Add and manage team members
+- ✅ **Service Catalog** - Create and price your offerings
+- ✅ **Responsive Design** - Works on all devices
+- ✅ **Secure Authentication** - Email/password login
+
+## 🚀 Quick Start
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+Then open `http://localhost:8080` in your browser.
+
+## 📖 Full Documentation
+
+See [SETUP_GUIDE.md](./SETUP_GUIDE.md) for:
+- Complete installation instructions
+- User guides (clients & business owners)
+- Database structure
+- Customization guide
+- Troubleshooting tips
+
+## 🎯 Demo Accounts
+
+### Test the Platform:
+
+1. **Sign up as Business Owner** at `/auth`
+2. Click **"Create Demo Business"** in dashboard
+3. Get a pre-configured hair salon with services, staff, and hours
+4. Start accepting bookings!
+
+Or create your own business from scratch.
+
+## 🏗️ Tech Stack
+
+- **Frontend**: React 18, TypeScript, Vite
+- **Styling**: Tailwind CSS, shadcn/ui
+- **Backend**: Lovable Cloud (Supabase)
+- **Database**: PostgreSQL with RLS
+- **Auth**: Supabase Authentication
+
+## 📱 Key Pages
+
+- `/` - Home with search and categories
+- `/search` - Browse all businesses
+- `/business/:id` - Business profile with booking
+- `/dashboard` - User/owner dashboard
+- `/business/:id/manage` - Business management (owners only)
+
+## 🎨 Design System
+
+Modern, professional design with:
+- Teal/turquoise primary color
+- Gold accent highlights  
+- Clean, spacious layouts
+- Smooth animations
+- Mobile-first responsive
+
+## 🔐 Security
+
+- Row-Level Security on all tables
+- Secure password hashing
+- Input validation with Zod
+- SQL injection prevention
+- Business data isolation
+
+## 📊 Analytics
+
+Business owners get:
+- Total bookings count
+- Last 24 hours bookings
+- 7-day and 30-day trends
+- Top performing services
+- Recent booking activity
+
+---
 
 ## Project info
 
