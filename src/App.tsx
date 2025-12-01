@@ -9,6 +9,8 @@ import Auth from "./pages/Auth";
 import Search from "./pages/Search";
 import Business from "./pages/Business";
 import Dashboard from "./pages/Dashboard";
+import BusinessCreate from "./pages/BusinessCreate";
+import BusinessManage from "./pages/BusinessManage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,7 +26,9 @@ const App = () => (
             <Route path="/" element={<Home />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/search" element={<Search />} />
+            <Route path="/business/new" element={<BusinessCreate />} />
             <Route path="/business/:id" element={<Business />} />
+            <Route path="/business/:id/manage" element={<BusinessManage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
