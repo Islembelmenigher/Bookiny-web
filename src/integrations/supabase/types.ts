@@ -264,6 +264,7 @@ export type Database = {
           comment: string | null
           created_at: string
           id: string
+          image_url: string | null
           rating: number
           updated_at: string
         }
@@ -274,6 +275,7 @@ export type Database = {
           comment?: string | null
           created_at?: string
           id?: string
+          image_url?: string | null
           rating: number
           updated_at?: string
         }
@@ -284,6 +286,7 @@ export type Database = {
           comment?: string | null
           created_at?: string
           id?: string
+          image_url?: string | null
           rating?: number
           updated_at?: string
         }
@@ -514,6 +517,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_business_average_rating: {
+        Args: { business_uuid: string }
+        Returns: number
+      }
       has_business_role: {
         Args: {
           _business_id: string

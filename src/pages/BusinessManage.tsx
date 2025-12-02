@@ -15,6 +15,8 @@ import { BookingsManager } from '@/components/business/BookingsManager';
 import { BusinessAnalytics } from '@/components/business/BusinessAnalytics';
 import { StaffInviteManager } from '@/components/business/StaffInviteManager';
 import { BusinessCoverUpload } from '@/components/business/BusinessCoverUpload';
+import { StaffScheduleManager } from '@/components/business/StaffScheduleManager';
+import { StaffServicesManager } from '@/components/business/StaffServicesManager';
 
 export default function BusinessManage() {
   const { id } = useParams();
@@ -23,6 +25,7 @@ export default function BusinessManage() {
   
   const [business, setBusiness] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState<'owner' | 'staff' | null>(null);
   const [stats, setStats] = useState({
     totalBookings: 0,
     todayBookings: 0,
@@ -46,10 +49,28 @@ export default function BusinessManage() {
 
       if (businessError) throw businessError;
 
-      if (businessData.owner_id !== user?.id) {
-        toast.error('You do not have permission to manage this business');
-        navigate('/dashboard');
-        return;
+      // Check if user is owner or staff
+      const isOwner = businessData.owner_id === user?.id;
+      
+      if (!isOwner) {
+        // Check if user is staff
+        const { data: roleData, error: roleError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('business_id', id)
+          .eq('user_id', user?.id)
+          .eq('role', 'staff')
+          .single();
+
+        if (roleError || !roleData) {
+          toast.error('You do not have permission to manage this business');
+          navigate('/dashboard');
+          return;
+        }
+
+        setUserRole('staff');
+      } else {
+        setUserRole('owner');
       }
 
       setBusiness(businessData);
@@ -184,43 +205,61 @@ export default function BusinessManage() {
 
           {/* Management Tabs */}
           <Tabs defaultValue="bookings" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className={`grid w-full ${userRole === 'staff' ? 'grid-cols-3' : 'grid-cols-6'}`}>
               <TabsTrigger value="bookings">Bookings</TabsTrigger>
-              <TabsTrigger value="services">Services</TabsTrigger>
-              <TabsTrigger value="staff">Staff</TabsTrigger>
-              <TabsTrigger value="hours">Hours</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
-              <TabsTrigger value="settings">Settings</TabsTrigger>
+              {userRole === 'staff' && <TabsTrigger value="my-schedule">My Schedule</TabsTrigger>}
+              {userRole === 'staff' && <TabsTrigger value="my-services">My Services</TabsTrigger>}
+              {userRole === 'owner' && <TabsTrigger value="services">Services</TabsTrigger>}
+              {userRole === 'owner' && <TabsTrigger value="staff">Staff</TabsTrigger>}
+              {userRole === 'owner' && <TabsTrigger value="hours">Hours</TabsTrigger>}
+              {userRole === 'owner' && <TabsTrigger value="analytics">Analytics</TabsTrigger>}
+              {userRole === 'owner' && <TabsTrigger value="settings">Settings</TabsTrigger>}
             </TabsList>
 
             <TabsContent value="bookings">
               <BookingsManager businessId={id!} />
             </TabsContent>
 
-            <TabsContent value="services">
-              <ServicesManager businessId={id!} />
-            </TabsContent>
+            {userRole === 'staff' && (
+              <>
+                <TabsContent value="my-schedule">
+                  <StaffScheduleManager businessId={id!} />
+                </TabsContent>
 
-            <TabsContent value="staff" className="space-y-4">
-              <StaffInviteManager businessId={id!} />
-              <StaffManager businessId={id!} />
-            </TabsContent>
+                <TabsContent value="my-services">
+                  <StaffServicesManager businessId={id!} />
+                </TabsContent>
+              </>
+            )}
 
-            <TabsContent value="hours">
-              <HoursManager businessId={id!} />
-            </TabsContent>
+            {userRole === 'owner' && (
+              <>
+                <TabsContent value="services">
+                  <ServicesManager businessId={id!} />
+                </TabsContent>
 
-            <TabsContent value="analytics">
-              <BusinessAnalytics businessId={id!} stats={stats} />
-            </TabsContent>
+                <TabsContent value="staff" className="space-y-4">
+                  <StaffInviteManager businessId={id!} />
+                  <StaffManager businessId={id!} />
+                </TabsContent>
 
-            <TabsContent value="settings">
-              <BusinessCoverUpload 
-                businessId={id!} 
-                currentCoverUrl={business?.cover_image_url}
-                onUploadSuccess={(url) => setBusiness({ ...business, cover_image_url: url })}
-              />
-            </TabsContent>
+                <TabsContent value="hours">
+                  <HoursManager businessId={id!} />
+                </TabsContent>
+
+                <TabsContent value="analytics">
+                  <BusinessAnalytics businessId={id!} stats={stats} />
+                </TabsContent>
+
+                <TabsContent value="settings">
+                  <BusinessCoverUpload 
+                    businessId={id!} 
+                    currentCoverUrl={business?.cover_image_url}
+                    onUploadSuccess={(url) => setBusiness({ ...business, cover_image_url: url })}
+                  />
+                </TabsContent>
+              </>
+            )}
           </Tabs>
         </div>
       </div>
