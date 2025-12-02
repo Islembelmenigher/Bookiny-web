@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/lib/auth';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -7,8 +8,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { ArrowLeft, User, Mail, Phone, Copy, Upload } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, Copy, Upload, Globe } from 'lucide-react';
 import { z } from 'zod';
+import { changeLanguage, getCurrentLanguage } from '@/lib/i18n';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const profileSchema = z.object({
   full_name: z.string().min(2, 'Name must be at least 2 characters').max(100),
@@ -23,13 +32,21 @@ const passwordSchema = z.object({
   path: ["confirmPassword"],
 });
 
+const languages = [
+  { code: 'en', name: 'English' },
+  { code: 'fr', name: 'Français' },
+  { code: 'ar', name: 'العربية' },
+];
+
 export default function Profile() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [profile, setProfile] = useState({ full_name: '', phone: '', avatar_url: '' });
   const [passwords, setPasswords] = useState({ newPassword: '', confirmPassword: '' });
+  const [selectedLanguage, setSelectedLanguage] = useState(getCurrentLanguage());
 
   useEffect(() => {
     if (!user) {
@@ -43,7 +60,7 @@ export default function Profile() {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('full_name, phone, avatar_url')
+        .select('full_name, phone, avatar_url, language_preference')
         .eq('id', user?.id)
         .single();
 
@@ -54,9 +71,13 @@ export default function Profile() {
           phone: data.phone || '',
           avatar_url: data.avatar_url || '',
         });
+        if (data.language_preference) {
+          setSelectedLanguage(data.language_preference);
+          changeLanguage(data.language_preference);
+        }
       }
     } catch (error: any) {
-      toast.error('Failed to load profile');
+      toast.error(t('errors.somethingWrong'));
       console.error(error);
     }
   };
@@ -75,12 +96,12 @@ export default function Profile() {
 
       if (error) throw error;
 
-      toast.success('Profile updated successfully');
+      toast.success(t('profile.profileUpdated'));
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
       } else {
-        toast.error('Failed to update profile');
+        toast.error(t('errors.somethingWrong'));
         console.error(error);
       }
     } finally {
@@ -101,13 +122,13 @@ export default function Profile() {
 
       if (error) throw error;
 
-      toast.success('Password updated successfully');
+      toast.success(t('profile.passwordUpdated'));
       setPasswords({ newPassword: '', confirmPassword: '' });
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
       } else {
-        toast.error('Failed to update password');
+        toast.error(t('errors.somethingWrong'));
         console.error(error);
       }
     } finally {
@@ -154,12 +175,32 @@ export default function Profile() {
       if (updateError) throw updateError;
 
       setProfile({ ...profile, avatar_url: publicUrl });
-      toast.success('Profile picture updated successfully');
+      toast.success(t('profile.profileUpdated'));
     } catch (error: any) {
-      toast.error(error.message || 'Failed to upload image');
+      toast.error(error.message || t('errors.somethingWrong'));
       console.error(error);
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleLanguageChange = async (langCode: string) => {
+    setSelectedLanguage(langCode);
+    changeLanguage(langCode);
+
+    if (user) {
+      try {
+        const { error } = await supabase
+          .from('profiles')
+          .update({ language_preference: langCode })
+          .eq('id', user.id);
+
+        if (error) throw error;
+        toast.success(t('profile.languageUpdated'));
+      } catch (error) {
+        console.error('Failed to save language preference:', error);
+        toast.error(t('errors.somethingWrong'));
+      }
     }
   };
 
@@ -171,19 +212,19 @@ export default function Profile() {
           onClick={() => navigate(-1)}
           className="mb-6"
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
+          <ArrowLeft className="h-4 w-4 me-2" />
+          {t('common.back')}
         </Button>
 
         <div className="max-w-2xl mx-auto space-y-6">
           <div>
-            <h1 className="text-3xl font-bold">Profile Settings</h1>
+            <h1 className="text-3xl font-bold">{t('profile.title')}</h1>
             <p className="text-muted-foreground mt-2">
-              Manage your account information and preferences
+              {t('profile.subtitle')}
             </p>
             {user?.id && (
               <div className="mt-4 p-3 bg-muted/50 rounded-lg border">
-                <p className="text-xs font-medium text-muted-foreground mb-1">Your User ID:</p>
+                <p className="text-xs font-medium text-muted-foreground mb-1">{t('profile.yourUserId')}:</p>
                 <div className="flex items-center gap-2">
                   <code className="text-sm font-mono bg-background px-2 py-1 rounded">
                     {user.id}
@@ -200,19 +241,44 @@ export default function Profile() {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Share this with business owners to get staff access
+                  {t('profile.shareWithOwner')}
                 </p>
               </div>
             )}
           </div>
 
+          {/* Language Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Globe className="h-5 w-5" />
+                {t('profile.languagePreference')}
+              </CardTitle>
+              <CardDescription>{t('profile.selectLanguage')}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
+                <SelectTrigger className="w-full md:w-[280px]">
+                  <SelectValue placeholder={t('profile.selectLanguage')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {languages.map((lang) => (
+                    <SelectItem key={lang.code} value={lang.code}>
+                      {lang.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5" />
-                Personal Information
+                {t('profile.personalInfo')}
               </CardTitle>
-              <CardDescription>Update your profile details</CardDescription>
+              <CardDescription>{t('profile.updateProfile')}</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleUpdateProfile} className="space-y-6">
@@ -229,7 +295,7 @@ export default function Profile() {
                     <Label htmlFor="avatar" className="cursor-pointer">
                       <div className="flex items-center gap-2 text-sm font-medium hover:underline">
                         <Upload className="h-4 w-4" />
-                        {uploading ? 'Uploading...' : 'Upload new picture'}
+                        {uploading ? t('profile.uploading') : t('profile.uploadPicture')}
                       </div>
                     </Label>
                     <Input
@@ -240,49 +306,49 @@ export default function Profile() {
                       onChange={handleAvatarUpload}
                       disabled={uploading}
                     />
-                    <p className="text-xs text-muted-foreground mt-1">PNG, JPG up to 2MB</p>
+                    <p className="text-xs text-muted-foreground mt-1">{t('profile.imageFormat')}</p>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t('common.email')}</Label>
                   <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-md">
                     <Mail className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm">{user?.email}</span>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Email cannot be changed
+                    {t('profile.emailCannotChange')}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="full_name">Full Name</Label>
+                  <Label htmlFor="full_name">{t('auth.fullName')}</Label>
                   <Input
                     id="full_name"
                     value={profile.full_name}
                     onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                    placeholder="Your full name"
+                    placeholder={t('auth.enterFullName')}
                     required
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
+                  <Label htmlFor="phone">{t('common.phone')}</Label>
                   <div className="flex items-center gap-2">
-                    <Phone className="h-4 w-4 text-muted-foreground ml-3 absolute" />
+                    <Phone className="h-4 w-4 text-muted-foreground ms-3 absolute" />
                     <Input
                       id="phone"
                       type="tel"
                       value={profile.phone || ''}
                       onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                      placeholder="Your phone number"
-                      className="pl-10"
+                      placeholder={t('common.phone')}
+                      className="ps-10"
                     />
                   </div>
                 </div>
 
                 <Button type="submit" disabled={loading}>
-                  {loading ? 'Updating...' : 'Update Profile'}
+                  {loading ? t('profile.updating') : t('profile.updateProfile')}
                 </Button>
               </form>
             </CardContent>
@@ -290,37 +356,37 @@ export default function Profile() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Change Password</CardTitle>
-              <CardDescription>Update your account password</CardDescription>
+              <CardTitle>{t('profile.changePassword')}</CardTitle>
+              <CardDescription>{t('profile.changePassword')}</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleUpdatePassword} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="newPassword">New Password</Label>
+                  <Label htmlFor="newPassword">{t('profile.newPassword')}</Label>
                   <Input
                     id="newPassword"
                     type="password"
                     value={passwords.newPassword}
                     onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
-                    placeholder="Enter new password"
+                    placeholder={t('profile.enterNewPassword')}
                     required
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Label htmlFor="confirmPassword">{t('profile.confirmPassword')}</Label>
                   <Input
                     id="confirmPassword"
                     type="password"
                     value={passwords.confirmPassword}
                     onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
-                    placeholder="Confirm new password"
+                    placeholder={t('profile.confirmNewPassword')}
                     required
                   />
                 </div>
 
                 <Button type="submit" disabled={loading}>
-                  {loading ? 'Updating...' : 'Change Password'}
+                  {loading ? t('profile.updating') : t('profile.changePassword')}
                 </Button>
               </form>
             </CardContent>
