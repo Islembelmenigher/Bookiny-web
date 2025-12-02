@@ -11,6 +11,7 @@ import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
+import { ReviewForm } from '@/components/business/ReviewForm';
 
 export default function Business() {
   const { id } = useParams();
@@ -21,6 +22,8 @@ export default function Business() {
   const [services, setServices] = useState<any[]>([]);
   const [staff, setStaff] = useState<any[]>([]);
   const [businessHours, setBusinessHours] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [averageRating, setAverageRating] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   
   const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
@@ -37,11 +40,13 @@ export default function Business() {
 
   const fetchBusinessDetails = async () => {
     try {
-      const [businessRes, servicesRes, staffRes, hoursRes] = await Promise.all([
+      const [businessRes, servicesRes, staffRes, hoursRes, reviewsRes, ratingRes] = await Promise.all([
         supabase.from('businesses').select('*').eq('id', id).single(),
         supabase.from('services').select('*').eq('business_id', id).eq('is_active', true),
         supabase.from('staff').select('*').eq('business_id', id).eq('is_active', true),
         supabase.from('business_hours').select('*').eq('business_id', id),
+        supabase.from('reviews').select('*, profiles(full_name, avatar_url)').eq('business_id', id).order('created_at', { ascending: false }),
+        supabase.rpc('get_business_average_rating', { business_uuid: id }),
       ]);
 
       if (businessRes.error) throw businessRes.error;
@@ -49,6 +54,8 @@ export default function Business() {
       setServices(servicesRes.data || []);
       setStaff(staffRes.data || []);
       setBusinessHours(hoursRes.data || []);
+      setReviews(reviewsRes.data || []);
+      setAverageRating(ratingRes.data || 0);
     } catch (error: any) {
       toast.error('Failed to load business details');
       console.error(error);
@@ -188,10 +195,12 @@ export default function Business() {
                     <span>{business.city}, {business.state}</span>
                   </div>
                 )}
-                <div className="flex items-center gap-1">
-                  <Star className="h-4 w-4 fill-accent text-accent" />
-                  <span>5.0 (0 reviews)</span>
-                </div>
+                {averageRating > 0 && (
+                  <div className="flex items-center gap-1">
+                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    <span>{averageRating} ({reviews.length} reviews)</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -244,7 +253,7 @@ export default function Business() {
 
           {/* Staff */}
           {staff.length > 0 && (
-            <Card>
+            <Card className="mb-6">
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-4">Our Team</h2>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -265,6 +274,82 @@ export default function Business() {
               </CardContent>
             </Card>
           )}
+
+          {/* Reviews Section */}
+          <div>
+            <h2 className="text-2xl font-semibold mb-4">Reviews</h2>
+            
+            {user && (
+              <div className="mb-6">
+                <ReviewForm 
+                  businessId={id!} 
+                  onReviewSubmitted={fetchBusinessDetails}
+                />
+              </div>
+            )}
+
+            {reviews.length === 0 ? (
+              <Card>
+                <CardContent className="p-6 text-center text-muted-foreground">
+                  No reviews yet. Be the first to review!
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {reviews.map((review) => (
+                  <Card key={review.id}>
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4">
+                        {review.profiles?.avatar_url ? (
+                          <img
+                            src={review.profiles.avatar_url}
+                            alt={review.profiles.full_name}
+                            className="h-10 w-10 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                            <span className="text-sm font-medium text-primary">
+                              {review.profiles?.full_name?.charAt(0) || 'U'}
+                            </span>
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-medium">{review.profiles?.full_name || 'Anonymous'}</span>
+                            <div className="flex">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`h-4 w-4 ${
+                                    i < review.rating
+                                      ? 'fill-yellow-400 text-yellow-400'
+                                      : 'text-muted-foreground'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          {review.comment && (
+                            <p className="text-muted-foreground mb-2">{review.comment}</p>
+                          )}
+                          {review.image_url && (
+                            <img
+                              src={review.image_url}
+                              alt="Review"
+                              className="rounded-lg max-h-64 object-cover mt-2"
+                            />
+                          )}
+                          <p className="text-xs text-muted-foreground mt-2">
+                            {format(new Date(review.created_at), 'MMM d, yyyy')}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
