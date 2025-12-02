@@ -25,6 +25,7 @@ export function ReviewForm({ businessId, onReviewSubmitted }: ReviewFormProps) {
   const [uploading, setUploading] = useState(false);
   const [canReview, setCanReview] = useState<boolean | null>(null);
   const [checkingEligibility, setCheckingEligibility] = useState(true);
+  const [isOwnerOrStaff, setIsOwnerOrStaff] = useState(false);
 
   useEffect(() => {
     checkReviewEligibility();
@@ -38,6 +39,37 @@ export function ReviewForm({ businessId, onReviewSubmitted }: ReviewFormProps) {
     }
 
     try {
+      // Check if user is business owner
+      const { data: business } = await supabase
+        .from('businesses')
+        .select('owner_id')
+        .eq('id', businessId)
+        .single();
+
+      if (business && business.owner_id === user.id) {
+        setIsOwnerOrStaff(true);
+        setCanReview(false);
+        setCheckingEligibility(false);
+        return;
+      }
+
+      // Check if user is staff for this business
+      const { data: staffRole } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('business_id', businessId)
+        .eq('role', 'staff')
+        .maybeSingle();
+
+      if (staffRole) {
+        setIsOwnerOrStaff(true);
+        setCanReview(false);
+        setCheckingEligibility(false);
+        return;
+      }
+
+      // Check if user has bookings
       const { data: bookings, error } = await supabase
         .from('bookings')
         .select('id, status')
@@ -174,6 +206,11 @@ export function ReviewForm({ businessId, onReviewSubmitted }: ReviewFormProps) {
         </CardContent>
       </Card>
     );
+  }
+
+  // Hide review form entirely for business owners and staff
+  if (isOwnerOrStaff) {
+    return null;
   }
 
   if (canReview === false) {

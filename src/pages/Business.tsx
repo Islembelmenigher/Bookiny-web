@@ -5,13 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Calendar as CalendarIcon, MapPin, Star, Clock, DollarSign, User } from 'lucide-react';
+import { CalendarIcon, MapPin, Star, Clock, DollarSign, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { ReviewForm } from '@/components/business/ReviewForm';
+import { PortfolioGallery } from '@/components/business/PortfolioGallery';
 
 export default function Business() {
   const { id } = useParams();
@@ -32,6 +33,9 @@ export default function Business() {
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [existingBookings, setExistingBookings] = useState<any[]>([]);
+  const [staffServices, setStaffServices] = useState<any[]>([]);
+  const [staffHours, setStaffHours] = useState<any[]>([]);
+  const [filteredStaff, setFilteredStaff] = useState<any[]>([]);
 
   useEffect(() => {
     if (id) {
@@ -39,11 +43,45 @@ export default function Business() {
     }
   }, [id]);
 
+  // Fetch staff services when business loads
   useEffect(() => {
-    if (selectedDate && id) {
+    if (id && staff.length > 0) {
+      fetchStaffServices();
+    }
+  }, [id, staff]);
+
+  // Filter staff when service is selected
+  useEffect(() => {
+    if (selectedService && staffServices.length > 0) {
+      const staffIds = staffServices
+        .filter(ss => ss.service_id === selectedService.id)
+        .map(ss => ss.staff_id);
+      const filtered = staff.filter(s => staffIds.includes(s.id));
+      setFilteredStaff(filtered);
+      // Reset staff selection if current staff doesn't offer this service
+      if (selectedStaff && !staffIds.includes(selectedStaff.id)) {
+        setSelectedStaff(null);
+      }
+    } else {
+      setFilteredStaff(staff);
+    }
+  }, [selectedService, staffServices, staff]);
+
+  // Fetch staff hours when staff is selected
+  useEffect(() => {
+    if (selectedStaff) {
+      fetchStaffHours(selectedStaff.id);
+    } else {
+      setStaffHours([]);
+    }
+  }, [selectedStaff]);
+
+  // Fetch bookings when date changes
+  useEffect(() => {
+    if (selectedDate && id && selectedStaff) {
       fetchExistingBookings();
     }
-  }, [selectedDate, id]);
+  }, [selectedDate, id, selectedStaff]);
 
   const fetchBusinessDetails = async () => {
     try {
@@ -71,13 +109,33 @@ export default function Business() {
     }
   };
 
+  const fetchStaffServices = async () => {
+    const { data } = await supabase
+      .from('staff_services')
+      .select('staff_id, service_id')
+      .in('staff_id', staff.map(s => s.id));
+    
+    setStaffServices(data || []);
+  };
+
+  const fetchStaffHours = async (staffId: string) => {
+    const { data } = await supabase
+      .from('staff_hours')
+      .select('*')
+      .eq('staff_id', staffId)
+      .eq('is_available', true);
+    
+    setStaffHours(data || []);
+  };
+
   const fetchExistingBookings = async () => {
-    if (!selectedDate) return;
+    if (!selectedDate || !selectedStaff) return;
     
     const { data } = await supabase
       .from('bookings')
       .select('start_time, end_time, staff_id')
       .eq('business_id', id)
+      .eq('staff_id', selectedStaff.id)
       .eq('booking_date', format(selectedDate, 'yyyy-MM-dd'))
       .in('status', ['pending', 'confirmed']);
     
@@ -104,14 +162,15 @@ export default function Business() {
       return;
     }
 
-    // Double-check if slot is still available before booking
     const bookingDate = format(selectedDate, 'yyyy-MM-dd');
     const endTime = calculateEndTime(selectedTime, selectedService.duration_minutes);
     
+    // Check for conflicts
     const { data: conflictCheck } = await supabase
       .from('bookings')
       .select('id')
       .eq('business_id', id)
+      .eq('staff_id', selectedStaff.id)
       .eq('booking_date', bookingDate)
       .in('status', ['pending', 'confirmed'])
       .or(`and(start_time.lt.${endTime},end_time.gt.${selectedTime})`);
@@ -167,26 +226,59 @@ export default function Business() {
     return existingBookings.some(b => {
       const bookingStart = timeToMinutes(b.start_time);
       const bookingEnd = timeToMinutes(b.end_time);
-      // Check for overlap: slot is reserved if slotStart < bookingEnd AND slotEnd > bookingStart
       return slotStart < bookingEnd && slotEnd > bookingStart;
     });
   };
 
   const getTimeSlots = () => {
-    if (!selectedDate || businessHours.length === 0) {
+    if (!selectedDate || businessHours.length === 0 || !selectedStaff) {
       return [];
     }
 
     const dayOfWeek = selectedDate.getDay();
-    const dayHours = businessHours.find(h => h.day_of_week === dayOfWeek);
+    const businessDayHours = businessHours.find(h => h.day_of_week === dayOfWeek);
 
-    if (!dayHours || dayHours.is_closed) {
+    if (!businessDayHours || businessDayHours.is_closed) {
       return [];
     }
 
+    // Get staff hours for this day
+    const staffDayHours = staffHours.find(h => h.day_of_week === dayOfWeek);
+    
+    // If staff has no hours set for this day, use business hours
+    // If staff has hours, use the intersection of business and staff hours
+    let startTime: string;
+    let endTime: string;
+
+    if (staffDayHours) {
+      // Use the later start time and earlier end time (intersection)
+      const businessStart = timeToMinutes(businessDayHours.start_time);
+      const businessEnd = timeToMinutes(businessDayHours.end_time);
+      const staffStart = timeToMinutes(staffDayHours.start_time);
+      const staffEnd = timeToMinutes(staffDayHours.end_time);
+
+      const effectiveStart = Math.max(businessStart, staffStart);
+      const effectiveEnd = Math.min(businessEnd, staffEnd);
+
+      if (effectiveStart >= effectiveEnd) {
+        return []; // No overlap between business and staff hours
+      }
+
+      const startHour = Math.floor(effectiveStart / 60);
+      const startMin = effectiveStart % 60;
+      const endHour = Math.floor(effectiveEnd / 60);
+      const endMin = effectiveEnd % 60;
+
+      startTime = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
+      endTime = `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
+    } else {
+      startTime = businessDayHours.start_time;
+      endTime = businessDayHours.end_time;
+    }
+
     const slots: { time: string; status: 'available' | 'reserved' }[] = [];
-    const [startHour, startMin] = dayHours.start_time.split(':').map(Number);
-    const [endHour, endMin] = dayHours.end_time.split(':').map(Number);
+    const [startHour, startMin] = startTime.split(':').map(Number);
+    const [endHour, endMin] = endTime.split(':').map(Number);
     
     let currentHour = startHour;
     let currentMin = startMin;
@@ -283,6 +375,11 @@ export default function Business() {
               </CardContent>
             </Card>
           )}
+
+          {/* Portfolio Gallery */}
+          <div className="mb-6">
+            <PortfolioGallery businessId={id!} />
+          </div>
 
           {/* Services */}
           <Card className="mb-6">
@@ -430,43 +527,55 @@ export default function Business() {
             <DialogTitle>Book {selectedService?.name}</DialogTitle>
           </DialogHeader>
           <div className="space-y-6">
-            {/* Select Staff */}
+            {/* Step 1: Select Staff First */}
             <div>
-              <h3 className="font-semibold mb-3">Select Professional</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {staff.map((member) => (
-                  <Button
-                    key={member.id}
-                    variant={selectedStaff?.id === member.id ? 'default' : 'outline'}
-                    className="justify-start"
-                    onClick={() => setSelectedStaff(member)}
-                  >
-                    <User className="h-4 w-4 mr-2" />
-                    {member.name}
-                  </Button>
-                ))}
-              </div>
+              <h3 className="font-semibold mb-3">1. Select Professional</h3>
+              {filteredStaff.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No staff members are available for this service.
+                </p>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  {filteredStaff.map((member) => (
+                    <Button
+                      key={member.id}
+                      variant={selectedStaff?.id === member.id ? 'default' : 'outline'}
+                      className="justify-start"
+                      onClick={() => {
+                        setSelectedStaff(member);
+                        setSelectedDate(undefined);
+                        setSelectedTime('');
+                      }}
+                    >
+                      <User className="h-4 w-4 mr-2" />
+                      {member.name}
+                    </Button>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Select Date */}
-            <div>
-              <h3 className="font-semibold mb-3">Select Date</h3>
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={(date) => {
-                  setSelectedDate(date);
-                  setSelectedTime('');
-                }}
-                disabled={(date) => date < new Date()}
-                className="rounded-md border pointer-events-auto"
-              />
-            </div>
-
-            {/* Select Time */}
-            {selectedDate && (
+            {/* Step 2: Select Date (only show after staff selected) */}
+            {selectedStaff && (
               <div>
-                <h3 className="font-semibold mb-3">Select Time</h3>
+                <h3 className="font-semibold mb-3">2. Select Date</h3>
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => {
+                    setSelectedDate(date);
+                    setSelectedTime('');
+                  }}
+                  disabled={(date) => date < new Date()}
+                  className="rounded-md border pointer-events-auto"
+                />
+              </div>
+            )}
+
+            {/* Step 3: Select Time (only show after date selected) */}
+            {selectedStaff && selectedDate && (
+              <div>
+                <h3 className="font-semibold mb-3">3. Select Time</h3>
                 <div className="flex gap-2 mb-3 text-sm">
                   <div className="flex items-center gap-1">
                     <div className="w-4 h-4 rounded bg-green-500/20 border border-green-500" />
@@ -478,7 +587,9 @@ export default function Business() {
                   </div>
                 </div>
                 {timeSlots.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">This business is closed on the selected date.</p>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedStaff.name} is not available on this date.
+                  </p>
                 ) : (
                   <div className="grid grid-cols-4 gap-2 max-h-64 overflow-y-auto">
                     {timeSlots.map(({ time, status }) => (
