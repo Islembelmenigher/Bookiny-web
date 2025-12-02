@@ -197,6 +197,9 @@ export default function Dashboard() {
                                 <DollarSign className="h-4 w-4" />
                                 <span>${booking.services?.price}</span>
                               </div>
+                              <div className="text-primary font-medium">
+                                Performed by: {booking.staff?.name || 'Not assigned'}
+                              </div>
                             </div>
                           </div>
                           <div className="flex gap-2">

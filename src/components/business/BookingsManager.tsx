@@ -146,6 +146,10 @@ export function BookingsManager({ businessId }: BookingsManagerProps) {
                       </div>
                     </div>
 
+                    <div className="text-sm text-primary font-medium">
+                      Performed by: {booking.staff?.name || 'Not assigned'}
+                    </div>
+
                     {booking.notes && (
                       <p className="text-sm text-muted-foreground">
                         Note: {booking.notes}
