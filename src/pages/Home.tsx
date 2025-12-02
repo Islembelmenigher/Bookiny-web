@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, MapPin, Star, Clock, ChevronRight, Sparkles } from 'lucide-react';
+import { Search, ChevronRight, Sparkles } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import heroImage from '@/assets/hero-image.jpg';
 
@@ -20,12 +20,36 @@ export default function Home() {
   };
 
   const categories = [
-    { name: 'Hair Salon', icon: '💇', category: 'salon' },
-    { name: 'Spa & Massage', icon: '💆', category: 'spa' },
-    { name: 'Barbershop', icon: '✂️', category: 'barbershop' },
-    { name: 'Nail Salon', icon: '💅', category: 'nail_salon' },
-    { name: 'Beauty', icon: '✨', category: 'beauty' },
-    { name: 'Fitness', icon: '💪', category: 'fitness' },
+    { 
+      name: 'Hair Salon', 
+      category: 'salon',
+      image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400&h=300&fit=crop'
+    },
+    { 
+      name: 'Spa & Massage', 
+      category: 'spa',
+      image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&h=300&fit=crop'
+    },
+    { 
+      name: 'Barbershop', 
+      category: 'barbershop',
+      image: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=400&h=300&fit=crop'
+    },
+    { 
+      name: 'Nail Salon', 
+      category: 'nail_salon',
+      image: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=300&fit=crop'
+    },
+    { 
+      name: 'Beauty', 
+      category: 'beauty',
+      image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&h=300&fit=crop'
+    },
+    { 
+      name: 'Fitness', 
+      category: 'fitness',
+      image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=300&fit=crop'
+    },
   ];
 
   return (
@@ -84,12 +108,18 @@ export default function Home() {
             {categories.map((cat) => (
               <Card
                 key={cat.category}
-                className="cursor-pointer hover:shadow-glow transition-all duration-300 hover:-translate-y-1"
+                className="cursor-pointer overflow-hidden group transition-all duration-300 hover:-translate-y-1 hover:shadow-glow"
                 onClick={() => navigate(`/search?category=${cat.category}`)}
               >
-                <CardContent className="p-6 text-center">
-                  <div className="text-4xl mb-3">{cat.icon}</div>
-                  <h3 className="font-semibold">{cat.name}</h3>
+                <CardContent className="p-0 relative h-40">
+                  <div 
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-110"
+                    style={{ backgroundImage: `url(${cat.image})` }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 p-4 text-center">
+                    <h3 className="font-semibold text-white text-lg">{cat.name}</h3>
+                  </div>
                 </CardContent>
               </Card>
             ))}

@@ -4,13 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, Clock, MapPin, DollarSign, X, Building2, Plus } from 'lucide-react';
+import { Calendar, Clock, MapPin, DollarSign, X, Building2, Plus, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { useNavigate, Link } from 'react-router-dom';
 import { DemoDataSeeder } from '@/components/DemoDataSeeder';
+import { RescheduleDialog } from '@/components/business/RescheduleDialog';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -20,6 +21,7 @@ export default function Dashboard() {
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [staffBusinesses, setStaffBusinesses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [rescheduleBooking, setRescheduleBooking] = useState<any>(null);
 
   useEffect(() => {
     if (!user) {
@@ -197,16 +199,28 @@ export default function Dashboard() {
                               </div>
                             </div>
                           </div>
-                          {booking.status === 'pending' && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleCancelBooking(booking.id)}
-                            >
-                              <X className="h-4 w-4 mr-2" />
-                              Cancel
-                            </Button>
-                          )}
+                          <div className="flex gap-2">
+                            {(booking.status === 'pending' || booking.status === 'confirmed') && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setRescheduleBooking(booking)}
+                              >
+                                <RefreshCw className="h-4 w-4 mr-2" />
+                                Reschedule
+                              </Button>
+                            )}
+                            {booking.status === 'pending' && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleCancelBooking(booking.id)}
+                              >
+                                <X className="h-4 w-4 mr-2" />
+                                Cancel
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -311,6 +325,13 @@ export default function Dashboard() {
           </Tabs>
         </div>
       </div>
+
+      <RescheduleDialog
+        booking={rescheduleBooking}
+        open={!!rescheduleBooking}
+        onOpenChange={(open) => !open && setRescheduleBooking(null)}
+        onRescheduled={fetchData}
+      />
     </Layout>
   );
 }

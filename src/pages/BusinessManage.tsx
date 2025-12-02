@@ -76,30 +76,29 @@ export default function BusinessManage() {
       }
 
       // Fetch basic statistics
-      const { count: bookingsCount } = await supabase
-        .from('bookings')
-        .select('*', { count: 'exact', head: true })
-        .eq('business_id', id);
+      const [bookingsCountRes, servicesCountRes, staffCountRes, todayBookingsRes, revenueRes] = await Promise.all([
+        supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('business_id', id),
+        supabase.from('services').select('*', { count: 'exact', head: true }).eq('business_id', id).eq('is_active', true),
+        supabase.from('staff').select('*', { count: 'exact', head: true }).eq('business_id', id).eq('is_active', true),
+        supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('business_id', id).eq('booking_date', new Date().toISOString().split('T')[0]),
+        supabase.from('bookings').select('services(price)').eq('business_id', id).eq('status', 'completed'),
+      ]);
 
-      const { count: servicesCount } = await supabase
-        .from('services')
-        .select('*', { count: 'exact', head: true })
-        .eq('business_id', id)
-        .eq('is_active', true);
-
-      const { count: staffCount } = await supabase
-        .from('staff')
-        .select('*', { count: 'exact', head: true })
-        .eq('business_id', id)
-        .eq('is_active', true);
+      // Calculate total revenue from completed bookings
+      let totalRevenue = 0;
+      if (revenueRes.data) {
+        totalRevenue = revenueRes.data.reduce((sum: number, booking: any) => {
+          return sum + (booking.services?.price || 0);
+        }, 0);
+      }
 
       setStats({
-        totalBookings: bookingsCount || 0,
-        totalServices: servicesCount || 0,
-        totalStaff: staffCount || 0,
-        todayBookings: 0,
-        totalRevenue: 0,
-        activeServices: servicesCount || 0,
+        totalBookings: bookingsCountRes.count || 0,
+        totalServices: servicesCountRes.count || 0,
+        totalStaff: staffCountRes.count || 0,
+        todayBookings: todayBookingsRes.count || 0,
+        totalRevenue: totalRevenue,
+        activeServices: servicesCountRes.count || 0,
       });
     } catch (error: any) {
       toast.error('Failed to load business data');
