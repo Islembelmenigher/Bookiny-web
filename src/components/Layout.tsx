@@ -1,7 +1,8 @@
 import { ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Calendar, User, LogOut, Menu, Search } from 'lucide-react';
+import { Calendar, User, LogOut, Menu } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import {
   DropdownMenu,
@@ -11,12 +12,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { LanguageSelector } from '@/components/LanguageSelector';
 
 interface LayoutProps {
   children: ReactNode;
 }
 
 export function Layout({ children }: LayoutProps) {
+  const { t } = useTranslation();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -26,8 +29,8 @@ export function Layout({ children }: LayoutProps) {
   };
 
   const navLinks = [
-    { label: 'Home', path: '/' },
-    { label: 'Search', path: '/search' },
+    { label: t('nav.home'), path: '/' },
+    { label: t('nav.search'), path: '/search' },
   ];
 
   return (
@@ -56,12 +59,14 @@ export function Layout({ children }: LayoutProps) {
           </div>
 
           <div className="flex items-center gap-4">
+            <LanguageSelector variant="minimal" />
+            
             {user ? (
               <>
                 <Button variant="ghost" size="sm" asChild className="hidden md:flex">
                   <Link to="/dashboard">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Dashboard
+                    <Calendar className="h-4 w-4 me-2" />
+                    {t('nav.dashboard')}
                   </Link>
                 </Button>
                 
@@ -73,15 +78,15 @@ export function Layout({ children }: LayoutProps) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem asChild>
-                      <Link to="/dashboard">My Bookings</Link>
+                      <Link to="/dashboard">{t('nav.myBookings')}</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link to="/profile">Profile</Link>
+                      <Link to="/profile">{t('nav.profile')}</Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut}>
-                      <LogOut className="h-4 w-4 mr-2" />
-                      Sign Out
+                      <LogOut className="h-4 w-4 me-2" />
+                      {t('nav.logout')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -89,10 +94,10 @@ export function Layout({ children }: LayoutProps) {
             ) : (
               <>
                 <Button variant="ghost" size="sm" asChild className="hidden md:flex">
-                  <Link to="/auth">Sign In</Link>
+                  <Link to="/auth">{t('nav.login')}</Link>
                 </Button>
                 <Button size="sm" asChild className="hidden md:flex">
-                  <Link to="/auth?mode=signup">Get Started</Link>
+                  <Link to="/auth?mode=signup">{t('nav.signup')}</Link>
                 </Button>
               </>
             )}
@@ -118,23 +123,23 @@ export function Layout({ children }: LayoutProps) {
                   {user ? (
                     <>
                       <Link to="/dashboard" className="text-lg font-medium hover:text-primary transition-colors">
-                        Dashboard
+                        {t('nav.dashboard')}
                       </Link>
                       <Link to="/profile" className="text-lg font-medium hover:text-primary transition-colors">
-                        Profile
+                        {t('nav.profile')}
                       </Link>
                       <Button onClick={handleSignOut} variant="outline" className="w-full justify-start">
-                        <LogOut className="h-4 w-4 mr-2" />
-                        Sign Out
+                        <LogOut className="h-4 w-4 me-2" />
+                        {t('nav.logout')}
                       </Button>
                     </>
                   ) : (
                     <>
                       <Button asChild className="w-full">
-                        <Link to="/auth">Sign In</Link>
+                        <Link to="/auth">{t('nav.login')}</Link>
                       </Button>
                       <Button asChild variant="outline" className="w-full">
-                        <Link to="/auth?mode=signup">Sign Up</Link>
+                        <Link to="/auth?mode=signup">{t('nav.signup')}</Link>
                       </Button>
                     </>
                   )}
@@ -160,21 +165,21 @@ export function Layout({ children }: LayoutProps) {
                 <span className="font-bold">Booksy</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                Book appointments with your favorite local businesses.
+                {t('auth.signInToContinue')}
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-3">For Clients</h3>
+              <h3 className="font-semibold mb-3">{t('auth.client')}</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/search" className="hover:text-foreground">Find Services</Link></li>
-                <li><Link to="/auth" className="hover:text-foreground">Sign Up</Link></li>
+                <li><Link to="/search" className="hover:text-foreground">{t('home.findServices')}</Link></li>
+                <li><Link to="/auth" className="hover:text-foreground">{t('nav.signup')}</Link></li>
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold mb-3">For Businesses</h3>
+              <h3 className="font-semibold mb-3">{t('auth.business')}</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/auth?mode=signup&type=business" className="hover:text-foreground">List Your Business</Link></li>
-                <li><Link to="/dashboard" className="hover:text-foreground">Business Dashboard</Link></li>
+                <li><Link to="/auth?mode=signup&type=business" className="hover:text-foreground">{t('home.listBusiness')}</Link></li>
+                <li><Link to="/dashboard" className="hover:text-foreground">{t('nav.dashboard')}</Link></li>
               </ul>
             </div>
             <div>
