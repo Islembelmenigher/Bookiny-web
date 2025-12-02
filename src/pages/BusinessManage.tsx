@@ -17,6 +17,7 @@ import { StaffInviteManager } from '@/components/business/StaffInviteManager';
 import { BusinessCoverUpload } from '@/components/business/BusinessCoverUpload';
 import { StaffScheduleManager } from '@/components/business/StaffScheduleManager';
 import { StaffServicesManager } from '@/components/business/StaffServicesManager';
+import { PortfolioManager } from '@/components/business/PortfolioManager';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 export default function BusinessManage() {
@@ -272,6 +273,8 @@ export default function BusinessManage() {
                     currentCoverUrl={business?.cover_image_url}
                     onUploadSuccess={(url) => setBusiness({ ...business, cover_image_url: url })}
                   />
+
+                  <PortfolioManager businessId={id!} />
                   
                   {/* Danger Zone */}
                   <Card className="border-destructive">
