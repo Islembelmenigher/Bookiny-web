@@ -154,15 +154,21 @@ export default function Business() {
     return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
   };
 
+  const timeToMinutes = (time: string): number => {
+    const [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + minutes;
+  };
+
   const isSlotReserved = (time: string) => {
     if (!selectedService) return false;
-    const endTime = calculateEndTime(time, selectedService.duration_minutes);
+    const slotStart = timeToMinutes(time);
+    const slotEnd = slotStart + selectedService.duration_minutes;
     
     return existingBookings.some(b => {
-      const bookingStart = b.start_time;
-      const bookingEnd = b.end_time;
-      // Check for overlap
-      return (time < bookingEnd && endTime > bookingStart);
+      const bookingStart = timeToMinutes(b.start_time);
+      const bookingEnd = timeToMinutes(b.end_time);
+      // Check for overlap: slot is reserved if slotStart < bookingEnd AND slotEnd > bookingStart
+      return slotStart < bookingEnd && slotEnd > bookingStart;
     });
   };
 

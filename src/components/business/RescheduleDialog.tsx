@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -15,78 +15,114 @@ interface RescheduleDialogProps {
 }
 
 export function RescheduleDialog({ booking, open, onOpenChange, onRescheduled }: RescheduleDialogProps) {
-  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [businessHours, setBusinessHours] = useState<any[]>([]);
   const [existingBookings, setExistingBookings] = useState<any[]>([]);
+  const [serviceDuration, setServiceDuration] = useState<number>(30);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  // Reset state when dialog opens/closes
   useEffect(() => {
     if (open && booking) {
       setSelectedDate(undefined);
       setSelectedTime('');
       setExistingBookings([]);
-      fetchBusinessHours();
+      setLoading(true);
+      
+      // Fetch service duration if not available in booking
+      const fetchServiceAndHours = async () => {
+        try {
+          // Fetch business hours
+          const { data: hoursData } = await supabase
+            .from('business_hours')
+            .select('*')
+            .eq('business_id', booking.business_id);
+          
+          setBusinessHours(hoursData || []);
+          
+          // Get service duration - check if it's already in the booking object
+          let duration = 30;
+          if (booking.services?.duration_minutes) {
+            duration = booking.services.duration_minutes;
+          } else if (booking.service_id) {
+            const { data: serviceData } = await supabase
+              .from('services')
+              .select('duration_minutes')
+              .eq('id', booking.service_id)
+              .single();
+            
+            if (serviceData?.duration_minutes) {
+              duration = serviceData.duration_minutes;
+            }
+          }
+          setServiceDuration(duration);
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+      fetchServiceAndHours();
+    } else {
+      // Reset when closing
+      setSelectedDate(undefined);
+      setSelectedTime('');
+      setBusinessHours([]);
+      setExistingBookings([]);
+      setServiceDuration(30);
     }
   }, [open, booking]);
 
+  // Fetch existing bookings when date changes
   useEffect(() => {
-    if (selectedDate && booking && open) {
+    if (selectedDate && booking?.business_id && open) {
+      const fetchExistingBookings = async () => {
+        const { data } = await supabase
+          .from('bookings')
+          .select('start_time, end_time, staff_id')
+          .eq('business_id', booking.business_id)
+          .eq('booking_date', format(selectedDate, 'yyyy-MM-dd'))
+          .neq('id', booking.id)
+          .in('status', ['pending', 'confirmed']);
+        
+        setExistingBookings(data || []);
+      };
+      
       fetchExistingBookings();
     }
-  }, [selectedDate, booking, open]);
+  }, [selectedDate, booking?.business_id, booking?.id, open]);
 
-  const fetchBusinessHours = async () => {
-    if (!booking?.business_id) return;
-    setLoading(true);
-    try {
-      const { data } = await supabase
-        .from('business_hours')
-        .select('*')
-        .eq('business_id', booking.business_id);
-      setBusinessHours(data || []);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchExistingBookings = async () => {
-    if (!selectedDate || !booking?.business_id) return;
-    
-    const { data } = await supabase
-      .from('bookings')
-      .select('start_time, end_time, staff_id')
-      .eq('business_id', booking.business_id)
-      .eq('booking_date', format(selectedDate, 'yyyy-MM-dd'))
-      .neq('id', booking.id)
-      .in('status', ['pending', 'confirmed']);
-    
-    setExistingBookings(data || []);
-  };
-
-  const calculateEndTime = (startTime: string, durationMinutes: number) => {
+  const calculateEndTime = useCallback((startTime: string, durationMinutes: number): string => {
     const [hours, minutes] = startTime.split(':').map(Number);
     const totalMinutes = hours * 60 + minutes + durationMinutes;
     const endHours = Math.floor(totalMinutes / 60);
     const endMinutes = totalMinutes % 60;
     return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
-  };
+  }, []);
 
-  const isSlotReserved = (time: string) => {
-    const duration = booking.services?.duration_minutes || 30;
-    const endTime = calculateEndTime(time, duration);
+  const timeToMinutes = useCallback((time: string): number => {
+    const [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + minutes;
+  }, []);
+
+  const isSlotReserved = useCallback((slotTime: string): boolean => {
+    const slotStart = timeToMinutes(slotTime);
+    const slotEnd = slotStart + serviceDuration;
     
     return existingBookings.some(b => {
-      const bookingStart = b.start_time;
-      const bookingEnd = b.end_time;
-      return (time < bookingEnd && endTime > bookingStart);
+      const bookingStart = timeToMinutes(b.start_time);
+      const bookingEnd = timeToMinutes(b.end_time);
+      
+      // Check if the slot overlaps with an existing booking
+      // A slot is reserved if: slotStart < bookingEnd AND slotEnd > bookingStart
+      return slotStart < bookingEnd && slotEnd > bookingStart;
     });
-  };
+  }, [existingBookings, serviceDuration, timeToMinutes]);
 
-  const getTimeSlots = () => {
+  const getTimeSlots = useCallback(() => {
     if (!selectedDate || businessHours.length === 0) return [];
 
     const dayOfWeek = selectedDate.getDay();
@@ -94,63 +130,107 @@ export function RescheduleDialog({ booking, open, onOpenChange, onRescheduled }:
 
     if (!dayHours || dayHours.is_closed) return [];
 
-    const slots: { time: string; status: 'available' | 'reserved' | 'outside' }[] = [];
-    const [startHour, startMin] = dayHours.start_time.split(':').map(Number);
-    const [endHour, endMin] = dayHours.end_time.split(':').map(Number);
+    const slots: { time: string; status: 'available' | 'reserved' }[] = [];
+    const startMinutes = timeToMinutes(dayHours.start_time);
+    const endMinutes = timeToMinutes(dayHours.end_time);
 
-    for (let h = 0; h < 24; h++) {
-      for (let m = 0; m < 60; m += 30) {
-        const time = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-        const isWithinHours = 
-          (h > startHour || (h === startHour && m >= startMin)) &&
-          (h < endHour || (h === endHour && m < endMin));
-
-        if (!isWithinHours) continue;
-
-        const reserved = isSlotReserved(time);
-        slots.push({
-          time,
-          status: reserved ? 'reserved' : 'available',
-        });
-      }
+    // Generate slots only within business hours
+    for (let minutes = startMinutes; minutes < endMinutes; minutes += 30) {
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      const time = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+      
+      // Check if this slot's end time would exceed business hours
+      const slotEndMinutes = minutes + serviceDuration;
+      if (slotEndMinutes > endMinutes) continue;
+      
+      const reserved = isSlotReserved(time);
+      slots.push({
+        time,
+        status: reserved ? 'reserved' : 'available',
+      });
     }
 
     return slots;
-  };
+  }, [selectedDate, businessHours, serviceDuration, timeToMinutes, isSlotReserved]);
 
   const handleReschedule = async () => {
-    if (!selectedDate || !selectedTime) {
+    if (!selectedDate || !selectedTime || !booking?.id) {
       toast.error('Please select a new date and time');
       return;
     }
 
     setSaving(true);
     try {
-      const duration = booking.services?.duration_minutes || 30;
+      const newEndTime = calculateEndTime(selectedTime, serviceDuration);
+      const newDate = format(selectedDate, 'yyyy-MM-dd');
+      
+      // Double-check for conflicts before updating
+      const { data: conflicts } = await supabase
+        .from('bookings')
+        .select('id')
+        .eq('business_id', booking.business_id)
+        .eq('booking_date', newDate)
+        .neq('id', booking.id)
+        .in('status', ['pending', 'confirmed'])
+        .lt('start_time', newEndTime)
+        .gt('end_time', selectedTime);
+      
+      if (conflicts && conflicts.length > 0) {
+        toast.error('This time slot has just been booked. Please select another time.');
+        // Refresh bookings to show updated availability
+        const { data } = await supabase
+          .from('bookings')
+          .select('start_time, end_time, staff_id')
+          .eq('business_id', booking.business_id)
+          .eq('booking_date', newDate)
+          .neq('id', booking.id)
+          .in('status', ['pending', 'confirmed']);
+        
+        setExistingBookings(data || []);
+        setSelectedTime('');
+        setSaving(false);
+        return;
+      }
+
       const { error } = await supabase
         .from('bookings')
         .update({
-          booking_date: format(selectedDate, 'yyyy-MM-dd'),
+          booking_date: newDate,
           start_time: selectedTime,
-          end_time: calculateEndTime(selectedTime, duration),
+          end_time: newEndTime,
         })
         .eq('id', booking.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Reschedule error:', error);
+        if (error.message?.includes('overlap')) {
+          toast.error('This time slot is no longer available. Please select another time.');
+        } else {
+          toast.error('Failed to reschedule booking. Please try again.');
+        }
+        return;
+      }
 
       toast.success('Booking rescheduled successfully');
       onRescheduled();
       onOpenChange(false);
     } catch (error: any) {
-      toast.error('Failed to reschedule booking');
-      console.error(error);
+      console.error('Reschedule error:', error);
+      toast.error('Failed to reschedule booking. Please try again.');
     } finally {
       setSaving(false);
     }
   };
 
+  const handleDateSelect = (date: Date | undefined) => {
+    setSelectedDate(date);
+    setSelectedTime('');
+  };
+
   const slots = getTimeSlots();
 
+  // Don't render dialog content if no booking
   if (!booking) {
     return null;
   }
@@ -173,10 +253,7 @@ export function RescheduleDialog({ booking, open, onOpenChange, onRescheduled }:
               <Calendar
                 mode="single"
                 selected={selectedDate}
-                onSelect={(date) => {
-                  setSelectedDate(date);
-                  setSelectedTime('');
-                }}
+                onSelect={handleDateSelect}
                 disabled={(date) => date < new Date()}
                 className="rounded-md border"
               />
