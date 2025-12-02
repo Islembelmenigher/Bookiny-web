@@ -13,6 +13,7 @@ import { StaffManager } from '@/components/business/StaffManager';
 import { HoursManager } from '@/components/business/HoursManager';
 import { BookingsManager } from '@/components/business/BookingsManager';
 import { BusinessAnalytics } from '@/components/business/BusinessAnalytics';
+import { StaffAnalytics } from '@/components/business/StaffAnalytics';
 import { StaffInviteManager } from '@/components/business/StaffInviteManager';
 import { BusinessCoverUpload } from '@/components/business/BusinessCoverUpload';
 import { StaffScheduleManager } from '@/components/business/StaffScheduleManager';
@@ -168,8 +169,8 @@ export default function BusinessManage() {
             <p className="text-muted-foreground">Manage your business and bookings</p>
           </div>
 
-          {/* Stats Cards */}
-          <div className="grid md:grid-cols-4 gap-4 mb-8">
+          {/* Stats Cards - Hide Revenue from Staff */}
+          <div className={`grid gap-4 mb-8 ${userRole === 'owner' ? 'md:grid-cols-4' : 'md:grid-cols-3'}`}>
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
@@ -206,17 +207,19 @@ export default function BusinessManage() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total Revenue</p>
-                    <p className="text-2xl font-bold">${stats.totalRevenue}</p>
+            {userRole === 'owner' && (
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Total Revenue</p>
+                      <p className="text-2xl font-bold">${stats.totalRevenue}</p>
+                    </div>
+                    <Users className="h-8 w-8 text-blue-500" />
                   </div>
-                  <Users className="h-8 w-8 text-blue-500" />
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Management Tabs */}
@@ -263,8 +266,9 @@ export default function BusinessManage() {
                   <HoursManager businessId={id!} />
                 </TabsContent>
 
-                <TabsContent value="analytics">
+                <TabsContent value="analytics" className="space-y-6">
                   <BusinessAnalytics businessId={id!} stats={stats} />
+                  <StaffAnalytics businessId={id!} />
                 </TabsContent>
 
                 <TabsContent value="settings" className="space-y-6">

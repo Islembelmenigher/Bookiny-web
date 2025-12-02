@@ -7,8 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, User } from 'lucide-react';
+import { Plus, Pencil, Trash2, User, Briefcase } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { OwnerStaffServicesManager } from './OwnerStaffServicesManager';
 
 interface StaffManagerProps {
   businessId: string;
@@ -19,6 +20,7 @@ export function StaffManager({ businessId }: StaffManagerProps) {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState<any>(null);
+  const [servicesStaff, setServicesStaff] = useState<any>(null);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -121,6 +123,18 @@ export function StaffManager({ businessId }: StaffManagerProps) {
     return <div className="animate-pulse space-y-4">Loading staff...</div>;
   }
 
+  // If viewing services for a staff member
+  if (servicesStaff) {
+    return (
+      <OwnerStaffServicesManager
+        businessId={businessId}
+        staffId={servicesStaff.id}
+        staffName={servicesStaff.name}
+        onClose={() => setServicesStaff(null)}
+      />
+    );
+  }
+
   return (
     <>
       <Card>
@@ -166,7 +180,15 @@ export function StaffManager({ businessId }: StaffManagerProps) {
                       </p>
                     )}
                   </div>
-                  <div className="flex gap-1">
+                  <div className="flex flex-col gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setServicesStaff(member)}
+                      title="Assign Services"
+                    >
+                      <Briefcase className="h-4 w-4" />
+                    </Button>
                     <Button
                       variant="outline"
                       size="sm"
