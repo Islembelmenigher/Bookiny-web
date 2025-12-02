@@ -75,6 +75,18 @@ export function StaffInviteManager({ businessId }: StaffInviteManagerProps) {
         return;
       }
 
+      // Also create a staff entry so they appear on the business page
+      const { error: staffError } = await supabase
+        .from('staff')
+        .insert({
+          business_id: businessId,
+          profile_id: validatedUserId,
+          name: profileData.full_name,
+          is_active: true,
+        });
+
+      if (staffError) throw staffError;
+
       toast.success(`${profileData.full_name} added as staff member`);
       setUserId('');
       fetchStaffRoles();

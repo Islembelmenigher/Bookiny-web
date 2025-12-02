@@ -14,6 +14,7 @@ import { HoursManager } from '@/components/business/HoursManager';
 import { BookingsManager } from '@/components/business/BookingsManager';
 import { BusinessAnalytics } from '@/components/business/BusinessAnalytics';
 import { StaffInviteManager } from '@/components/business/StaffInviteManager';
+import { BusinessCoverUpload } from '@/components/business/BusinessCoverUpload';
 
 export default function BusinessManage() {
   const { id } = useParams();
@@ -183,12 +184,13 @@ export default function BusinessManage() {
 
           {/* Management Tabs */}
           <Tabs defaultValue="bookings" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="bookings">Bookings</TabsTrigger>
               <TabsTrigger value="services">Services</TabsTrigger>
               <TabsTrigger value="staff">Staff</TabsTrigger>
               <TabsTrigger value="hours">Hours</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsTrigger value="settings">Settings</TabsTrigger>
             </TabsList>
 
             <TabsContent value="bookings">
@@ -210,6 +212,14 @@ export default function BusinessManage() {
 
             <TabsContent value="analytics">
               <BusinessAnalytics businessId={id!} stats={stats} />
+            </TabsContent>
+
+            <TabsContent value="settings">
+              <BusinessCoverUpload 
+                businessId={id!} 
+                currentCoverUrl={business?.cover_image_url}
+                onUploadSuccess={(url) => setBusiness({ ...business, cover_image_url: url })}
+              />
             </TabsContent>
           </Tabs>
         </div>
