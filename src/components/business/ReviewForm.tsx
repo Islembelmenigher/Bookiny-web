@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
-import { Star, Upload, X } from 'lucide-react';
+import { Star, Upload, X, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface ReviewFormProps {
   businessId: string;
@@ -22,6 +23,38 @@ export function ReviewForm({ businessId, onReviewSubmitted }: ReviewFormProps) {
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [canReview, setCanReview] = useState<boolean | null>(null);
+  const [checkingEligibility, setCheckingEligibility] = useState(true);
+
+  useEffect(() => {
+    checkReviewEligibility();
+  }, [businessId, user]);
+
+  const checkReviewEligibility = async () => {
+    if (!user) {
+      setCanReview(false);
+      setCheckingEligibility(false);
+      return;
+    }
+
+    try {
+      const { data: bookings, error } = await supabase
+        .from('bookings')
+        .select('id, status')
+        .eq('business_id', businessId)
+        .eq('client_id', user.id)
+        .in('status', ['completed', 'pending']);
+
+      if (error) throw error;
+
+      setCanReview(bookings && bookings.length > 0);
+    } catch (error: any) {
+      console.error('Error checking review eligibility:', error);
+      setCanReview(false);
+    } finally {
+      setCheckingEligibility(false);
+    }
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -108,6 +141,58 @@ export function ReviewForm({ businessId, onReviewSubmitted }: ReviewFormProps) {
       setUploading(false);
     }
   };
+
+  if (checkingEligibility) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Leave a Review</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="animate-pulse space-y-2">
+            <div className="h-4 bg-muted rounded w-3/4"></div>
+            <div className="h-4 bg-muted rounded w-1/2"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Leave a Review</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              You must be logged in to leave a review.
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (canReview === false) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Leave a Review</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              You can only leave a review if you have a completed or pending booking with this business.
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
