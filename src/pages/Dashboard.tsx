@@ -18,6 +18,7 @@ export default function Dashboard() {
   const [profile, setProfile] = useState<any>(null);
   const [bookings, setBookings] = useState<any[]>([]);
   const [businesses, setBusinesses] = useState<any[]>([]);
+  const [staffBusinesses, setStaffBusinesses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,7 +31,7 @@ export default function Dashboard() {
 
   const fetchData = async () => {
     try {
-      const [profileRes, bookingsRes, businessesRes] = await Promise.all([
+      const [profileRes, bookingsRes, businessesRes, staffRolesRes] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', user?.id).single(),
         supabase
           .from('bookings')
@@ -46,11 +47,25 @@ export default function Dashboard() {
           .from('businesses')
           .select('*')
           .eq('owner_id', user?.id),
+        supabase
+          .from('user_roles')
+          .select(`
+            business_id,
+            businesses (*)
+          `)
+          .eq('user_id', user?.id)
+          .eq('role', 'staff'),
       ]);
 
       if (profileRes.data) setProfile(profileRes.data);
       if (bookingsRes.data) setBookings(bookingsRes.data);
       if (businessesRes.data) setBusinesses(businessesRes.data);
+      if (staffRolesRes.data) {
+        const staffBiz = staffRolesRes.data
+          .map((role: any) => role.businesses)
+          .filter(Boolean);
+        setStaffBusinesses(staffBiz);
+      }
     } catch (error: any) {
       toast.error('Failed to load dashboard data');
       console.error(error);
@@ -129,6 +144,7 @@ export default function Dashboard() {
             <TabsList>
               <TabsTrigger value="bookings">My Bookings</TabsTrigger>
               {isBusinessOwner && <TabsTrigger value="businesses">My Businesses</TabsTrigger>}
+              {staffBusinesses.length > 0 && <TabsTrigger value="staff">Staff Access</TabsTrigger>}
             </TabsList>
 
             <TabsContent value="bookings" className="space-y-4">
@@ -247,6 +263,49 @@ export default function Dashboard() {
                     ))}
                   </div>
                 )}
+              </TabsContent>
+            )}
+
+            {staffBusinesses.length > 0 && (
+              <TabsContent value="staff" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Staff Dashboard Access</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground mb-4">
+                      You have staff access to the following businesses. Click to open their dashboard.
+                    </p>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {staffBusinesses.map((business) => (
+                        <Card key={business.id}>
+                          <CardContent className="p-6">
+                            <div className="flex items-start justify-between mb-3">
+                              <div>
+                                <h3 className="font-semibold text-lg">{business.name}</h3>
+                                <Badge variant="secondary">{business.category.replace('_', ' ')}</Badge>
+                              </div>
+                            </div>
+                            <div className="text-sm text-muted-foreground space-y-1">
+                              <div className="flex items-center gap-2">
+                                <MapPin className="h-4 w-4" />
+                                <span>{business.city}, {business.state}</span>
+                              </div>
+                            </div>
+                            <div className="mt-4">
+                              <Button size="sm" asChild className="w-full">
+                                <Link to={`/business/${business.id}/manage`}>
+                                  <Building2 className="h-4 w-4 mr-2" />
+                                  Open Business Dashboard
+                                </Link>
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
               </TabsContent>
             )}
           </Tabs>
