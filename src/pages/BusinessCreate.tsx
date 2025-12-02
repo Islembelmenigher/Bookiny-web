@@ -77,6 +77,17 @@ export default function BusinessCreate() {
 
       if (error) throw error;
 
+      // Create default business hours (Mon-Fri, 9:00 AM - 5:00 PM)
+      const defaultHours = [1, 2, 3, 4, 5].map(day => ({
+        business_id: data.id,
+        day_of_week: day,
+        start_time: '09:00',
+        end_time: '17:00',
+        is_closed: false,
+      }));
+
+      await supabase.from('business_hours').insert(defaultHours);
+
       toast.success('Business created successfully!');
       navigate(`/business/${data.id}/manage`);
     } catch (error: any) {
