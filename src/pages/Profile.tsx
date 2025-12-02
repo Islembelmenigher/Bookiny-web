@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { ArrowLeft, User, Mail, Phone, Copy } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, Copy, Upload } from 'lucide-react';
 import { z } from 'zod';
 
 const profileSchema = z.object({
@@ -27,7 +27,8 @@ export default function Profile() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [profile, setProfile] = useState({ full_name: '', phone: '' });
+  const [uploading, setUploading] = useState(false);
+  const [profile, setProfile] = useState({ full_name: '', phone: '', avatar_url: '' });
   const [passwords, setPasswords] = useState({ newPassword: '', confirmPassword: '' });
 
   useEffect(() => {
@@ -42,13 +43,17 @@ export default function Profile() {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('full_name, phone')
+        .select('full_name, phone, avatar_url')
         .eq('id', user?.id)
         .single();
 
       if (error) throw error;
       if (data) {
-        setProfile(data);
+        setProfile({
+          full_name: data.full_name || '',
+          phone: data.phone || '',
+          avatar_url: data.avatar_url || '',
+        });
       }
     } catch (error: any) {
       toast.error('Failed to load profile');
@@ -110,6 +115,54 @@ export default function Profile() {
     }
   };
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0] || !user) return;
+
+    const file = e.target.files[0];
+    
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Image must be less than 2MB');
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      setProfile({ ...profile, avatar_url: publicUrl });
+      toast.success('Profile picture updated successfully');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to upload image');
+      console.error(error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
@@ -162,7 +215,35 @@ export default function Profile() {
               <CardDescription>Update your profile details</CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleUpdateProfile} className="space-y-4">
+              <form onSubmit={handleUpdateProfile} className="space-y-6">
+                {/* Avatar Upload */}
+                <div className="flex items-center gap-4">
+                  <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+                    {profile.avatar_url ? (
+                      <img src={profile.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
+                    ) : (
+                      <User className="h-10 w-10 text-primary" />
+                    )}
+                  </div>
+                  <div>
+                    <Label htmlFor="avatar" className="cursor-pointer">
+                      <div className="flex items-center gap-2 text-sm font-medium hover:underline">
+                        <Upload className="h-4 w-4" />
+                        {uploading ? 'Uploading...' : 'Upload new picture'}
+                      </div>
+                    </Label>
+                    <Input
+                      id="avatar"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleAvatarUpload}
+                      disabled={uploading}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">PNG, JPG up to 2MB</p>
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-md">

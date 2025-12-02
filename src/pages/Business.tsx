@@ -20,6 +20,7 @@ export default function Business() {
   const [business, setBusiness] = useState<any>(null);
   const [services, setServices] = useState<any[]>([]);
   const [staff, setStaff] = useState<any[]>([]);
+  const [businessHours, setBusinessHours] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
   const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
@@ -36,16 +37,18 @@ export default function Business() {
 
   const fetchBusinessDetails = async () => {
     try {
-      const [businessRes, servicesRes, staffRes] = await Promise.all([
+      const [businessRes, servicesRes, staffRes, hoursRes] = await Promise.all([
         supabase.from('businesses').select('*').eq('id', id).single(),
         supabase.from('services').select('*').eq('business_id', id).eq('is_active', true),
         supabase.from('staff').select('*').eq('business_id', id).eq('is_active', true),
+        supabase.from('business_hours').select('*').eq('business_id', id),
       ]);
 
       if (businessRes.error) throw businessRes.error;
       setBusiness(businessRes.data);
       setServices(servicesRes.data || []);
       setStaff(staffRes.data || []);
+      setBusinessHours(hoursRes.data || []);
     } catch (error: any) {
       toast.error('Failed to load business details');
       console.error(error);
@@ -101,11 +104,36 @@ export default function Business() {
     return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
   };
 
-  const timeSlots = [
-    '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-    '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
-    '15:00', '15:30', '16:00', '16:30', '17:00', '17:30',
-  ];
+  const getAvailableTimeSlots = () => {
+    if (!selectedDate || businessHours.length === 0) {
+      return [];
+    }
+
+    const dayOfWeek = selectedDate.getDay();
+    const dayHours = businessHours.find(h => h.day_of_week === dayOfWeek);
+
+    if (!dayHours || dayHours.is_closed) {
+      return [];
+    }
+
+    const slots = [];
+    const [startHour, startMin] = dayHours.start_time.split(':').map(Number);
+    const [endHour, endMin] = dayHours.end_time.split(':').map(Number);
+    
+    let currentHour = startHour;
+    let currentMin = startMin;
+
+    while (currentHour < endHour || (currentHour === endHour && currentMin < endMin)) {
+      slots.push(`${String(currentHour).padStart(2, '0')}:${String(currentMin).padStart(2, '0')}`);
+      currentMin += 30;
+      if (currentMin >= 60) {
+        currentMin = 0;
+        currentHour += 1;
+      }
+    }
+
+    return slots;
+  };
 
   if (loading) {
     return (
@@ -281,18 +309,22 @@ export default function Business() {
             {selectedDate && (
               <div>
                 <h3 className="font-semibold mb-3">Select Time</h3>
-                <div className="grid grid-cols-4 gap-2">
-                  {timeSlots.map((time) => (
-                    <Button
-                      key={time}
-                      variant={selectedTime === time ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setSelectedTime(time)}
-                    >
-                      {time}
-                    </Button>
-                  ))}
-                </div>
+                {getAvailableTimeSlots().length === 0 ? (
+                  <p className="text-sm text-muted-foreground">This business is closed on the selected date.</p>
+                ) : (
+                  <div className="grid grid-cols-4 gap-2 max-h-64 overflow-y-auto">
+                    {getAvailableTimeSlots().map((time) => (
+                      <Button
+                        key={time}
+                        variant={selectedTime === time ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setSelectedTime(time)}
+                      >
+                        {time}
+                      </Button>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
