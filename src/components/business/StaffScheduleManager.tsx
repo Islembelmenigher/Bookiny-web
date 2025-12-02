@@ -19,6 +19,7 @@ export function StaffScheduleManager({ businessId }: StaffScheduleManagerProps) 
   const { user } = useAuth();
   const [staffId, setStaffId] = useState<string | null>(null);
   const [schedule, setSchedule] = useState<any[]>([]);
+  const [businessHours, setBusinessHours] = useState<Record<number, any>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,6 +28,18 @@ export function StaffScheduleManager({ businessId }: StaffScheduleManagerProps) 
 
   const fetchStaffSchedule = async () => {
     try {
+      // Fetch business hours first
+      const { data: hoursData } = await supabase
+        .from('business_hours')
+        .select('*')
+        .eq('business_id', businessId);
+
+      const hoursMap: Record<number, any> = {};
+      hoursData?.forEach((hour) => {
+        hoursMap[hour.day_of_week] = hour;
+      });
+      setBusinessHours(hoursMap);
+
       // Get staff record for current user
       const { data: staffData, error: staffError } = await supabase
         .from('staff')
@@ -54,10 +67,11 @@ export function StaffScheduleManager({ businessId }: StaffScheduleManagerProps) 
       // Initialize schedule for all days
       const fullSchedule = DAYS.map((_, index) => {
         const existing = scheduleData?.find(s => s.day_of_week === index);
+        const businessHour = hoursMap[index];
         return existing || {
           day_of_week: index,
-          start_time: '09:00',
-          end_time: '17:00',
+          start_time: businessHour?.start_time || '09:00',
+          end_time: businessHour?.end_time || '17:00',
           is_available: false,
           staff_id: staffData.id,
         };
@@ -75,6 +89,22 @@ export function StaffScheduleManager({ businessId }: StaffScheduleManagerProps) 
   const handleSaveSchedule = async () => {
     if (!staffId) return;
 
+    // Validate staff schedules against business hours
+    for (const day of schedule) {
+      if (day.is_available) {
+        const businessHour = businessHours[day.day_of_week];
+        if (!businessHour || businessHour.is_closed) {
+          toast.error(`Cannot set availability for ${DAYS[day.day_of_week]} - business is closed`);
+          return;
+        }
+        
+        if (day.start_time < businessHour.start_time || day.end_time > businessHour.end_time) {
+          toast.error(`${DAYS[day.day_of_week]} hours must be within business hours (${businessHour.start_time} - ${businessHour.end_time})`);
+          return;
+        }
+      }
+    }
+
     try {
       setLoading(true);
 
@@ -84,9 +114,12 @@ export function StaffScheduleManager({ businessId }: StaffScheduleManagerProps) 
       // Insert new schedule (only for available days)
       const scheduleToInsert = schedule
         .filter(day => day.is_available)
-        .map(({ id, ...day }) => ({
-          ...day,
+        .map(day => ({
           staff_id: staffId,
+          day_of_week: day.day_of_week,
+          start_time: day.start_time,
+          end_time: day.end_time,
+          is_available: true,
         }));
 
       if (scheduleToInsert.length > 0) {
@@ -126,37 +159,57 @@ export function StaffScheduleManager({ businessId }: StaffScheduleManagerProps) 
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {schedule.map((day, index) => (
-          <div key={index} className="border rounded-lg p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <Label className="text-base font-medium">{DAYS[index]}</Label>
-              <Switch
-                checked={day.is_available}
-                onCheckedChange={(checked) => updateDay(index, 'is_available', checked)}
-              />
-            </div>
-            {day.is_available && (
-              <div className="grid grid-cols-2 gap-4">
+        {schedule.map((day, index) => {
+          const businessHour = businessHours[index];
+          const isBusinessClosed = !businessHour || businessHour.is_closed;
+          
+          return (
+            <div key={index} className="border rounded-lg p-4 space-y-3">
+              <div className="flex items-center justify-between">
                 <div>
-                  <Label className="text-sm">Start Time</Label>
-                  <Input
-                    type="time"
-                    value={day.start_time}
-                    onChange={(e) => updateDay(index, 'start_time', e.target.value)}
-                  />
+                  <Label className="text-base font-medium">{DAYS[index]}</Label>
+                  {isBusinessClosed && (
+                    <p className="text-xs text-muted-foreground">Business closed</p>
+                  )}
+                  {!isBusinessClosed && (
+                    <p className="text-xs text-muted-foreground">
+                      Business hours: {businessHour.start_time} - {businessHour.end_time}
+                    </p>
+                  )}
                 </div>
-                <div>
-                  <Label className="text-sm">End Time</Label>
-                  <Input
-                    type="time"
-                    value={day.end_time}
-                    onChange={(e) => updateDay(index, 'end_time', e.target.value)}
-                  />
-                </div>
+                <Switch
+                  checked={day.is_available}
+                  disabled={isBusinessClosed}
+                  onCheckedChange={(checked) => updateDay(index, 'is_available', checked)}
+                />
               </div>
-            )}
-          </div>
-        ))}
+              {day.is_available && !isBusinessClosed && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm">Start Time</Label>
+                    <Input
+                      type="time"
+                      value={day.start_time}
+                      min={businessHour?.start_time}
+                      max={businessHour?.end_time}
+                      onChange={(e) => updateDay(index, 'start_time', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm">End Time</Label>
+                    <Input
+                      type="time"
+                      value={day.end_time}
+                      min={businessHour?.start_time}
+                      max={businessHour?.end_time}
+                      onChange={(e) => updateDay(index, 'end_time', e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
         <Button onClick={handleSaveSchedule} disabled={loading} className="w-full">
           <Save className="h-4 w-4 mr-2" />
           Save Schedule
