@@ -24,17 +24,21 @@ export function RescheduleDialog({ booking, open, onOpenChange, onRescheduled }:
 
   useEffect(() => {
     if (open && booking) {
+      setSelectedDate(undefined);
+      setSelectedTime('');
+      setExistingBookings([]);
       fetchBusinessHours();
     }
   }, [open, booking]);
 
   useEffect(() => {
-    if (selectedDate && booking) {
+    if (selectedDate && booking && open) {
       fetchExistingBookings();
     }
-  }, [selectedDate, booking]);
+  }, [selectedDate, booking, open]);
 
   const fetchBusinessHours = async () => {
+    if (!booking?.business_id) return;
     setLoading(true);
     try {
       const { data } = await supabase
@@ -50,7 +54,7 @@ export function RescheduleDialog({ booking, open, onOpenChange, onRescheduled }:
   };
 
   const fetchExistingBookings = async () => {
-    if (!selectedDate) return;
+    if (!selectedDate || !booking?.business_id) return;
     
     const { data } = await supabase
       .from('bookings')
@@ -146,6 +150,10 @@ export function RescheduleDialog({ booking, open, onOpenChange, onRescheduled }:
   };
 
   const slots = getTimeSlots();
+
+  if (!booking) {
+    return null;
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

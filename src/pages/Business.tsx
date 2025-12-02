@@ -104,15 +104,34 @@ export default function Business() {
       return;
     }
 
+    // Double-check if slot is still available before booking
+    const bookingDate = format(selectedDate, 'yyyy-MM-dd');
+    const endTime = calculateEndTime(selectedTime, selectedService.duration_minutes);
+    
+    const { data: conflictCheck } = await supabase
+      .from('bookings')
+      .select('id')
+      .eq('business_id', id)
+      .eq('booking_date', bookingDate)
+      .in('status', ['pending', 'confirmed'])
+      .or(`and(start_time.lt.${endTime},end_time.gt.${selectedTime})`);
+    
+    if (conflictCheck && conflictCheck.length > 0) {
+      toast.error('This time slot has just been booked. Please select another time.');
+      await fetchExistingBookings();
+      setSelectedTime('');
+      return;
+    }
+
     try {
       const { error } = await supabase.from('bookings').insert({
         business_id: id,
         service_id: selectedService.id,
         staff_id: selectedStaff.id,
         client_id: user?.id,
-        booking_date: format(selectedDate, 'yyyy-MM-dd'),
+        booking_date: bookingDate,
         start_time: selectedTime,
-        end_time: calculateEndTime(selectedTime, selectedService.duration_minutes),
+        end_time: endTime,
         status: 'pending',
       });
 
