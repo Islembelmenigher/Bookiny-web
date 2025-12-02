@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
-import { ArrowLeft, TrendingUp, Calendar, DollarSign, Users } from 'lucide-react';
+import { ArrowLeft, TrendingUp, Calendar, DollarSign, Users, Trash2 } from 'lucide-react';
 import { ServicesManager } from '@/components/business/ServicesManager';
 import { StaffManager } from '@/components/business/StaffManager';
 import { HoursManager } from '@/components/business/HoursManager';
@@ -17,6 +17,7 @@ import { StaffInviteManager } from '@/components/business/StaffInviteManager';
 import { BusinessCoverUpload } from '@/components/business/BusinessCoverUpload';
 import { StaffScheduleManager } from '@/components/business/StaffScheduleManager';
 import { StaffServicesManager } from '@/components/business/StaffServicesManager';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 export default function BusinessManage() {
   const { id } = useParams();
@@ -31,6 +32,8 @@ export default function BusinessManage() {
     todayBookings: 0,
     totalRevenue: 0,
     activeServices: 0,
+    totalServices: 0,
+    totalStaff: 0,
   });
 
   useEffect(() => {
@@ -48,65 +51,78 @@ export default function BusinessManage() {
         .single();
 
       if (businessError) throw businessError;
+      setBusiness(businessData);
 
       // Check if user is owner or staff
-      const isOwner = businessData.owner_id === user?.id;
-      
-      if (!isOwner) {
-        // Check if user is staff
-        const { data: roleData, error: roleError } = await supabase
+      if (businessData.owner_id === user?.id) {
+        setUserRole('owner');
+      } else {
+        // Check if user is staff for this business
+        const { data: roleData } = await supabase
           .from('user_roles')
           .select('role')
-          .eq('business_id', id)
           .eq('user_id', user?.id)
+          .eq('business_id', id)
           .eq('role', 'staff')
-          .single();
+          .maybeSingle();
 
-        if (roleError || !roleData) {
-          toast.error('You do not have permission to manage this business');
+        if (roleData) {
+          setUserRole('staff');
+        } else {
+          toast.error('You do not have permission to access this business');
           navigate('/dashboard');
           return;
         }
-
-        setUserRole('staff');
-      } else {
-        setUserRole('owner');
       }
 
-      setBusiness(businessData);
+      // Fetch basic statistics
+      const { count: bookingsCount } = await supabase
+        .from('bookings')
+        .select('*', { count: 'exact', head: true })
+        .eq('business_id', id);
 
-      // Fetch statistics
-      const today = new Date().toISOString().split('T')[0];
-      
-      const [totalBookingsRes, todayBookingsRes, servicesRes] = await Promise.all([
-        supabase
-          .from('bookings')
-          .select('*', { count: 'exact' })
-          .eq('business_id', id),
-        supabase
-          .from('bookings')
-          .select('*', { count: 'exact' })
-          .eq('business_id', id)
-          .gte('booking_date', today)
-          .lte('booking_date', today),
-        supabase
-          .from('services')
-          .select('*', { count: 'exact' })
-          .eq('business_id', id)
-          .eq('is_active', true),
-      ]);
+      const { count: servicesCount } = await supabase
+        .from('services')
+        .select('*', { count: 'exact', head: true })
+        .eq('business_id', id)
+        .eq('is_active', true);
+
+      const { count: staffCount } = await supabase
+        .from('staff')
+        .select('*', { count: 'exact', head: true })
+        .eq('business_id', id)
+        .eq('is_active', true);
 
       setStats({
-        totalBookings: totalBookingsRes.count || 0,
-        todayBookings: todayBookingsRes.count || 0,
-        totalRevenue: 0, // Calculate from bookings if needed
-        activeServices: servicesRes.count || 0,
+        totalBookings: bookingsCount || 0,
+        totalServices: servicesCount || 0,
+        totalStaff: staffCount || 0,
+        todayBookings: 0,
+        totalRevenue: 0,
+        activeServices: servicesCount || 0,
       });
     } catch (error: any) {
       toast.error('Failed to load business data');
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteBusiness = async () => {
+    try {
+      const { error } = await supabase
+        .from('businesses')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success('Business deleted successfully');
+      navigate('/dashboard');
+    } catch (error: any) {
+      console.error('Error deleting business:', error);
+      toast.error('Failed to delete business');
     }
   };
 
@@ -251,12 +267,58 @@ export default function BusinessManage() {
                   <BusinessAnalytics businessId={id!} stats={stats} />
                 </TabsContent>
 
-                <TabsContent value="settings">
+                <TabsContent value="settings" className="space-y-6">
                   <BusinessCoverUpload 
                     businessId={id!} 
                     currentCoverUrl={business?.cover_image_url}
                     onUploadSuccess={(url) => setBusiness({ ...business, cover_image_url: url })}
                   />
+                  
+                  {/* Danger Zone */}
+                  <Card className="border-destructive">
+                    <CardHeader>
+                      <CardTitle className="text-destructive">Danger Zone</CardTitle>
+                      <CardDescription>
+                        Irreversible actions that will permanently delete your business
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" className="w-full sm:w-auto">
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete Business
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete your business
+                              and remove all associated data including:
+                              <ul className="list-disc list-inside mt-2 space-y-1">
+                                <li>All bookings</li>
+                                <li>All services</li>
+                                <li>All staff members</li>
+                                <li>Business hours and schedules</li>
+                                <li>Reviews and ratings</li>
+                                <li>All images and files</li>
+                              </ul>
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={handleDeleteBusiness}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Delete Business
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </CardContent>
+                  </Card>
                 </TabsContent>
               </>
             )}
