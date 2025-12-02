@@ -31,12 +31,19 @@ export default function Business() {
   const [selectedStaff, setSelectedStaff] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState<string>('');
+  const [existingBookings, setExistingBookings] = useState<any[]>([]);
 
   useEffect(() => {
     if (id) {
       fetchBusinessDetails();
     }
   }, [id]);
+
+  useEffect(() => {
+    if (selectedDate && id) {
+      fetchExistingBookings();
+    }
+  }, [selectedDate, id]);
 
   const fetchBusinessDetails = async () => {
     try {
@@ -64,6 +71,19 @@ export default function Business() {
     }
   };
 
+  const fetchExistingBookings = async () => {
+    if (!selectedDate) return;
+    
+    const { data } = await supabase
+      .from('bookings')
+      .select('start_time, end_time, staff_id')
+      .eq('business_id', id)
+      .eq('booking_date', format(selectedDate, 'yyyy-MM-dd'))
+      .in('status', ['pending', 'confirmed']);
+    
+    setExistingBookings(data || []);
+  };
+
   const handleBookService = (service: any) => {
     if (!user) {
       toast.error('Please sign in to book an appointment');
@@ -71,6 +91,10 @@ export default function Business() {
       return;
     }
     setSelectedService(service);
+    setSelectedDate(undefined);
+    setSelectedTime('');
+    setSelectedStaff(null);
+    setExistingBookings([]);
     setBookingDialogOpen(true);
   };
 
@@ -111,7 +135,19 @@ export default function Business() {
     return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
   };
 
-  const getAvailableTimeSlots = () => {
+  const isSlotReserved = (time: string) => {
+    if (!selectedService) return false;
+    const endTime = calculateEndTime(time, selectedService.duration_minutes);
+    
+    return existingBookings.some(b => {
+      const bookingStart = b.start_time;
+      const bookingEnd = b.end_time;
+      // Check for overlap
+      return (time < bookingEnd && endTime > bookingStart);
+    });
+  };
+
+  const getTimeSlots = () => {
     if (!selectedDate || businessHours.length === 0) {
       return [];
     }
@@ -123,7 +159,7 @@ export default function Business() {
       return [];
     }
 
-    const slots = [];
+    const slots: { time: string; status: 'available' | 'reserved' }[] = [];
     const [startHour, startMin] = dayHours.start_time.split(':').map(Number);
     const [endHour, endMin] = dayHours.end_time.split(':').map(Number);
     
@@ -131,7 +167,14 @@ export default function Business() {
     let currentMin = startMin;
 
     while (currentHour < endHour || (currentHour === endHour && currentMin < endMin)) {
-      slots.push(`${String(currentHour).padStart(2, '0')}:${String(currentMin).padStart(2, '0')}`);
+      const time = `${String(currentHour).padStart(2, '0')}:${String(currentMin).padStart(2, '0')}`;
+      const reserved = isSlotReserved(time);
+      
+      slots.push({
+        time,
+        status: reserved ? 'reserved' : 'available',
+      });
+      
       currentMin += 30;
       if (currentMin >= 60) {
         currentMin = 0;
@@ -165,6 +208,8 @@ export default function Business() {
       </Layout>
     );
   }
+
+  const timeSlots = getTimeSlots();
 
   return (
     <Layout>
@@ -355,7 +400,7 @@ export default function Business() {
 
       {/* Booking Dialog */}
       <Dialog open={bookingDialogOpen} onOpenChange={setBookingDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Book {selectedService?.name}</DialogTitle>
           </DialogHeader>
@@ -384,7 +429,10 @@ export default function Business() {
               <Calendar
                 mode="single"
                 selected={selectedDate}
-                onSelect={setSelectedDate}
+                onSelect={(date) => {
+                  setSelectedDate(date);
+                  setSelectedTime('');
+                }}
                 disabled={(date) => date < new Date()}
                 className="rounded-md border pointer-events-auto"
               />
@@ -394,16 +442,32 @@ export default function Business() {
             {selectedDate && (
               <div>
                 <h3 className="font-semibold mb-3">Select Time</h3>
-                {getAvailableTimeSlots().length === 0 ? (
+                <div className="flex gap-2 mb-3 text-sm">
+                  <div className="flex items-center gap-1">
+                    <div className="w-4 h-4 rounded bg-green-500/20 border border-green-500" />
+                    <span>Available</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-4 h-4 rounded bg-red-500/20 border border-red-500" />
+                    <span>Reserved</span>
+                  </div>
+                </div>
+                {timeSlots.length === 0 ? (
                   <p className="text-sm text-muted-foreground">This business is closed on the selected date.</p>
                 ) : (
                   <div className="grid grid-cols-4 gap-2 max-h-64 overflow-y-auto">
-                    {getAvailableTimeSlots().map((time) => (
+                    {timeSlots.map(({ time, status }) => (
                       <Button
                         key={time}
-                        variant={selectedTime === time ? 'default' : 'outline'}
+                        variant="outline"
                         size="sm"
+                        disabled={status === 'reserved'}
                         onClick={() => setSelectedTime(time)}
+                        className={`
+                          ${selectedTime === time ? 'ring-2 ring-primary' : ''}
+                          ${status === 'available' ? 'bg-green-500/10 border-green-500 hover:bg-green-500/20 text-foreground' : ''}
+                          ${status === 'reserved' ? 'bg-red-500/10 border-red-500 text-muted-foreground cursor-not-allowed' : ''}
+                        `}
                       >
                         {time}
                       </Button>
