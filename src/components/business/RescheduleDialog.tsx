@@ -193,12 +193,14 @@ export function RescheduleDialog({ booking, open, onOpenChange, onRescheduled }:
         return;
       }
 
+      // When rescheduling, set status to pending so owner can re-confirm
       const { error } = await supabase
         .from('bookings')
         .update({
           booking_date: newDate,
           start_time: selectedTime,
           end_time: newEndTime,
+          status: 'pending',
         })
         .eq('id', booking.id);
 

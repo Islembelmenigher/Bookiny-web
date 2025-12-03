@@ -134,6 +134,12 @@ export function BookingsManager({ businessId }: BookingsManagerProps) {
                         <User className="h-4 w-4" />
                         <span>{booking.profiles?.full_name}</span>
                       </div>
+                      {booking.profiles?.phone && (
+                        <div className="flex items-center gap-1">
+                          <Phone className="h-4 w-4" />
+                          <span>{booking.profiles.phone}</span>
+                        </div>
+                      )}
                       <div className="flex items-center gap-1">
                         <Calendar className="h-4 w-4" />
                         <span>{format(new Date(booking.booking_date), 'MMM d, yyyy')}</span>
