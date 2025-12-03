@@ -38,7 +38,8 @@
     "tomorrow": "Demain",
     "noResults": "Aucun résultat trouvé",
     "error": "Une erreur s'est produite",
-    "success": "Succès"
+    "success": "Succès",
+    "copied": "Copié dans le presse-papiers"
   },
   "nav": {
     "home": "Accueil",
@@ -64,6 +65,8 @@
     "enterEmail": "Entrez votre email",
     "enterPassword": "Entrez votre mot de passe",
     "enterFullName": "Entrez votre nom complet",
+    "enterPhone": "Entrez votre numéro de téléphone",
+    "phoneFormat": "Format algérien: 05/06/07 suivi de 8 chiffres",
     "accountType": "Type de compte",
     "client": "Client",
     "clientDesc": "Réserver des services",
@@ -76,6 +79,15 @@
     "signInSuccess": "Connexion réussie",
     "signUpSuccess": "Compte créé avec succès ! Vérifiez votre email pour confirmer.",
     "signOutSuccess": "Déconnexion réussie"
+  },
+  "address": {
+    "wilaya": "Wilaya",
+    "city": "Ville/Commune",
+    "postalCode": "Code Postal",
+    "streetName": "Nom de Rue",
+    "streetNumber": "Numéro de Rue",
+    "selectWilaya": "Sélectionner la wilaya",
+    "selectCity": "Sélectionner la ville/commune"
   },
   "home": {
     "heroTitle": "Réservez des Services Locaux Facilement",
@@ -119,7 +131,9 @@
     "priceLowHigh": "Prix : Croissant",
     "priceHighLow": "Prix : Décroissant",
     "noBusinesses": "Aucune entreprise trouvée",
-    "tryDifferent": "Essayez d'autres termes de recherche ou filtres"
+    "tryDifferent": "Essayez d'autres termes de recherche ou filtres",
+    "filterByLocation": "Filtrer par Emplacement",
+    "applyFilters": "Appliquer les Filtres"
   },
   "business": {
     "about": "À propos",
@@ -148,7 +162,11 @@
     "yourRating": "Votre Note",
     "yourReview": "Votre Avis",
     "submitReview": "Soumettre l'Avis",
-    "viewAll": "Voir Tout"
+    "viewAll": "Voir Tout",
+    "contactPhone": "Téléphone",
+    "ourTeam": "Notre Équipe",
+    "manage": "Gérer votre entreprise et vos réservations",
+    "backToDashboard": "Retour au Tableau de Bord"
   },
   "booking": {
     "title": "Mes Réservations",
@@ -165,7 +183,9 @@
     "cancelSuccess": "Réservation annulée avec succès",
     "rescheduleSuccess": "Réservation reprogrammée avec succès",
     "notes": "Notes",
-    "addNotes": "Ajouter des notes pour votre rendez-vous"
+    "addNotes": "Ajouter des notes pour votre rendez-vous",
+    "clientPhone": "Téléphone du Client",
+    "noBookings": "Aucune réservation trouvée"
   },
   "dashboard": {
     "title": "Tableau de Bord",
@@ -187,7 +207,11 @@
     "allTime": "Tout le Temps",
     "topServices": "Services Populaires",
     "staffPerformance": "Performance du Personnel",
-    "bookingsByStaff": "Réservations par Personnel"
+    "bookingsByStaff": "Réservations par Personnel",
+    "activeServices": "Services Actifs",
+    "mySchedule": "Mon Horaire",
+    "myServices": "Mes Services",
+    "hours": "Heures"
   },
   "profile": {
     "title": "Paramètres du Profil",
@@ -238,7 +262,8 @@
     "enterUserId": "Entrer l'ID Utilisateur",
     "inviteSuccess": "Membre du personnel invité avec succès",
     "removeStaff": "Retirer le Personnel",
-    "removeConfirm": "Êtes-vous sûr de vouloir retirer ce membre du personnel ?"
+    "removeConfirm": "Êtes-vous sûr de vouloir retirer ce membre du personnel ?",
+    "completedBookings": "Réservations Terminées"
   },
   "services": {
     "addService": "Ajouter un Service",
@@ -263,6 +288,15 @@
     "thursday": "Jeudi",
     "friday": "Vendredi",
     "saturday": "Samedi"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "Aucune notification",
+    "markRead": "Marquer comme lu",
+    "markAllRead": "Tout marquer comme lu",
+    "newBooking": "Nouvelle Réservation",
+    "bookingConfirmed": "Réservation Confirmée",
+    "bookingRescheduled": "Réservation Reprogrammée"
   },
   "errors": {
     "invalidEmail": "Veuillez entrer une adresse email valide",

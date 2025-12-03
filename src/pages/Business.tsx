@@ -13,6 +13,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { ReviewForm } from '@/components/business/ReviewForm';
 import { PortfolioGallery } from '@/components/business/PortfolioGallery';
+import { formatDZD } from '@/lib/algeria';
 
 export default function Business() {
   const { id } = useParams();

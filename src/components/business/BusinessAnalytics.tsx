@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { TrendingUp, Calendar, DollarSign, Users, Clock } from 'lucide-react';
 import { format, subDays, startOfDay } from 'date-fns';
+import { formatDZD } from '@/lib/algeria';
 
 interface BusinessAnalyticsProps {
   businessId: string;
@@ -179,7 +180,7 @@ export function BusinessAnalytics({ businessId, stats }: BusinessAnalyticsProps)
                     </div>
                     <div>
                       <h4 className="font-semibold">{service.name}</h4>
-                      <p className="text-sm text-muted-foreground">${service.price}</p>
+                      <p className="text-sm text-muted-foreground">{formatDZD(service.price)}</p>
                     </div>
                   </div>
                   <div className="text-right">

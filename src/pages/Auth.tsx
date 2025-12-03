@@ -11,11 +11,12 @@ import { toast } from 'sonner';
 import { Calendar, Loader2 } from 'lucide-react';
 import { z } from 'zod';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { validateAlgerianPhone } from '@/lib/algeria';
 
 const emailSchema = z.string().email('Invalid email address');
 const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
 const nameSchema = z.string().min(2, 'Name must be at least 2 characters');
-const phoneSchema = z.string().min(10, 'Phone number must be at least 10 digits');
+const phoneSchema = z.string().refine(validateAlgerianPhone, 'Phone must be Algerian format (05/06/07XXXXXXXX)');
 
 export default function Auth() {
   const { t } = useTranslation();
@@ -174,11 +175,12 @@ export default function Auth() {
                   <Input
                     id="signup-phone"
                     type="tel"
-                    placeholder={t('auth.enterPhone')}
+                    placeholder="05XXXXXXXX"
                     value={signUpData.phone}
                     onChange={(e) => setSignUpData({ ...signUpData, phone: e.target.value })}
                     required
                   />
+                  <p className="text-xs text-muted-foreground">{t('auth.phoneFormat')}</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-email">{t('auth.emailAddress')}</Label>

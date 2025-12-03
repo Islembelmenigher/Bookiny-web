@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,32 +13,37 @@ import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
 import { Loader2, Building2 } from 'lucide-react';
 import { z } from 'zod';
+import { WILAYAS, getCommunesByWilaya, validateAlgerianPhone } from '@/lib/algeria';
 
 const businessSchema = z.object({
   name: z.string().min(2, 'Business name must be at least 2 characters'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   category: z.string(),
-  address: z.string().min(5, 'Address is required'),
-  city: z.string().min(2, 'City is required'),
-  state: z.string().min(2, 'State is required'),
-  zip_code: z.string().min(5, 'Valid zip code is required'),
-  phone: z.string().min(10, 'Valid phone number is required'),
+  wilaya: z.string().min(1, 'Wilaya is required'),
+  city: z.string().min(2, 'City/Commune is required'),
+  postal_code: z.string().min(5, 'Valid postal code is required'),
+  street_name: z.string().min(2, 'Street name is required'),
+  street_number: z.string().optional(),
+  phone: z.string().refine(validateAlgerianPhone, 'Phone must be Algerian format (05/06/07XXXXXXXX)'),
   email: z.string().email('Valid email is required'),
 });
 
 export default function BusinessCreate() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [communes, setCommunes] = useState<string[]>([]);
   
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     category: 'salon',
-    address: '',
+    wilaya: '',
     city: '',
-    state: '',
-    zip_code: '',
+    postal_code: '',
+    street_name: '',
+    street_number: '',
     phone: '',
     email: '',
     website: '',
@@ -64,6 +70,19 @@ export default function BusinessCreate() {
     fetchUserProfile();
   }, [user]);
 
+  // Update communes when wilaya changes
+  useEffect(() => {
+    if (formData.wilaya) {
+      const wilayaCommunes = getCommunesByWilaya(formData.wilaya);
+      setCommunes(wilayaCommunes);
+      if (wilayaCommunes.length > 0 && !wilayaCommunes.includes(formData.city)) {
+        setFormData(prev => ({ ...prev, city: '' }));
+      }
+    } else {
+      setCommunes([]);
+    }
+  }, [formData.wilaya]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -78,16 +97,20 @@ export default function BusinessCreate() {
 
     setLoading(true);
     try {
+      // Build full address from Algerian fields
+      const fullAddress = `${formData.street_number ? formData.street_number + ' ' : ''}${formData.street_name}`;
+      const wilayaName = WILAYAS.find(w => w.code === formData.wilaya)?.name || formData.wilaya;
+
       const { data, error } = await supabase
         .from('businesses')
         .insert({
           name: formData.name,
           description: formData.description,
           category: formData.category as any,
-          address: formData.address,
+          address: fullAddress,
           city: formData.city,
-          state: formData.state,
-          zip_code: formData.zip_code,
+          state: wilayaName,
+          zip_code: formData.postal_code,
           phone: formData.phone,
           email: formData.email,
           website: formData.website,
@@ -98,8 +121,8 @@ export default function BusinessCreate() {
 
       if (error) throw error;
 
-      // Create default business hours (Mon-Fri, 9:00 AM - 5:00 PM)
-      const defaultHours = [1, 2, 3, 4, 5].map(day => ({
+      // Create default business hours (Sun-Thu for Algeria, 9:00 AM - 5:00 PM)
+      const defaultHours = [0, 1, 2, 3, 4].map(day => ({
         business_id: data.id,
         day_of_week: day,
         start_time: '09:00',
@@ -109,7 +132,7 @@ export default function BusinessCreate() {
 
       await supabase.from('business_hours').insert(defaultHours);
 
-      toast.success('Business created successfully!');
+      toast.success(t('common.success'));
       navigate(`/business/${data.id}/manage`);
     } catch (error: any) {
       toast.error(error.message || 'Failed to create business');
@@ -199,63 +222,103 @@ export default function BusinessCreate() {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="address">Street Address *</Label>
-                  <Input
-                    id="address"
-                    placeholder="123 Main Street"
-                    value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    required
-                  />
+                {/* Algerian Address Fields */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="wilaya">{t('address.wilaya')} *</Label>
+                    <Select
+                      value={formData.wilaya}
+                      onValueChange={(value) => setFormData({ ...formData, wilaya: value })}
+                    >
+                      <SelectTrigger id="wilaya">
+                        <SelectValue placeholder={t('address.selectWilaya')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {WILAYAS.map((wilaya) => (
+                          <SelectItem key={wilaya.code} value={wilaya.code}>
+                            {wilaya.code} - {wilaya.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="city">{t('address.city')} *</Label>
+                    {communes.length > 0 ? (
+                      <Select
+                        value={formData.city}
+                        onValueChange={(value) => setFormData({ ...formData, city: value })}
+                      >
+                        <SelectTrigger id="city">
+                          <SelectValue placeholder={t('address.selectCity')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {communes.map((commune) => (
+                            <SelectItem key={commune} value={commune}>
+                              {commune}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Input
+                        id="city"
+                        placeholder={t('address.city')}
+                        value={formData.city}
+                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                        required
+                      />
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="city">City *</Label>
+                    <Label htmlFor="postal_code">{t('address.postalCode')} *</Label>
                     <Input
-                      id="city"
-                      placeholder="New York"
-                      value={formData.city}
-                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      id="postal_code"
+                      placeholder="16000"
+                      value={formData.postal_code}
+                      onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
                       required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="state">State *</Label>
+                    <Label htmlFor="street_name">{t('address.streetName')} *</Label>
                     <Input
-                      id="state"
-                      placeholder="NY"
-                      value={formData.state}
-                      onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                      id="street_name"
+                      placeholder={t('address.streetName')}
+                      value={formData.street_name}
+                      onChange={(e) => setFormData({ ...formData, street_name: e.target.value })}
                       required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="zip_code">Zip Code *</Label>
+                    <Label htmlFor="street_number">{t('address.streetNumber')}</Label>
                     <Input
-                      id="zip_code"
-                      placeholder="10001"
-                      value={formData.zip_code}
-                      onChange={(e) => setFormData({ ...formData, zip_code: e.target.value })}
-                      required
+                      id="street_number"
+                      placeholder="12"
+                      value={formData.street_number}
+                      onChange={(e) => setFormData({ ...formData, street_number: e.target.value })}
                     />
                   </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number *</Label>
+                    <Label htmlFor="phone">{t('common.phone')} *</Label>
                     <Input
                       id="phone"
                       type="tel"
-                      placeholder="(555) 123-4567"
+                      placeholder="05XXXXXXXX"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       required
                     />
+                    <p className="text-xs text-muted-foreground">{t('auth.phoneFormat')}</p>
                   </div>
 
                   <div className="space-y-2">
