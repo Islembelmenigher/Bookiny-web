@@ -8,7 +8,7 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string, fullName: string, role: 'client' | 'business_owner') => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, role: 'client' | 'business_owner', phone?: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
 
@@ -45,8 +45,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error };
   };
 
-  const signUp = async (email: string, password: string, fullName: string, role: 'client' | 'business_owner') => {
-    const { error } = await supabase.auth.signUp({
+  const signUp = async (email: string, password: string, fullName: string, role: 'client' | 'business_owner', phone?: string) => {
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -57,6 +57,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         emailRedirectTo: `${window.location.origin}/`,
       },
     });
+    
+    // Update phone in profiles if signup successful and phone provided
+    if (!error && data.user && phone) {
+      await supabase.from('profiles').update({ phone }).eq('id', data.user.id);
+    }
+    
     return { error };
   };
 

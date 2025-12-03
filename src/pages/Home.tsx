@@ -89,7 +89,7 @@ export default function Home() {
                   placeholder={t('home.searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="ps-12 h-14 text-lg bg-white shadow-elegant"
+                  className="ps-12 h-14 text-lg bg-white shadow-elegant text-foreground"
                 />
               </div>
               <Button type="submit" size="lg" className="h-14 px-8 bg-accent hover:bg-accent/90 text-accent-foreground">

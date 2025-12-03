@@ -38,7 +38,8 @@
     "tomorrow": "Tomorrow",
     "noResults": "No results found",
     "error": "An error occurred",
-    "success": "Success"
+    "success": "Success",
+    "copied": "Copied to clipboard"
   },
   "nav": {
     "home": "Home",
@@ -64,6 +65,7 @@
     "enterEmail": "Enter your email",
     "enterPassword": "Enter your password",
     "enterFullName": "Enter your full name",
+    "enterPhone": "Enter your phone number",
     "accountType": "Account Type",
     "client": "Client",
     "clientDesc": "Book services",
@@ -148,7 +150,11 @@
     "yourRating": "Your Rating",
     "yourReview": "Your Review",
     "submitReview": "Submit Review",
-    "viewAll": "View All"
+    "viewAll": "View All",
+    "contactPhone": "Contact Phone",
+    "ourTeam": "Our Team",
+    "manage": "Manage your business and bookings",
+    "backToDashboard": "Back to Dashboard"
   },
   "booking": {
     "title": "My Bookings",
@@ -165,7 +171,9 @@
     "cancelSuccess": "Booking cancelled successfully",
     "rescheduleSuccess": "Booking rescheduled successfully",
     "notes": "Notes",
-    "addNotes": "Add notes for your appointment"
+    "addNotes": "Add notes for your appointment",
+    "clientPhone": "Client Phone",
+    "noBookings": "No bookings found"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -187,7 +195,11 @@
     "allTime": "All Time",
     "topServices": "Top Services",
     "staffPerformance": "Staff Performance",
-    "bookingsByStaff": "Bookings by Staff"
+    "bookingsByStaff": "Bookings by Staff",
+    "activeServices": "Active Services",
+    "mySchedule": "My Schedule",
+    "myServices": "My Services",
+    "hours": "Hours"
   },
   "profile": {
     "title": "Profile Settings",
@@ -238,7 +250,8 @@
     "enterUserId": "Enter User ID",
     "inviteSuccess": "Staff member invited successfully",
     "removeStaff": "Remove Staff",
-    "removeConfirm": "Are you sure you want to remove this staff member?"
+    "removeConfirm": "Are you sure you want to remove this staff member?",
+    "completedBookings": "Completed Bookings"
   },
   "services": {
     "addService": "Add Service",
@@ -263,6 +276,15 @@
     "thursday": "Thursday",
     "friday": "Friday",
     "saturday": "Saturday"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications",
+    "markRead": "Mark as read",
+    "markAllRead": "Mark all read",
+    "newBooking": "New Booking",
+    "bookingConfirmed": "Booking Confirmed",
+    "bookingRescheduled": "Booking Rescheduled"
   },
   "errors": {
     "invalidEmail": "Please enter a valid email address",

@@ -15,6 +15,7 @@ import { LanguageSelector } from '@/components/LanguageSelector';
 const emailSchema = z.string().email('Invalid email address');
 const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
 const nameSchema = z.string().min(2, 'Name must be at least 2 characters');
+const phoneSchema = z.string().min(10, 'Phone number must be at least 10 digits');
 
 export default function Auth() {
   const { t } = useTranslation();
@@ -28,7 +29,7 @@ export default function Auth() {
   const { user, signIn, signUp } = useAuth();
 
   const [signInData, setSignInData] = useState({ email: '', password: '' });
-  const [signUpData, setSignUpData] = useState({ email: '', password: '', fullName: '' });
+  const [signUpData, setSignUpData] = useState({ email: '', password: '', fullName: '', phone: '' });
 
   useEffect(() => {
     if (user) {
@@ -68,6 +69,7 @@ export default function Auth() {
       emailSchema.parse(signUpData.email);
       passwordSchema.parse(signUpData.password);
       nameSchema.parse(signUpData.fullName);
+      phoneSchema.parse(signUpData.phone);
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
@@ -76,7 +78,7 @@ export default function Auth() {
     }
 
     setLoading(true);
-    const { error } = await signUp(signUpData.email, signUpData.password, signUpData.fullName, accountType);
+    const { error } = await signUp(signUpData.email, signUpData.password, signUpData.fullName, accountType, signUpData.phone);
     setLoading(false);
 
     if (error) {
@@ -164,6 +166,17 @@ export default function Auth() {
                     placeholder={t('auth.enterFullName')}
                     value={signUpData.fullName}
                     onChange={(e) => setSignUpData({ ...signUpData, fullName: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="signup-phone">{t('common.phone')} *</Label>
+                  <Input
+                    id="signup-phone"
+                    type="tel"
+                    placeholder={t('auth.enterPhone')}
+                    value={signUpData.phone}
+                    onChange={(e) => setSignUpData({ ...signUpData, phone: e.target.value })}
                     required
                   />
                 </div>

@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { NotificationPanel } from '@/components/NotificationPanel';
 
 interface LayoutProps {
   children: ReactNode;
@@ -63,6 +64,7 @@ export function Layout({ children }: LayoutProps) {
             
             {user ? (
               <>
+                <NotificationPanel />
                 <Button variant="ghost" size="sm" asChild className="hidden md:flex">
                   <Link to="/dashboard">
                     <Calendar className="h-4 w-4 me-2" />
