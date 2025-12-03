@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -8,12 +9,13 @@ import { Badge } from '@/components/ui/badge';
 import { Search, MapPin, Star, Clock, Filter } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-
 export default function SearchPage() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const [ratings, setRatings] = useState<Record<string, number>>({});
 
   useEffect(() => {
     fetchBusinesses();
@@ -45,8 +47,18 @@ export default function SearchPage() {
 
       if (error) throw error;
       setBusinesses(data || []);
+      
+      // Fetch ratings for each business
+      if (data && data.length > 0) {
+        const ratingsMap: Record<string, number> = {};
+        for (const business of data) {
+          const { data: ratingData } = await supabase.rpc('get_business_average_rating', { business_uuid: business.id });
+          ratingsMap[business.id] = ratingData || 0;
+        }
+        setRatings(ratingsMap);
+      }
     } catch (error: any) {
-      toast.error('Failed to load businesses');
+      toast.error(t('errors.somethingWrong'));
       console.error(error);
     } finally {
       setLoading(false);
@@ -80,16 +92,16 @@ export default function SearchPage() {
         <div className="mb-8">
           <form onSubmit={handleSearch} className="flex gap-2 max-w-2xl mx-auto mb-6">
             <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Search for services, businesses..."
+                placeholder={t('home.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-12"
+                className="ps-12 h-12 text-foreground"
               />
             </div>
-            <Button type="submit" size="lg">Search</Button>
+            <Button type="submit" size="lg">{t('common.search')}</Button>
           </form>
 
           {/* Category Filters */}
@@ -129,7 +141,7 @@ export default function SearchPage() {
           </div>
         ) : businesses.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-muted-foreground text-lg">No businesses found. Try a different search.</p>
+            <p className="text-muted-foreground text-lg">{t('search.noBusinesses')}. {t('search.tryDifferent')}</p>
           </div>
         ) : (
           <>
@@ -170,8 +182,8 @@ export default function SearchPage() {
                           </div>
                         )}
                         <div className="flex items-center gap-1">
-                          <Star className="h-4 w-4 fill-accent text-accent" />
-                          <span>5.0</span>
+                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                          <span className="font-medium text-foreground">{ratings[business.id] || 0}</span>
                         </div>
                       </div>
                     </CardContent>

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Calendar, Clock, User, DollarSign, Check, X, RefreshCw } from 'lucide-react';
+import { Calendar, Clock, User, DollarSign, Check, X, RefreshCw, Phone } from 'lucide-react';
 import { format } from 'date-fns';
 import { RescheduleDialog } from './RescheduleDialog';
 
@@ -14,6 +15,7 @@ interface BookingsManagerProps {
 }
 
 export function BookingsManager({ businessId }: BookingsManagerProps) {
+  const { t } = useTranslation();
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'pending' | 'confirmed' | 'cancelled'>('all');
