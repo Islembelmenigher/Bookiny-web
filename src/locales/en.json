@@ -66,6 +66,7 @@
     "enterPassword": "Enter your password",
     "enterFullName": "Enter your full name",
     "enterPhone": "Enter your phone number",
+    "phoneFormat": "Algerian format: 05/06/07 followed by 8 digits",
     "accountType": "Account Type",
     "client": "Client",
     "clientDesc": "Book services",
@@ -78,6 +79,15 @@
     "signInSuccess": "Signed in successfully",
     "signUpSuccess": "Account created successfully! Check your email to confirm.",
     "signOutSuccess": "Signed out successfully"
+  },
+  "address": {
+    "wilaya": "Wilaya",
+    "city": "City/Commune",
+    "postalCode": "Postal Code",
+    "streetName": "Street Name",
+    "streetNumber": "Street Number",
+    "selectWilaya": "Select wilaya",
+    "selectCity": "Select city/commune"
   },
   "home": {
     "heroTitle": "Book Local Services with Ease",
@@ -121,7 +131,9 @@
     "priceLowHigh": "Price: Low to High",
     "priceHighLow": "Price: High to Low",
     "noBusinesses": "No businesses found",
-    "tryDifferent": "Try different search terms or filters"
+    "tryDifferent": "Try different search terms or filters",
+    "filterByLocation": "Filter by Location",
+    "applyFilters": "Apply Filters"
   },
   "business": {
     "about": "About",

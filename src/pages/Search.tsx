@@ -6,9 +6,23 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, MapPin, Star, Clock, Filter } from 'lucide-react';
+import { Search, MapPin, Star, Clock, Filter, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { WILAYAS, getCommunesByWilaya } from '@/lib/algeria';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
 export default function SearchPage() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -16,10 +30,24 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [ratings, setRatings] = useState<Record<string, number>>({});
+  const [filterWilaya, setFilterWilaya] = useState(searchParams.get('wilaya') || '');
+  const [filterCity, setFilterCity] = useState(searchParams.get('city') || '');
+  const [communes, setCommunes] = useState<string[]>([]);
+  const [filterOpen, setFilterOpen] = useState(false);
 
   useEffect(() => {
     fetchBusinesses();
   }, [searchParams]);
+
+  useEffect(() => {
+    if (filterWilaya) {
+      const wilayaCommunes = getCommunesByWilaya(filterWilaya);
+      setCommunes(wilayaCommunes);
+    } else {
+      setCommunes([]);
+      setFilterCity('');
+    }
+  }, [filterWilaya]);
 
   const fetchBusinesses = async () => {
     setLoading(true);
@@ -41,6 +69,21 @@ export default function SearchPage() {
       const searchTerm = searchParams.get('q');
       if (searchTerm) {
         query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+      }
+
+      // Filter by wilaya (stored in state field)
+      const wilayaParam = searchParams.get('wilaya');
+      if (wilayaParam) {
+        const wilayaName = WILAYAS.find(w => w.code === wilayaParam)?.name;
+        if (wilayaName) {
+          query = query.eq('state', wilayaName);
+        }
+      }
+
+      // Filter by city
+      const cityParam = searchParams.get('city');
+      if (cityParam) {
+        query = query.eq('city', cityParam);
       }
 
       const { data, error } = await query.order('created_at', { ascending: false });
@@ -67,10 +110,36 @@ export default function SearchPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      setSearchParams({ q: searchQuery });
-    }
+    const params: Record<string, string> = {};
+    if (searchQuery.trim()) params.q = searchQuery;
+    if (filterWilaya) params.wilaya = filterWilaya;
+    if (filterCity) params.city = filterCity;
+    setSearchParams(params);
   };
+
+  const applyFilters = () => {
+    const params: Record<string, string> = {};
+    if (searchQuery.trim()) params.q = searchQuery;
+    if (filterWilaya) params.wilaya = filterWilaya;
+    if (filterCity) params.city = filterCity;
+    const category = searchParams.get('category');
+    if (category) params.category = category;
+    setSearchParams(params);
+    setFilterOpen(false);
+  };
+
+  const clearFilters = () => {
+    setFilterWilaya('');
+    setFilterCity('');
+    const params: Record<string, string> = {};
+    if (searchQuery.trim()) params.q = searchQuery;
+    const category = searchParams.get('category');
+    if (category) params.category = category;
+    setSearchParams(params);
+    setFilterOpen(false);
+  };
+
+  const hasActiveFilters = filterWilaya || filterCity;
 
   const categories = [
     { label: 'All', value: '' },
@@ -101,8 +170,90 @@ export default function SearchPage() {
                 className="ps-12 h-12 text-foreground"
               />
             </div>
+            <Popover open={filterOpen} onOpenChange={setFilterOpen}>
+              <PopoverTrigger asChild>
+                <Button type="button" variant="outline" size="lg" className="relative">
+                  <Filter className="h-5 w-5" />
+                  {hasActiveFilters && (
+                    <span className="absolute -top-1 -end-1 h-3 w-3 bg-primary rounded-full" />
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80" align="end">
+                <div className="space-y-4">
+                  <h4 className="font-semibold">{t('search.filterByLocation')}</h4>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">{t('address.wilaya')}</label>
+                    <Select value={filterWilaya} onValueChange={setFilterWilaya}>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t('address.selectWilaya')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {WILAYAS.map((wilaya) => (
+                          <SelectItem key={wilaya.code} value={wilaya.code}>
+                            {wilaya.code} - {wilaya.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {communes.length > 0 && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">{t('address.city')}</label>
+                      <Select value={filterCity} onValueChange={setFilterCity}>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t('address.selectCity')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {communes.map((commune) => (
+                            <SelectItem key={commune} value={commune}>
+                              {commune}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2">
+                    <Button onClick={applyFilters} className="flex-1">
+                      {t('search.applyFilters')}
+                    </Button>
+                    {hasActiveFilters && (
+                      <Button variant="outline" onClick={clearFilters}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
             <Button type="submit" size="lg">{t('common.search')}</Button>
           </form>
+
+          {/* Active Filters Display */}
+          {hasActiveFilters && (
+            <div className="flex gap-2 justify-center mb-4 flex-wrap">
+              {filterWilaya && (
+                <Badge variant="secondary" className="gap-1">
+                  {WILAYAS.find(w => w.code === filterWilaya)?.name}
+                  <button onClick={() => { setFilterWilaya(''); applyFilters(); }}>
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+              {filterCity && (
+                <Badge variant="secondary" className="gap-1">
+                  {filterCity}
+                  <button onClick={() => { setFilterCity(''); applyFilters(); }}>
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+            </div>
+          )}
 
           {/* Category Filters */}
           <div className="flex gap-2 overflow-x-auto pb-2">

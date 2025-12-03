@@ -38,7 +38,8 @@
     "tomorrow": "غداً",
     "noResults": "لم يتم العثور على نتائج",
     "error": "حدث خطأ",
-    "success": "نجاح"
+    "success": "نجاح",
+    "copied": "تم النسخ إلى الحافظة"
   },
   "nav": {
     "home": "الرئيسية",
@@ -64,6 +65,8 @@
     "enterEmail": "أدخل بريدك الإلكتروني",
     "enterPassword": "أدخل كلمة المرور",
     "enterFullName": "أدخل اسمك الكامل",
+    "enterPhone": "أدخل رقم هاتفك",
+    "phoneFormat": "الصيغة الجزائرية: 05/06/07 متبوعة بـ 8 أرقام",
     "accountType": "نوع الحساب",
     "client": "عميل",
     "clientDesc": "حجز الخدمات",
@@ -76,6 +79,15 @@
     "signInSuccess": "تم تسجيل الدخول بنجاح",
     "signUpSuccess": "تم إنشاء الحساب بنجاح! تحقق من بريدك الإلكتروني للتأكيد.",
     "signOutSuccess": "تم تسجيل الخروج بنجاح"
+  },
+  "address": {
+    "wilaya": "الولاية",
+    "city": "البلدية",
+    "postalCode": "الرمز البريدي",
+    "streetName": "اسم الشارع",
+    "streetNumber": "رقم الشارع",
+    "selectWilaya": "اختر الولاية",
+    "selectCity": "اختر البلدية"
   },
   "home": {
     "heroTitle": "احجز الخدمات المحلية بسهولة",
@@ -119,7 +131,9 @@
     "priceLowHigh": "السعر: من الأقل للأعلى",
     "priceHighLow": "السعر: من الأعلى للأقل",
     "noBusinesses": "لم يتم العثور على أنشطة تجارية",
-    "tryDifferent": "جرب مصطلحات بحث أو فلاتر مختلفة"
+    "tryDifferent": "جرب مصطلحات بحث أو فلاتر مختلفة",
+    "filterByLocation": "تصفية حسب الموقع",
+    "applyFilters": "تطبيق الفلاتر"
   },
   "business": {
     "about": "حول",
@@ -148,7 +162,11 @@
     "yourRating": "تقييمك",
     "yourReview": "تقييمك",
     "submitReview": "إرسال التقييم",
-    "viewAll": "عرض الكل"
+    "viewAll": "عرض الكل",
+    "contactPhone": "رقم الهاتف",
+    "ourTeam": "فريقنا",
+    "manage": "إدارة نشاطك التجاري وحجوزاتك",
+    "backToDashboard": "العودة إلى لوحة التحكم"
   },
   "booking": {
     "title": "حجوزاتي",
@@ -165,7 +183,9 @@
     "cancelSuccess": "تم إلغاء الحجز بنجاح",
     "rescheduleSuccess": "تمت إعادة جدولة الحجز بنجاح",
     "notes": "ملاحظات",
-    "addNotes": "أضف ملاحظات لموعدك"
+    "addNotes": "أضف ملاحظات لموعدك",
+    "clientPhone": "هاتف العميل",
+    "noBookings": "لا توجد حجوزات"
   },
   "dashboard": {
     "title": "لوحة التحكم",
@@ -187,7 +207,11 @@
     "allTime": "كل الوقت",
     "topServices": "أفضل الخدمات",
     "staffPerformance": "أداء الموظفين",
-    "bookingsByStaff": "الحجوزات حسب الموظف"
+    "bookingsByStaff": "الحجوزات حسب الموظف",
+    "activeServices": "الخدمات النشطة",
+    "mySchedule": "جدولي",
+    "myServices": "خدماتي",
+    "hours": "الساعات"
   },
   "profile": {
     "title": "إعدادات الملف الشخصي",
@@ -238,7 +262,8 @@
     "enterUserId": "أدخل معرف المستخدم",
     "inviteSuccess": "تمت دعوة الموظف بنجاح",
     "removeStaff": "إزالة الموظف",
-    "removeConfirm": "هل أنت متأكد من إزالة هذا الموظف؟"
+    "removeConfirm": "هل أنت متأكد من إزالة هذا الموظف؟",
+    "completedBookings": "الحجوزات المكتملة"
   },
   "services": {
     "addService": "إضافة خدمة",
@@ -263,6 +288,15 @@
     "thursday": "الخميس",
     "friday": "الجمعة",
     "saturday": "السبت"
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "empty": "لا توجد إشعارات",
+    "markRead": "وضع علامة مقروء",
+    "markAllRead": "وضع علامة مقروء للكل",
+    "newBooking": "حجز جديد",
+    "bookingConfirmed": "تم تأكيد الحجز",
+    "bookingRescheduled": "تمت إعادة جدولة الحجز"
   },
   "errors": {
     "invalidEmail": "الرجاء إدخال بريد إلكتروني صالح",

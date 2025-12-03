@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { ArrowLeft, User, Mail, Phone, Copy, Upload, Globe } from 'lucide-react';
 import { z } from 'zod';
 import { changeLanguage, getCurrentLanguage } from '@/lib/i18n';
+import { validateAlgerianPhone } from '@/lib/algeria';
 import {
   Select,
   SelectContent,
@@ -21,7 +22,7 @@ import {
 
 const profileSchema = z.object({
   full_name: z.string().min(2, 'Name must be at least 2 characters').max(100),
-  phone: z.string().optional(),
+  phone: z.string().refine((val) => !val || validateAlgerianPhone(val), 'Phone must be Algerian format (05/06/07XXXXXXXX)'),
 });
 
 const passwordSchema = z.object({
@@ -341,10 +342,11 @@ export default function Profile() {
                       type="tel"
                       value={profile.phone || ''}
                       onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                      placeholder={t('common.phone')}
+                      placeholder="05XXXXXXXX"
                       className="ps-10"
                     />
                   </div>
+                  <p className="text-xs text-muted-foreground">{t('auth.phoneFormat')}</p>
                 </div>
 
                 <Button type="submit" disabled={loading}>
