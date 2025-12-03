@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { CalendarIcon, MapPin, Star, Clock, DollarSign, User } from 'lucide-react';
+import { CalendarIcon, MapPin, Star, Clock, DollarSign, User, Phone, Copy, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
@@ -36,6 +36,7 @@ export default function Business() {
   const [staffServices, setStaffServices] = useState<any[]>([]);
   const [staffHours, setStaffHours] = useState<any[]>([]);
   const [filteredStaff, setFilteredStaff] = useState<any[]>([]);
+  const [phoneCopied, setPhoneCopied] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -350,12 +351,30 @@ export default function Business() {
                 <h1 className="text-3xl font-bold">{business.name}</h1>
                 <Badge>{business.category.replace('_', ' ')}</Badge>
               </div>
-              <div className="flex items-center gap-4 text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-4 text-muted-foreground">
                 {business.city && (
                   <div className="flex items-center gap-1">
                     <MapPin className="h-4 w-4" />
                     <span>{business.city}, {business.state}</span>
                   </div>
+                )}
+                {business.phone && (
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(business.phone);
+                      setPhoneCopied(true);
+                      setTimeout(() => setPhoneCopied(false), 2000);
+                    }}
+                    className="flex items-center gap-1 hover:text-primary transition-colors"
+                  >
+                    <Phone className="h-4 w-4" />
+                    <span>{business.phone}</span>
+                    {phoneCopied ? (
+                      <Check className="h-3 w-3 text-green-500" />
+                    ) : (
+                      <Copy className="h-3 w-3" />
+                    )}
+                  </button>
                 )}
                 {averageRating > 0 && (
                   <div className="flex items-center gap-1">

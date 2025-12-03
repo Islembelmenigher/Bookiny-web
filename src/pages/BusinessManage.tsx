@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
-import { ArrowLeft, TrendingUp, Calendar, DollarSign, Users, Trash2 } from 'lucide-react';
+import { ArrowLeft, TrendingUp, Calendar, DollarSign, Users, Trash2, Phone, Copy, Check } from 'lucide-react';
 import { ServicesManager } from '@/components/business/ServicesManager';
 import { StaffManager } from '@/components/business/StaffManager';
 import { HoursManager } from '@/components/business/HoursManager';
@@ -29,6 +29,7 @@ export default function BusinessManage() {
   const [business, setBusiness] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState<'owner' | 'staff' | null>(null);
+  const [phoneCopied, setPhoneCopied] = useState(false);
   const [stats, setStats] = useState({
     totalBookings: 0,
     todayBookings: 0,
@@ -166,7 +167,27 @@ export default function BusinessManage() {
               Back to Dashboard
             </Button>
             <h1 className="text-3xl font-bold mb-2">{business.name}</h1>
-            <p className="text-muted-foreground">Manage your business and bookings</p>
+            <div className="flex flex-wrap items-center gap-4">
+              <p className="text-muted-foreground">Manage your business and bookings</p>
+              {business.phone && (
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(business.phone);
+                    setPhoneCopied(true);
+                    setTimeout(() => setPhoneCopied(false), 2000);
+                  }}
+                  className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <Phone className="h-4 w-4" />
+                  <span>{business.phone}</span>
+                  {phoneCopied ? (
+                    <Check className="h-3 w-3 text-green-500" />
+                  ) : (
+                    <Copy className="h-3 w-3" />
+                  )}
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Stats Cards - Hide Revenue from Staff */}

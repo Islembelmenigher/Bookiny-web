@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -42,6 +42,27 @@ export default function BusinessCreate() {
     email: '',
     website: '',
   });
+
+  // Auto-fill phone and email from user profile
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user?.id) return;
+      
+      const { data } = await supabase
+        .from('profiles')
+        .select('phone')
+        .eq('id', user.id)
+        .single();
+      
+      setFormData(prev => ({
+        ...prev,
+        phone: data?.phone || '',
+        email: user.email || '',
+      }));
+    };
+    
+    fetchUserProfile();
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
