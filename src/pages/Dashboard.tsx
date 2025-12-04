@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, Clock, MapPin, X, Building2, Plus, RefreshCw } from 'lucide-react';
+import { Calendar, Clock, MapPin, X, Building2, Plus, RefreshCw, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
@@ -13,6 +13,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { DemoDataSeeder } from '@/components/DemoDataSeeder';
 import { RescheduleDialog } from '@/components/business/RescheduleDialog';
 import { formatDZD } from '@/lib/algeria';
+
+const MAX_BUSINESSES = 3;
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -118,6 +120,8 @@ export default function Dashboard() {
   }
 
   const isBusinessOwner = profile?.role === 'business_owner';
+  const canCreateMoreBusinesses = businesses.length < MAX_BUSINESSES;
+  const hasReachedLimit = businesses.length >= MAX_BUSINESSES;
 
   return (
     <Layout>
@@ -129,9 +133,9 @@ export default function Dashboard() {
               <p className="text-muted-foreground">Welcome back, {profile?.full_name || 'User'}</p>
             </div>
             <div className="flex gap-2">
-              {isBusinessOwner && businesses.length === 0 && (
+              {isBusinessOwner && canCreateMoreBusinesses && (
                 <>
-                  <DemoDataSeeder />
+                  {businesses.length === 0 && <DemoDataSeeder />}
                   <Button asChild>
                     <Link to="/business/new">
                       <Plus className="h-4 w-4 mr-2" />
@@ -234,6 +238,18 @@ export default function Dashboard() {
 
             {isBusinessOwner && (
               <TabsContent value="businesses" className="space-y-4">
+                {/* Business Limit Message */}
+                {hasReachedLimit && (
+                  <Card className="border-accent/50 bg-accent/5">
+                    <CardContent className="p-4 flex items-center gap-3">
+                      <AlertCircle className="h-5 w-5 text-accent shrink-0" />
+                      <p className="text-sm text-muted-foreground">
+                        You can only create up to {MAX_BUSINESSES} businesses. You've reached the maximum limit.
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+
                 {businesses.length === 0 ? (
                   <Card>
                     <CardContent className="p-12 text-center">
@@ -251,34 +267,48 @@ export default function Dashboard() {
                     </CardContent>
                   </Card>
                 ) : (
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {businesses.map((business) => (
-                      <Card key={business.id}>
-                        <CardContent className="p-6">
-                          <div className="flex items-start justify-between mb-3">
-                            <div>
-                              <h3 className="font-semibold text-lg">{business.name}</h3>
-                              <Badge variant="secondary">{business.category.replace('_', ' ')}</Badge>
+                  <>
+                    {/* Add Business Button when under limit */}
+                    {canCreateMoreBusinesses && (
+                      <div className="flex justify-end">
+                        <Button asChild>
+                          <Link to="/business/new">
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Another Business ({businesses.length}/{MAX_BUSINESSES})
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
+                    
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {businesses.map((business) => (
+                        <Card key={business.id}>
+                          <CardContent className="p-6">
+                            <div className="flex items-start justify-between mb-3">
+                              <div>
+                                <h3 className="font-semibold text-lg">{business.name}</h3>
+                                <Badge variant="secondary">{business.category.replace('_', ' ')}</Badge>
+                              </div>
                             </div>
-                          </div>
-                          <div className="text-sm text-muted-foreground space-y-1">
-                            <div className="flex items-center gap-2">
-                              <MapPin className="h-4 w-4" />
-                              <span>{business.city}, {business.state}</span>
+                            <div className="text-sm text-muted-foreground space-y-1">
+                              <div className="flex items-center gap-2">
+                                <MapPin className="h-4 w-4" />
+                                <span>{business.city}, {business.state}</span>
+                              </div>
                             </div>
-                          </div>
-                          <div className="mt-4 flex gap-2">
-                            <Button variant="outline" size="sm" asChild className="flex-1">
-                              <Link to={`/business/${business.id}`}>View</Link>
-                            </Button>
-                            <Button size="sm" asChild className="flex-1">
-                              <Link to={`/business/${business.id}/manage`}>Manage</Link>
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
+                            <div className="mt-4 flex gap-2">
+                              <Button variant="outline" size="sm" asChild className="flex-1">
+                                <Link to={`/business/${business.id}`}>View</Link>
+                              </Button>
+                              <Button size="sm" asChild className="flex-1">
+                                <Link to={`/business/${business.id}/manage`}>Manage</Link>
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </>
                 )}
               </TabsContent>
             )}

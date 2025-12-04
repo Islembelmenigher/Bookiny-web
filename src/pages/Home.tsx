@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, ChevronRight, Sparkles, Filter } from 'lucide-react';
+import { Search, ChevronRight, Sparkles, Filter, CalendarCheck, Clock, Shield, Star, Heart, CheckCircle2 } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -57,6 +57,52 @@ export default function Home() {
       name: t('categories.dentist'), 
       category: 'dentist',
       image: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=400&h=300&fit=crop'
+    },
+  ];
+
+  const clientBenefits = [
+    {
+      icon: CalendarCheck,
+      title: t('home.clientBenefit1Title'),
+      description: t('home.clientBenefit1Desc'),
+    },
+    {
+      icon: Clock,
+      title: t('home.clientBenefit2Title'),
+      description: t('home.clientBenefit2Desc'),
+    },
+    {
+      icon: Star,
+      title: t('home.clientBenefit3Title'),
+      description: t('home.clientBenefit3Desc'),
+    },
+    {
+      icon: Shield,
+      title: t('home.clientBenefit4Title'),
+      description: t('home.clientBenefit4Desc'),
+    },
+  ];
+
+  const bookingSteps = [
+    {
+      step: '1',
+      title: t('home.bookingStep1Title'),
+      description: t('home.bookingStep1Desc'),
+    },
+    {
+      step: '2',
+      title: t('home.bookingStep2Title'),
+      description: t('home.bookingStep2Desc'),
+    },
+    {
+      step: '3',
+      title: t('home.bookingStep3Title'),
+      description: t('home.bookingStep3Desc'),
+    },
+    {
+      step: '4',
+      title: t('home.bookingStep4Title'),
+      description: t('home.bookingStep4Desc'),
     },
   ];
 
@@ -154,11 +200,11 @@ export default function Home() {
       <section className="py-16 md:py-20 bg-muted/30">
         <div className="container px-4">
           <h2 className="text-2xl md:text-3xl font-display font-bold text-center mb-10 text-foreground">{t('home.popularCategories')}</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="flex flex-wrap justify-center gap-4">
             {categories.map((cat) => (
               <Card
                 key={cat.category}
-                className="cursor-pointer overflow-hidden group transition-all duration-300 hover:-translate-y-1 hover:shadow-glow border-0"
+                className="cursor-pointer overflow-hidden group transition-all duration-300 hover:-translate-y-1 hover:shadow-glow border-0 w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-0.75rem)] lg:w-[180px]"
                 onClick={() => navigate(`/search?category=${cat.category}`)}
               >
                 <CardContent className="p-0 relative h-40">
@@ -208,6 +254,128 @@ export default function Home() {
               <p className="text-muted-foreground text-sm">
                 {t('home.step3Desc')}
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Clients Love Us */}
+      <section className="py-16 md:py-20 bg-muted/30">
+        <div className="container px-4">
+          <div className="text-center mb-12">
+            <Badge variant="teal" className="mb-4">
+              <Heart className="h-3 w-3 me-1" />
+              {t('home.whyClientsLoveUs')}
+            </Badge>
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-4">
+              {t('home.clientSectionTitle')}
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              {t('home.clientSectionSubtitle')}
+            </p>
+          </div>
+
+          {/* Benefits Grid */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
+            {clientBenefits.map((benefit, index) => (
+              <Card key={index} className="text-center p-6 hover:shadow-elegant transition-shadow">
+                <CardContent className="p-0 space-y-4">
+                  <div className="h-14 w-14 rounded-xl bg-primary/10 mx-auto flex items-center justify-center">
+                    <benefit.icon className="h-7 w-7 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-foreground">{benefit.title}</h3>
+                  <p className="text-sm text-muted-foreground">{benefit.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Booking Steps */}
+          <div className="max-w-4xl mx-auto">
+            <h3 className="text-xl font-semibold text-center mb-8 text-foreground">
+              {t('home.howToBook')}
+            </h3>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {bookingSteps.map((step, index) => (
+                <div key={index} className="relative">
+                  <Card className="p-5 h-full">
+                    <CardContent className="p-0 space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-teal text-teal-foreground flex items-center justify-center text-sm font-bold shrink-0">
+                          {step.step}
+                        </div>
+                        <h4 className="font-medium text-foreground text-sm">{step.title}</h4>
+                      </div>
+                      <p className="text-xs text-muted-foreground ps-11">{step.description}</p>
+                    </CardContent>
+                  </Card>
+                  {index < bookingSteps.length - 1 && (
+                    <div className="hidden lg:block absolute top-1/2 -right-2 transform -translate-y-1/2 z-10">
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Client Images */}
+          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+            <div className="relative rounded-xl overflow-hidden h-48">
+              <img 
+                src="https://images.unsplash.com/photo-1559599101-f09722fb4948?w=400&h=300&fit=crop" 
+                alt="Client booking appointment"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 to-transparent" />
+              <div className="absolute bottom-3 left-3 right-3">
+                <Badge variant="secondary" className="bg-card/90 text-foreground">
+                  <CheckCircle2 className="h-3 w-3 me-1" />
+                  {t('home.easyBooking')}
+                </Badge>
+              </div>
+            </div>
+            <div className="relative rounded-xl overflow-hidden h-48">
+              <img 
+                src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&h=300&fit=crop" 
+                alt="Beauty salon service"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 to-transparent" />
+              <div className="absolute bottom-3 left-3 right-3">
+                <Badge variant="secondary" className="bg-card/90 text-foreground">
+                  <Star className="h-3 w-3 me-1" />
+                  {t('home.topRated')}
+                </Badge>
+              </div>
+            </div>
+            <div className="relative rounded-xl overflow-hidden h-48">
+              <img 
+                src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400&h=300&fit=crop" 
+                alt="Hair styling service"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 to-transparent" />
+              <div className="absolute bottom-3 left-3 right-3">
+                <Badge variant="secondary" className="bg-card/90 text-foreground">
+                  <Clock className="h-3 w-3 me-1" />
+                  {t('home.saveTime')}
+                </Badge>
+              </div>
+            </div>
+            <div className="relative rounded-xl overflow-hidden h-48">
+              <img 
+                src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=400&h=300&fit=crop" 
+                alt="Medical consultation"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 to-transparent" />
+              <div className="absolute bottom-3 left-3 right-3">
+                <Badge variant="secondary" className="bg-card/90 text-foreground">
+                  <Shield className="h-3 w-3 me-1" />
+                  {t('home.verified')}
+                </Badge>
+              </div>
             </div>
           </div>
         </div>
