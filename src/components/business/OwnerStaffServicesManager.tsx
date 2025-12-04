@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { User, Briefcase } from 'lucide-react';
+import { formatDZD } from '@/lib/algeria';
 
 interface OwnerStaffServicesManagerProps {
   businessId: string;
@@ -132,7 +133,7 @@ export function OwnerStaffServicesManager({ businessId, staffId, staffName, onCl
                       <span className="font-medium">{service.name}</span>
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      ${service.price} · {service.duration_minutes} min
+                      {formatDZD(service.price)} · {service.duration_minutes} min
                     </div>
                   </div>
                 </label>

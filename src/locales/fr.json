@@ -133,6 +133,7 @@
     "noBusinesses": "Aucune entreprise trouvée",
     "tryDifferent": "Essayez d'autres termes de recherche ou filtres",
     "filterByLocation": "Filtrer par Emplacement",
+    "filterByArea": "Filtrer par Zone",
     "applyFilters": "Appliquer les Filtres"
   },
   "business": {

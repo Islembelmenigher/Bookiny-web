@@ -7,8 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, Clock, DollarSign } from 'lucide-react';
+import { Plus, Pencil, Trash2, Clock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { formatDZD } from '@/lib/algeria';
 
 interface ServicesManagerProps {
   businessId: string;
@@ -169,8 +170,7 @@ export function ServicesManager({ businessId }: ServicesManagerProps) {
                         <span>{service.duration_minutes} min</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <DollarSign className="h-4 w-4" />
-                        <span>${service.price}</span>
+                        <span>{formatDZD(service.price)}</span>
                       </div>
                     </div>
                   </div>
@@ -244,7 +244,7 @@ export function ServicesManager({ businessId }: ServicesManagerProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="price">Price ($) *</Label>
+                <Label htmlFor="price">Price (DZD) *</Label>
                 <Input
                   id="price"
                   type="number"

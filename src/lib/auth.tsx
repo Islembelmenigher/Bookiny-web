@@ -58,9 +58,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
     });
     
-    // Update phone in profiles if signup successful and phone provided
-    if (!error && data.user && phone) {
-      await supabase.from('profiles').update({ phone }).eq('id', data.user.id);
+    // Update phone and email in profiles if signup successful
+    if (!error && data.user) {
+      await supabase.from('profiles').update({ 
+        phone: phone || null,
+        email: email
+      }).eq('id', data.user.id);
     }
     
     return { error };

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { CalendarIcon, MapPin, Star, Clock, DollarSign, User, Phone, Copy, Check } from 'lucide-react';
+import { CalendarIcon, MapPin, Star, Clock, User, Phone, Copy, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
@@ -52,12 +52,13 @@ export default function Business() {
     }
   }, [id, staff]);
 
-  // Filter staff when service is selected
+  // Filter staff when service is selected - only show staff with this service assigned
   useEffect(() => {
-    if (selectedService && staffServices.length > 0) {
+    if (selectedService && staffServices.length >= 0) {
       const staffIds = staffServices
         .filter(ss => ss.service_id === selectedService.id)
         .map(ss => ss.staff_id);
+      // Only show staff who have this specific service assigned
       const filtered = staff.filter(s => staffIds.includes(s.id));
       setFilteredStaff(filtered);
       // Reset staff selection if current staff doesn't offer this service
@@ -65,7 +66,11 @@ export default function Business() {
         setSelectedStaff(null);
       }
     } else {
-      setFilteredStaff(staff);
+      // If no service selected, show staff who have at least one service assigned
+      const staffWithServices = staff.filter(s => 
+        staffServices.some(ss => ss.staff_id === s.id)
+      );
+      setFilteredStaff(staffWithServices);
     }
   }, [selectedService, staffServices, staff]);
 
@@ -425,8 +430,7 @@ export default function Business() {
                             <span>{service.duration_minutes} min</span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <DollarSign className="h-4 w-4" />
-                            <span>${service.price}</span>
+                            <span>{formatDZD(service.price)}</span>
                           </div>
                         </div>
                       </div>

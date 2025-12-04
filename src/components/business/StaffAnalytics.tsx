@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { User, CheckCircle, TrendingUp } from 'lucide-react';
+import { formatDZD } from '@/lib/algeria';
 
 interface StaffAnalyticsProps {
   businessId: string;
@@ -206,7 +207,7 @@ export function StaffAnalytics({ businessId }: StaffAnalyticsProps) {
                   <div>
                     <h4 className="font-semibold">{booking.services?.name}</h4>
                     <p className="text-sm text-muted-foreground">
-                      {booking.profiles?.full_name} · ${booking.services?.price}
+                      {booking.profiles?.full_name} · {formatDZD(booking.services?.price || 0)}
                     </p>
                   </div>
                   <div className="text-right">

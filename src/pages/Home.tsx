@@ -5,20 +5,31 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, ChevronRight, Sparkles } from 'lucide-react';
+import { Search, ChevronRight, Sparkles, Filter } from 'lucide-react';
 import { Layout } from '@/components/Layout';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { ALGERIA_WILAYAS } from '@/lib/algeria';
 import heroImage from '@/assets/hero-image.jpg';
 
 export default function Home() {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedWilaya, setSelectedWilaya] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
   const navigate = useNavigate();
+
+  const wilayaData = ALGERIA_WILAYAS.find(w => w.code === selectedWilaya);
+  const communes = wilayaData?.communes || [];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-    }
+    const params = new URLSearchParams();
+    if (searchQuery.trim()) params.set('q', searchQuery);
+    if (selectedWilaya) params.set('wilaya', selectedWilaya);
+    if (selectedCity) params.set('city', selectedCity);
+    navigate(`/search?${params.toString()}`);
   };
 
   const categories = [
@@ -92,6 +103,50 @@ export default function Home() {
                   className="ps-12 h-14 text-lg bg-white shadow-elegant text-foreground"
                 />
               </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button type="button" variant="secondary" size="lg" className="h-14 px-4">
+                    <Filter className="h-5 w-5" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-72" align="end">
+                  <div className="space-y-4">
+                    <h4 className="font-medium">{t('search.filterByArea')}</h4>
+                    <div className="space-y-2">
+                      <Label>{t('address.wilaya')}</Label>
+                      <Select value={selectedWilaya} onValueChange={(v) => { setSelectedWilaya(v); setSelectedCity(''); }}>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t('address.selectWilaya')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">{t('common.all')}</SelectItem>
+                          {ALGERIA_WILAYAS.map((w) => (
+                            <SelectItem key={w.code} value={w.code}>
+                              {w.code} - {w.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {selectedWilaya && communes.length > 0 && (
+                      <div className="space-y-2">
+                        <Label>{t('address.city')}</Label>
+                        <Select value={selectedCity} onValueChange={setSelectedCity}>
+                          <SelectTrigger>
+                            <SelectValue placeholder={t('address.selectCity')} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">{t('common.all')}</SelectItem>
+                            {communes.map((c) => (
+                              <SelectItem key={c} value={c}>{c}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
               <Button type="submit" size="lg" className="h-14 px-8 bg-accent hover:bg-accent/90 text-accent-foreground">
                 {t('home.searchButton')}
               </Button>

@@ -133,6 +133,7 @@
     "noBusinesses": "لم يتم العثور على أنشطة تجارية",
     "tryDifferent": "جرب مصطلحات بحث أو فلاتر مختلفة",
     "filterByLocation": "تصفية حسب الموقع",
+    "filterByArea": "تصفية حسب المنطقة",
     "applyFilters": "تطبيق الفلاتر"
   },
   "business": {
