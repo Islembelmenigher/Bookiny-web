@@ -8,7 +8,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, User, Briefcase } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { OwnerStaffServicesManager } from './OwnerStaffServicesManager';
 
 interface StaffManagerProps {
@@ -178,12 +177,7 @@ export function StaffManager({ businessId }: StaffManagerProps) {
                     <User className="h-6 w-6 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold">{member.name}</h3>
-                      {!member.is_active && (
-                        <Badge variant="secondary">Inactive</Badge>
-                      )}
-                    </div>
+                    <h3 className="font-semibold mb-1">{member.name}</h3>
                     {member.title && (
                       <p className="text-sm text-muted-foreground mb-2">
                         {member.title}
