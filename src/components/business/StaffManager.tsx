@@ -38,6 +38,7 @@ export function StaffManager({ businessId }: StaffManagerProps) {
         .from('staff')
         .select('*')
         .eq('business_id', businessId)
+        .eq('is_active', true)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
