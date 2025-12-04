@@ -37,12 +37,12 @@ export function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
         <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center space-x-2">
               <Calendar className="h-6 w-6 text-primary" />
-              <span className="font-bold text-xl">Booksy</span>
+              <span className="font-display font-bold text-xl text-foreground">BookEase</span>
             </Link>
 
             {/* Desktop Nav */}
@@ -51,7 +51,7 @@ export function Layout({ children }: LayoutProps) {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -59,7 +59,7 @@ export function Layout({ children }: LayoutProps) {
             </nav>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <LanguageSelector variant="minimal" />
             
             {user ? (
@@ -158,42 +158,42 @@ export function Layout({ children }: LayoutProps) {
       </main>
 
       {/* Footer */}
-      <footer className="border-t bg-muted/50">
-        <div className="container py-8">
+      <footer className="border-t border-border bg-card">
+        <div className="container py-10">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <Calendar className="h-5 w-5 text-primary" />
-                <span className="font-bold">Booksy</span>
+                <span className="font-display font-bold text-lg">BookEase</span>
               </div>
               <p className="text-sm text-muted-foreground">
                 {t('auth.signInToContinue')}
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-3">{t('auth.client')}</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/search" className="hover:text-foreground">{t('home.findServices')}</Link></li>
-                <li><Link to="/auth" className="hover:text-foreground">{t('nav.signup')}</Link></li>
+              <h3 className="font-semibold mb-4 text-foreground">{t('auth.client')}</h3>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                <li><Link to="/search" className="hover:text-primary transition-colors">{t('home.findServices')}</Link></li>
+                <li><Link to="/auth" className="hover:text-primary transition-colors">{t('nav.signup')}</Link></li>
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold mb-3">{t('auth.business')}</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/auth?mode=signup&type=business" className="hover:text-foreground">{t('home.listBusiness')}</Link></li>
-                <li><Link to="/dashboard" className="hover:text-foreground">{t('nav.dashboard')}</Link></li>
+              <h3 className="font-semibold mb-4 text-foreground">{t('auth.business')}</h3>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                <li><Link to="/auth?mode=signup&type=business" className="hover:text-primary transition-colors">{t('home.listBusiness')}</Link></li>
+                <li><Link to="/dashboard" className="hover:text-primary transition-colors">{t('nav.dashboard')}</Link></li>
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold mb-3">Support</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground">Help Center</a></li>
-                <li><a href="#" className="hover:text-foreground">Contact Us</a></li>
+              <h3 className="font-semibold mb-4 text-foreground">Support</h3>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-primary transition-colors">Help Center</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Contact Us</a></li>
               </ul>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
-            © 2024 Booksy. All rights reserved.
+          <div className="mt-10 pt-8 border-t border-border text-center text-sm text-muted-foreground">
+            © 2024 BookEase. All rights reserved.
           </div>
         </div>
       </footer>

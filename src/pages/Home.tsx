@@ -75,24 +75,24 @@ export default function Home() {
             backgroundImage: `url(${heroImage})`,
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/70 to-primary/50" />
+          <div className="absolute inset-0 bg-gradient-hero opacity-90" />
         </div>
         
         <div className="relative z-10 container px-4">
-          <div className="max-w-3xl mx-auto text-center text-white space-y-6">
-            <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30">
+          <div className="max-w-3xl mx-auto text-center text-primary-foreground space-y-6">
+            <Badge variant="secondary" className="mb-4 bg-primary-foreground/15 text-primary-foreground border-primary-foreground/20">
               <Sparkles className="h-3 w-3 me-1" />
               {t('home.heroTitle')}
             </Badge>
-            <h1 className="text-5xl md:text-6xl font-bold leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold leading-tight">
               {t('home.heroTitle')}
             </h1>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto">
+            <p className="text-lg md:text-xl text-primary-foreground/90 max-w-2xl mx-auto">
               {t('home.heroSubtitle')}
             </p>
 
             {/* Search Bar */}
-            <form onSubmit={handleSearch} className="flex gap-2 max-w-2xl mx-auto mt-8">
+            <form onSubmit={handleSearch} className="flex gap-3 max-w-2xl mx-auto mt-8">
               <div className="flex-1 relative">
                 <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
@@ -100,20 +100,20 @@ export default function Home() {
                   placeholder={t('home.searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="ps-12 h-14 text-lg bg-white shadow-elegant text-foreground"
+                  className="ps-12 h-14 text-base bg-card shadow-card text-foreground rounded-xl border-0"
                 />
               </div>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button type="button" variant="secondary" size="lg" className="h-14 px-4">
+                  <Button type="button" variant="secondary" size="lg" className="h-14 px-5">
                     <Filter className="h-5 w-5" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-72" align="end">
                   <div className="space-y-4">
-                    <h4 className="font-medium">{t('search.filterByArea')}</h4>
+                    <h4 className="font-semibold text-foreground">{t('search.filterByArea')}</h4>
                     <div className="space-y-2">
-                      <Label>{t('address.wilaya')}</Label>
+                      <Label className="text-sm text-muted-foreground">{t('address.wilaya')}</Label>
                       <Select value={selectedWilaya || "__all__"} onValueChange={(v) => { setSelectedWilaya(v === "__all__" ? "" : v); setSelectedCity(''); }}>
                         <SelectTrigger>
                           <SelectValue placeholder={t('address.selectWilaya')} />
@@ -130,7 +130,7 @@ export default function Home() {
                     </div>
                     {selectedWilaya && communes.length > 0 && (
                       <div className="space-y-2">
-                        <Label>{t('address.city')}</Label>
+                        <Label className="text-sm text-muted-foreground">{t('address.city')}</Label>
                         <Select value={selectedCity || "__all__"} onValueChange={(v) => setSelectedCity(v === "__all__" ? "" : v)}>
                           <SelectTrigger>
                             <SelectValue placeholder={t('address.selectCity')} />
@@ -147,7 +147,7 @@ export default function Home() {
                   </div>
                 </PopoverContent>
               </Popover>
-              <Button type="submit" size="lg" className="h-14 px-8 bg-accent hover:bg-accent/90 text-accent-foreground">
+              <Button type="submit" variant="accent" size="lg" className="h-14 px-8">
                 {t('home.searchButton')}
               </Button>
             </form>
@@ -156,14 +156,14 @@ export default function Home() {
       </section>
 
       {/* Categories */}
-      <section className="py-16 bg-muted/30">
+      <section className="py-16 md:py-20 bg-muted/30">
         <div className="container px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">{t('home.popularCategories')}</h2>
+          <h2 className="text-2xl md:text-3xl font-display font-bold text-center mb-10 text-foreground">{t('home.popularCategories')}</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {categories.map((cat) => (
               <Card
                 key={cat.category}
-                className="cursor-pointer overflow-hidden group transition-all duration-300 hover:-translate-y-1 hover:shadow-glow"
+                className="cursor-pointer overflow-hidden group transition-all duration-300 hover:-translate-y-1 hover:shadow-glow border-0"
                 onClick={() => navigate(`/search?category=${cat.category}`)}
               >
                 <CardContent className="p-0 relative h-40">
@@ -171,9 +171,9 @@ export default function Home() {
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-110"
                     style={{ backgroundImage: `url(${cat.image})` }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/30 to-transparent" />
                   <div className="absolute inset-x-0 bottom-0 p-4 text-center">
-                    <h3 className="font-semibold text-white text-lg">{cat.name}</h3>
+                    <h3 className="font-semibold text-card text-base">{cat.name}</h3>
                   </div>
                 </CardContent>
               </Card>
@@ -183,34 +183,34 @@ export default function Home() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16">
+      <section className="py-16 md:py-20 bg-card">
         <div className="container px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">{t('home.howItWorks')}</h2>
+          <h2 className="text-2xl md:text-3xl font-display font-bold text-center mb-12 text-foreground">{t('home.howItWorks')}</h2>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <div className="text-center space-y-4">
-              <div className="h-16 w-16 rounded-full bg-gradient-primary mx-auto flex items-center justify-center text-primary-foreground text-2xl font-bold">
+              <div className="h-16 w-16 rounded-full bg-primary mx-auto flex items-center justify-center text-primary-foreground text-2xl font-bold shadow-elegant">
                 1
               </div>
-              <h3 className="text-xl font-semibold">{t('home.step1Title')}</h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-lg font-semibold text-foreground">{t('home.step1Title')}</h3>
+              <p className="text-muted-foreground text-sm">
                 {t('home.step1Desc')}
               </p>
             </div>
             <div className="text-center space-y-4">
-              <div className="h-16 w-16 rounded-full bg-gradient-primary mx-auto flex items-center justify-center text-primary-foreground text-2xl font-bold">
+              <div className="h-16 w-16 rounded-full bg-teal mx-auto flex items-center justify-center text-teal-foreground text-2xl font-bold shadow-elegant">
                 2
               </div>
-              <h3 className="text-xl font-semibold">{t('home.step2Title')}</h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-lg font-semibold text-foreground">{t('home.step2Title')}</h3>
+              <p className="text-muted-foreground text-sm">
                 {t('home.step2Desc')}
               </p>
             </div>
             <div className="text-center space-y-4">
-              <div className="h-16 w-16 rounded-full bg-gradient-primary mx-auto flex items-center justify-center text-primary-foreground text-2xl font-bold">
+              <div className="h-16 w-16 rounded-full bg-accent mx-auto flex items-center justify-center text-accent-foreground text-2xl font-bold shadow-elegant">
                 3
               </div>
-              <h3 className="text-xl font-semibold">{t('home.step3Title')}</h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-lg font-semibold text-foreground">{t('home.step3Title')}</h3>
+              <p className="text-muted-foreground text-sm">
                 {t('home.step3Desc')}
               </p>
             </div>
@@ -219,22 +219,22 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-primary text-primary-foreground">
+      <section className="py-16 md:py-20 bg-primary text-primary-foreground">
         <div className="container px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold mb-4">
             {t('home.ctaTitle')}
           </h2>
-          <p className="text-xl mb-8 text-primary-foreground/90">
+          <p className="text-lg md:text-xl mb-8 text-primary-foreground/85 max-w-2xl mx-auto">
             {t('home.ctaSubtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" asChild>
+            <Button size="lg" variant="secondary" asChild className="bg-card text-foreground hover:bg-card/90">
               <a href="/search">
                 {t('home.findServices')}
                 <ChevronRight className="ms-2 h-5 w-5" />
               </a>
             </Button>
-            <Button size="lg" variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20" asChild>
+            <Button size="lg" variant="outline" className="bg-primary-foreground/10 border-primary-foreground/25 text-primary-foreground hover:bg-primary-foreground/20" asChild>
               <a href="/auth?mode=signup&type=business">
                 {t('home.listBusiness')}
               </a>
