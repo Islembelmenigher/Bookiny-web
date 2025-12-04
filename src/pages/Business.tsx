@@ -238,7 +238,7 @@ export default function Business() {
   };
 
   const getTimeSlots = () => {
-    if (!selectedDate || businessHours.length === 0 || !selectedStaff) {
+    if (!selectedDate || businessHours.length === 0 || !selectedStaff || !selectedService) {
       return [];
     }
 
@@ -283,21 +283,26 @@ export default function Business() {
       endTime = businessDayHours.end_time;
     }
 
-    const slots: { time: string; status: 'available' | 'reserved' }[] = [];
+    const slots: string[] = [];
     const [startHour, startMin] = startTime.split(':').map(Number);
     const [endHour, endMin] = endTime.split(':').map(Number);
+    const serviceDuration = selectedService.duration_minutes;
     
     let currentHour = startHour;
     let currentMin = startMin;
 
     while (currentHour < endHour || (currentHour === endHour && currentMin < endMin)) {
       const time = `${String(currentHour).padStart(2, '0')}:${String(currentMin).padStart(2, '0')}`;
-      const reserved = isSlotReserved(time);
       
-      slots.push({
-        time,
-        status: reserved ? 'reserved' : 'available',
-      });
+      // Check if this slot + service duration would fit before end time
+      const slotStart = timeToMinutes(time);
+      const slotEnd = slotStart + serviceDuration;
+      const dayEnd = timeToMinutes(endTime);
+      
+      // Only add slot if it doesn't overlap with existing bookings AND fits within working hours
+      if (slotEnd <= dayEnd && !isSlotReserved(time)) {
+        slots.push(time);
+      }
       
       currentMin += 5;
       if (currentMin >= 60) {
@@ -603,30 +608,24 @@ export default function Business() {
                 <div className="flex gap-2 mb-3 text-sm">
                   <div className="flex items-center gap-1">
                     <div className="w-4 h-4 rounded bg-green-500/20 border border-green-500" />
-                    <span>Available</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <div className="w-4 h-4 rounded bg-red-500/20 border border-red-500" />
-                    <span>Reserved</span>
+                    <span>Available slots only</span>
                   </div>
                 </div>
                 {timeSlots.length === 0 ? (
                   <p className="text-sm text-muted-foreground">
-                    {selectedStaff.name} is not available on this date.
+                    {selectedStaff.name} is not available on this date or all slots are booked.
                   </p>
                 ) : (
                   <div className="grid grid-cols-4 gap-2 max-h-64 overflow-y-auto">
-                    {timeSlots.map(({ time, status }) => (
+                    {timeSlots.map((time) => (
                       <Button
                         key={time}
                         variant="outline"
                         size="sm"
-                        disabled={status === 'reserved'}
                         onClick={() => setSelectedTime(time)}
                         className={`
                           ${selectedTime === time ? 'ring-2 ring-primary' : ''}
-                          ${status === 'available' ? 'bg-green-500/10 border-green-500 hover:bg-green-500/20 text-foreground' : ''}
-                          ${status === 'reserved' ? 'bg-red-500/10 border-red-500 text-muted-foreground cursor-not-allowed' : ''}
+                          bg-green-500/10 border-green-500 hover:bg-green-500/20 text-foreground
                         `}
                       >
                         {time}
