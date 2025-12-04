@@ -114,12 +114,12 @@ export default function Home() {
                     <h4 className="font-medium">{t('search.filterByArea')}</h4>
                     <div className="space-y-2">
                       <Label>{t('address.wilaya')}</Label>
-                      <Select value={selectedWilaya} onValueChange={(v) => { setSelectedWilaya(v); setSelectedCity(''); }}>
+                      <Select value={selectedWilaya || "__all__"} onValueChange={(v) => { setSelectedWilaya(v === "__all__" ? "" : v); setSelectedCity(''); }}>
                         <SelectTrigger>
                           <SelectValue placeholder={t('address.selectWilaya')} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">{t('common.all')}</SelectItem>
+                          <SelectItem value="__all__">{t('common.all')}</SelectItem>
                           {ALGERIA_WILAYAS.map((w) => (
                             <SelectItem key={w.code} value={w.code}>
                               {w.code} - {w.name}
@@ -131,12 +131,12 @@ export default function Home() {
                     {selectedWilaya && communes.length > 0 && (
                       <div className="space-y-2">
                         <Label>{t('address.city')}</Label>
-                        <Select value={selectedCity} onValueChange={setSelectedCity}>
+                        <Select value={selectedCity || "__all__"} onValueChange={(v) => setSelectedCity(v === "__all__" ? "" : v)}>
                           <SelectTrigger>
                             <SelectValue placeholder={t('address.selectCity')} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">{t('common.all')}</SelectItem>
+                            <SelectItem value="__all__">{t('common.all')}</SelectItem>
                             {communes.map((c) => (
                               <SelectItem key={c} value={c}>{c}</SelectItem>
                             ))}
