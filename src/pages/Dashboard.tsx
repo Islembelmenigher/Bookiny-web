@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, Clock, MapPin, DollarSign, X, Building2, Plus, RefreshCw } from 'lucide-react';
+import { Calendar, Clock, MapPin, X, Building2, Plus, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
@@ -12,6 +12,7 @@ import { format } from 'date-fns';
 import { useNavigate, Link } from 'react-router-dom';
 import { DemoDataSeeder } from '@/components/DemoDataSeeder';
 import { RescheduleDialog } from '@/components/business/RescheduleDialog';
+import { formatDZD } from '@/lib/algeria';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -194,8 +195,7 @@ export default function Dashboard() {
                                 <span>{booking.start_time} ({booking.services?.duration_minutes} min)</span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <DollarSign className="h-4 w-4" />
-                                <span>${booking.services?.price}</span>
+                                <span>{formatDZD(booking.services?.price || 0)}</span>
                               </div>
                               <div className="text-primary font-medium">
                                 Performed by: {booking.staff?.name || 'Not assigned'}

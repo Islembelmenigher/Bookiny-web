@@ -6,9 +6,10 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Calendar, Clock, User, DollarSign, Check, X, RefreshCw, Phone } from 'lucide-react';
+import { Calendar, Clock, User, Check, X, RefreshCw, Phone } from 'lucide-react';
 import { format } from 'date-fns';
 import { RescheduleDialog } from './RescheduleDialog';
+import { formatDZD } from '@/lib/algeria';
 
 interface BookingsManagerProps {
   businessId: string;
@@ -149,8 +150,7 @@ export function BookingsManager({ businessId }: BookingsManagerProps) {
                         <span>{booking.start_time}</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <DollarSign className="h-4 w-4" />
-                        <span>${booking.services?.price}</span>
+                        <span>{formatDZD(booking.services?.price || 0)}</span>
                       </div>
                     </div>
 

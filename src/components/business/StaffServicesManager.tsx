@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
 import { Briefcase, Save } from 'lucide-react';
+import { formatDZD } from '@/lib/algeria';
 
 interface StaffServicesManagerProps {
   businessId: string;
@@ -153,7 +154,7 @@ export function StaffServicesManager({ businessId }: StaffServicesManagerProps) 
                       </p>
                     )}
                     <div className="flex gap-4 mt-2 text-sm text-muted-foreground">
-                      <span>${service.price}</span>
+                      <span>{formatDZD(service.price)}</span>
                       <span>{service.duration_minutes} min</span>
                     </div>
                   </div>

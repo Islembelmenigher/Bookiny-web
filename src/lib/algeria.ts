@@ -94,3 +94,9 @@ export const COMMUNES: Record<string, string[]> = {
 export const getCommunesByWilaya = (wilayaCode: string): string[] => {
   return COMMUNES[wilayaCode] || [];
 };
+
+// Combined wilayas with communes for easier usage
+export const ALGERIA_WILAYAS = WILAYAS.map(w => ({
+  ...w,
+  communes: COMMUNES[w.code] || []
+}));
