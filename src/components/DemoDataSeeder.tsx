@@ -24,9 +24,9 @@ export function DemoDataSeeder() {
       const { data: business, error: businessError } = await supabase
         .from('businesses')
         .insert({
-          name: 'Elite Hair Studio',
-          description: 'Premium hair salon offering cuts, color, and styling services. Experience luxury and style with our expert stylists.',
-          category: 'salon',
+          name: 'Elite Barber Studio',
+          description: 'Premium barber shop offering cuts, styling, and grooming services. Experience luxury and style with our expert barbers.',
+          category: 'barber_men',
           address: '123 Fashion Avenue',
           city: 'New York',
           state: 'NY',

@@ -108,16 +108,11 @@
     "listBusiness": "List Your Business"
   },
   "categories": {
-    "salon": "Hair Salon",
-    "spa": "Spa",
-    "barbershop": "Barbershop",
+    "barber_men": "Barber for Men",
+    "barber_women": "Barber for Women",
     "nail_salon": "Nail Salon",
-    "massage": "Massage",
-    "tattoo": "Tattoo",
-    "fitness": "Fitness",
-    "beauty": "Beauty",
-    "wellness": "Wellness",
-    "other": "Other"
+    "doctor": "Doctor",
+    "dentist": "Dentist"
   },
   "search": {
     "title": "Search Results",

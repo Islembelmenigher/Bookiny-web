@@ -621,16 +621,11 @@ export type Database = {
         | "completed"
         | "no_show"
       business_category:
-        | "salon"
-        | "spa"
-        | "barbershop"
+        | "barber_men"
+        | "barber_women"
         | "nail_salon"
-        | "massage"
-        | "tattoo"
-        | "fitness"
-        | "beauty"
-        | "wellness"
-        | "other"
+        | "doctor"
+        | "dentist"
       user_role: "client" | "business_owner" | "staff"
     }
     CompositeTypes: {
@@ -768,16 +763,11 @@ export const Constants = {
         "no_show",
       ],
       business_category: [
-        "salon",
-        "spa",
-        "barbershop",
+        "barber_men",
+        "barber_women",
         "nail_salon",
-        "massage",
-        "tattoo",
-        "fitness",
-        "beauty",
-        "wellness",
-        "other",
+        "doctor",
+        "dentist",
       ],
       user_role: ["client", "business_owner", "staff"],
     },

@@ -34,19 +34,14 @@ export default function Home() {
 
   const categories = [
     { 
-      name: t('categories.salon'), 
-      category: 'salon',
-      image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400&h=300&fit=crop'
-    },
-    { 
-      name: t('categories.spa'), 
-      category: 'spa',
-      image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&h=300&fit=crop'
-    },
-    { 
-      name: t('categories.barbershop'), 
-      category: 'barbershop',
+      name: t('categories.barber_men'), 
+      category: 'barber_men',
       image: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=400&h=300&fit=crop'
+    },
+    { 
+      name: t('categories.barber_women'), 
+      category: 'barber_women',
+      image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400&h=300&fit=crop'
     },
     { 
       name: t('categories.nail_salon'), 
@@ -54,14 +49,14 @@ export default function Home() {
       image: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=300&fit=crop'
     },
     { 
-      name: t('categories.beauty'), 
-      category: 'beauty',
-      image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&h=300&fit=crop'
+      name: t('categories.doctor'), 
+      category: 'doctor',
+      image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=300&fit=crop'
     },
     { 
-      name: t('categories.fitness'), 
-      category: 'fitness',
-      image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=300&fit=crop'
+      name: t('categories.dentist'), 
+      category: 'dentist',
+      image: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=400&h=300&fit=crop'
     },
   ];
 
