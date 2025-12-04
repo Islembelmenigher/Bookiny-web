@@ -33,9 +33,9 @@ export function StaffAnalytics({ businessId }: StaffAnalyticsProps) {
     if (selectedStaff !== 'all') {
       fetchStaffBookings(selectedStaff);
     } else {
-      setStaffBookings([]);
+      fetchAllStaffBookings();
     }
-  }, [selectedStaff]);
+  }, [selectedStaff, staffStats]);
 
   const fetchStaffStats = async () => {
     try {
@@ -87,12 +87,34 @@ export function StaffAnalytics({ businessId }: StaffAnalyticsProps) {
         .select(`
           *,
           services (name, price),
-          profiles (full_name)
+          profiles (full_name),
+          staff (name)
         `)
         .eq('business_id', businessId)
         .eq('staff_id', staffId)
         .order('booking_date', { ascending: false })
         .limit(10);
+
+      if (error) throw error;
+      setStaffBookings(data || []);
+    } catch (error: any) {
+      console.error(error);
+    }
+  };
+
+  const fetchAllStaffBookings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select(`
+          *,
+          services (name, price),
+          profiles (full_name),
+          staff (name)
+        `)
+        .eq('business_id', businessId)
+        .order('booking_date', { ascending: false })
+        .limit(20);
 
       if (error) throw error;
       setStaffBookings(data || []);
@@ -189,13 +211,9 @@ export function StaffAnalytics({ businessId }: StaffAnalyticsProps) {
           </div>
         </CardHeader>
         <CardContent>
-          {selectedStaff === 'all' ? (
+          {staffBookings.length === 0 ? (
             <p className="text-center text-muted-foreground py-4">
-              Select a staff member to view their bookings
-            </p>
-          ) : staffBookings.length === 0 ? (
-            <p className="text-center text-muted-foreground py-4">
-              No bookings found for this staff member
+              {selectedStaff === 'all' ? 'No bookings found' : 'No bookings found for this staff member'}
             </p>
           ) : (
             <div className="space-y-3">
@@ -209,6 +227,9 @@ export function StaffAnalytics({ businessId }: StaffAnalyticsProps) {
                     <p className="text-sm text-muted-foreground">
                       {booking.profiles?.full_name} · {formatDZD(booking.services?.price || 0)}
                     </p>
+                    {selectedStaff === 'all' && booking.staff?.name && (
+                      <p className="text-xs text-primary">Staff: {booking.staff.name}</p>
+                    )}
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-medium">{booking.booking_date}</p>

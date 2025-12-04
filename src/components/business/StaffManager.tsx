@@ -105,6 +105,20 @@ export function StaffManager({ businessId }: StaffManagerProps) {
     if (!confirm('Are you sure you want to remove this staff member?')) return;
 
     try {
+      // First get the staff member to check if they have a profile_id
+      const staffMember = staff.find(s => s.id === id);
+      
+      // If staff has a profile_id, remove their role access
+      if (staffMember?.profile_id) {
+        await supabase
+          .from('user_roles')
+          .delete()
+          .eq('user_id', staffMember.profile_id)
+          .eq('business_id', businessId)
+          .eq('role', 'staff');
+      }
+
+      // Then set staff as inactive
       const { error } = await supabase
         .from('staff')
         .update({ is_active: false })

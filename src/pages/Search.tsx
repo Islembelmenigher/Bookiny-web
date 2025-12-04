@@ -228,7 +228,7 @@ export default function SearchPage() {
                 </div>
               </PopoverContent>
             </Popover>
-            <Button type="submit" size="lg">{t('common.search')}</Button>
+            <Button type="submit" size="lg">{t('home.searchButton')}</Button>
           </form>
 
           {/* Active Filters Display */}
