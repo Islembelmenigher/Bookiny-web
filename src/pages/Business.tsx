@@ -299,7 +299,7 @@ export default function Business() {
         status: reserved ? 'reserved' : 'available',
       });
       
-      currentMin += 30;
+      currentMin += 5;
       if (currentMin >= 60) {
         currentMin = 0;
         currentHour += 1;

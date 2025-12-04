@@ -20,6 +20,8 @@ import { StaffScheduleManager } from '@/components/business/StaffScheduleManager
 import { StaffServicesManager } from '@/components/business/StaffServicesManager';
 import { PortfolioManager } from '@/components/business/PortfolioManager';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { formatDZD } from '@/lib/algeria';
+import { format } from 'date-fns';
 
 export default function BusinessManage() {
   const { id } = useParams();
@@ -79,11 +81,12 @@ export default function BusinessManage() {
       }
 
       // Fetch basic statistics
+      const todayDate = format(new Date(), 'yyyy-MM-dd');
       const [bookingsCountRes, servicesCountRes, staffCountRes, todayBookingsRes, revenueRes] = await Promise.all([
         supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('business_id', id),
         supabase.from('services').select('*', { count: 'exact', head: true }).eq('business_id', id).eq('is_active', true),
         supabase.from('staff').select('*', { count: 'exact', head: true }).eq('business_id', id).eq('is_active', true),
-        supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('business_id', id).eq('booking_date', new Date().toISOString().split('T')[0]),
+        supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('business_id', id).eq('booking_date', todayDate),
         supabase.from('bookings').select('services(price)').eq('business_id', id).eq('status', 'completed'),
       ]);
 
@@ -234,7 +237,7 @@ export default function BusinessManage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">Total Revenue</p>
-                      <p className="text-2xl font-bold">${stats.totalRevenue}</p>
+                      <p className="text-2xl font-bold">{formatDZD(stats.totalRevenue)}</p>
                     </div>
                     <Users className="h-8 w-8 text-blue-500" />
                   </div>
