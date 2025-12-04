@@ -143,13 +143,11 @@ export default function SearchPage() {
 
   const categories = [
     { label: 'All', value: '' },
-    { label: 'Salon', value: 'salon' },
-    { label: 'Spa', value: 'spa' },
-    { label: 'Barbershop', value: 'barbershop' },
+    { label: 'Barber for Men', value: 'barber_men' },
+    { label: 'Barber for Women', value: 'barber_women' },
     { label: 'Nail Salon', value: 'nail_salon' },
-    { label: 'Massage', value: 'massage' },
-    { label: 'Beauty', value: 'beauty' },
-    { label: 'Fitness', value: 'fitness' },
+    { label: 'Doctor', value: 'doctor' },
+    { label: 'Dentist', value: 'dentist' },
   ];
 
   const currentCategory = searchParams.get('category') || '';

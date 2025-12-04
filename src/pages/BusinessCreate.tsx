@@ -34,11 +34,13 @@ export default function BusinessCreate() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [communes, setCommunes] = useState<string[]>([]);
+  const [businessCount, setBusinessCount] = useState(0);
+  const [checkingLimit, setCheckingLimit] = useState(true);
   
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    category: 'salon',
+    category: 'barber_men',
     wilaya: '',
     city: '',
     postal_code: '',
@@ -48,6 +50,23 @@ export default function BusinessCreate() {
     email: '',
     website: '',
   });
+
+  // Check how many businesses the user already owns
+  useEffect(() => {
+    const checkBusinessCount = async () => {
+      if (!user?.id) return;
+      
+      const { count } = await supabase
+        .from('businesses')
+        .select('*', { count: 'exact', head: true })
+        .eq('owner_id', user.id);
+      
+      setBusinessCount(count || 0);
+      setCheckingLimit(false);
+    };
+    
+    checkBusinessCount();
+  }, [user]);
 
   // Auto-fill phone and email from user profile
   useEffect(() => {
@@ -143,16 +162,11 @@ export default function BusinessCreate() {
   };
 
   const categories = [
-    { value: 'salon', label: 'Hair Salon' },
-    { value: 'spa', label: 'Spa & Wellness' },
-    { value: 'barbershop', label: 'Barbershop' },
+    { value: 'barber_men', label: 'Barber for Men' },
+    { value: 'barber_women', label: 'Barber for Women' },
     { value: 'nail_salon', label: 'Nail Salon' },
-    { value: 'massage', label: 'Massage Therapy' },
-    { value: 'tattoo', label: 'Tattoo & Piercing' },
-    { value: 'fitness', label: 'Fitness & Gym' },
-    { value: 'beauty', label: 'Beauty Services' },
-    { value: 'wellness', label: 'Wellness Center' },
-    { value: 'other', label: 'Other' },
+    { value: 'doctor', label: 'Doctor' },
+    { value: 'dentist', label: 'Dentist' },
   ];
 
   return (
@@ -169,6 +183,29 @@ export default function BusinessCreate() {
             </p>
           </div>
 
+          {checkingLimit ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
+                <p className="text-muted-foreground">Checking business limit...</p>
+              </CardContent>
+            </Card>
+          ) : businessCount >= 3 ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <div className="h-16 w-16 rounded-full bg-destructive/10 mx-auto mb-4 flex items-center justify-center">
+                  <Building2 className="h-8 w-8 text-destructive" />
+                </div>
+                <h2 className="text-xl font-semibold mb-2">Business Limit Reached</h2>
+                <p className="text-muted-foreground mb-4">
+                  You can only create up to 3 businesses. Please manage your existing businesses or delete one to create a new one.
+                </p>
+                <Button onClick={() => navigate('/dashboard')}>
+                  Go to Dashboard
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
           <form onSubmit={handleSubmit}>
             <Card>
               <CardHeader>
@@ -368,6 +405,7 @@ export default function BusinessCreate() {
               </CardContent>
             </Card>
           </form>
+          )}
         </div>
       </div>
     </Layout>

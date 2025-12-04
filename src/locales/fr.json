@@ -108,16 +108,11 @@
     "listBusiness": "Inscrire votre Entreprise"
   },
   "categories": {
-    "salon": "Salon de Coiffure",
-    "spa": "Spa",
-    "barbershop": "Barbier",
+    "barber_men": "Barbier Homme",
+    "barber_women": "Barbier Femme",
     "nail_salon": "Salon de Manucure",
-    "massage": "Massage",
-    "tattoo": "Tatouage",
-    "fitness": "Fitness",
-    "beauty": "Beauté",
-    "wellness": "Bien-être",
-    "other": "Autre"
+    "doctor": "Médecin",
+    "dentist": "Dentiste"
   },
   "search": {
     "title": "Résultats de Recherche",

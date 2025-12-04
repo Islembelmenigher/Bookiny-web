@@ -108,16 +108,11 @@
     "listBusiness": "أضف نشاطك التجاري"
   },
   "categories": {
-    "salon": "صالون تصفيف الشعر",
-    "spa": "سبا",
-    "barbershop": "صالون حلاقة",
+    "barber_men": "حلاق رجال",
+    "barber_women": "حلاق نساء",
     "nail_salon": "صالون أظافر",
-    "massage": "مساج",
-    "tattoo": "وشم",
-    "fitness": "لياقة بدنية",
-    "beauty": "تجميل",
-    "wellness": "عافية",
-    "other": "أخرى"
+    "doctor": "طبيب",
+    "dentist": "طبيب أسنان"
   },
   "search": {
     "title": "نتائج البحث",
