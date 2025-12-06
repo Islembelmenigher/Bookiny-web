@@ -45,6 +45,34 @@ export default function Business() {
     }
   }, [id]);
 
+  // Subscribe to real-time booking updates
+  useEffect(() => {
+    if (!id) return;
+
+    const channel = supabase
+      .channel('booking-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'bookings',
+          filter: `business_id=eq.${id}`
+        },
+        () => {
+          // Refetch bookings when any change happens
+          if (selectedDate && selectedStaff) {
+            fetchExistingBookings();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [id, selectedDate, selectedStaff]);
+
   // Fetch staff services when business loads
   useEffect(() => {
     if (id && staff.length > 0) {
@@ -345,57 +373,58 @@ export default function Business() {
       <div className="container py-8 px-4">
         {/* Business Header */}
         <div
-          className="h-64 rounded-lg bg-cover bg-center mb-6 relative"
+          className="h-80 md:h-96 rounded-2xl bg-cover bg-center mb-8 relative overflow-hidden shadow-lg"
           style={{
             backgroundImage: business.cover_image_url
               ? `url(${business.cover_image_url})`
-              : 'linear-gradient(135deg, hsl(185 84% 45%), hsl(185 84% 60%))',
+              : 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)))',
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent rounded-lg"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent rounded-2xl"></div>
+          <div className="absolute bottom-6 left-6 right-6">
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">{business.name}</h1>
+              <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">{business.category.replace('_', ' ')}</Badge>
+            </div>
+            <div className="flex flex-wrap items-center gap-4 text-white/90">
+              {business.city && (
+                <div className="flex items-center gap-1 backdrop-blur-sm bg-black/20 px-3 py-1 rounded-full">
+                  <MapPin className="h-4 w-4" />
+                  <span>{business.city}, {business.state}</span>
+                </div>
+              )}
+              {averageRating > 0 && (
+                <div className="flex items-center gap-1 backdrop-blur-sm bg-black/20 px-3 py-1 rounded-full">
+                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  <span>{averageRating} ({reviews.length} reviews)</span>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         <div className="max-w-5xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold">{business.name}</h1>
-                <Badge>{business.category.replace('_', ' ')}</Badge>
-              </div>
-              <div className="flex flex-wrap items-center gap-4 text-muted-foreground">
-                {business.city && (
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4" />
-                    <span>{business.city}, {business.state}</span>
-                  </div>
+          {/* Contact Info Bar */}
+          {business.phone && (
+            <div className="mb-6">
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(business.phone);
+                  setPhoneCopied(true);
+                  setTimeout(() => setPhoneCopied(false), 2000);
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-lg hover:bg-primary/20 transition-colors"
+              >
+                <Phone className="h-4 w-4 text-primary" />
+                <span className="font-medium">{business.phone}</span>
+                {phoneCopied ? (
+                  <Check className="h-4 w-4 text-green-500" />
+                ) : (
+                  <Copy className="h-4 w-4 text-muted-foreground" />
                 )}
-                {business.phone && (
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(business.phone);
-                      setPhoneCopied(true);
-                      setTimeout(() => setPhoneCopied(false), 2000);
-                    }}
-                    className="flex items-center gap-1 hover:text-primary transition-colors"
-                  >
-                    <Phone className="h-4 w-4" />
-                    <span>{business.phone}</span>
-                    {phoneCopied ? (
-                      <Check className="h-3 w-3 text-green-500" />
-                    ) : (
-                      <Copy className="h-3 w-3" />
-                    )}
-                  </button>
-                )}
-                {averageRating > 0 && (
-                  <div className="flex items-center gap-1">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span>{averageRating} ({reviews.length} reviews)</span>
-                  </div>
-                )}
-              </div>
+              </button>
             </div>
-          </div>
+          )}
 
           {business.description && (
             <Card className="mb-6">

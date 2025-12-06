@@ -1,9 +1,10 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Calendar, User, LogOut, Menu } from 'lucide-react';
+import { Calendar, User, LogOut, Menu, CreditCard } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
+import { supabase } from '@/integrations/supabase/client';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +24,21 @@ export function Layout({ children }: LayoutProps) {
   const { t } = useTranslation();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [isBusinessOwner, setIsBusinessOwner] = useState(false);
+
+  useEffect(() => {
+    const checkUserRole = async () => {
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        setIsBusinessOwner(data?.role === 'business_owner');
+      }
+    };
+    checkUserRole();
+  }, [user]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -85,6 +101,14 @@ export function Layout({ children }: LayoutProps) {
                     <DropdownMenuItem asChild>
                       <Link to="/profile">{t('nav.profile')}</Link>
                     </DropdownMenuItem>
+                    {isBusinessOwner && (
+                      <DropdownMenuItem asChild>
+                        <Link to="/payment">
+                          <CreditCard className="h-4 w-4 me-2" />
+                          Subscription
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut}>
                       <LogOut className="h-4 w-4 me-2" />
@@ -130,6 +154,12 @@ export function Layout({ children }: LayoutProps) {
                       <Link to="/profile" className="text-lg font-medium hover:text-primary transition-colors">
                         {t('nav.profile')}
                       </Link>
+                      {isBusinessOwner && (
+                        <Link to="/payment" className="text-lg font-medium hover:text-primary transition-colors flex items-center">
+                          <CreditCard className="h-4 w-4 me-2" />
+                          Subscription
+                        </Link>
+                      )}
                       <Button onClick={handleSignOut} variant="outline" className="w-full justify-start">
                         <LogOut className="h-4 w-4 me-2" />
                         {t('nav.logout')}
