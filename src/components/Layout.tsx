@@ -215,10 +215,10 @@ export function Layout({ children }: LayoutProps) {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold mb-4 text-foreground">Support</h3>
+              <h3 className="font-semibold mb-4 text-foreground">{t('footer.support')}</h3>
               <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Contact Us</a></li>
+                <li><Link to="/how-to-use" className="hover:text-primary transition-colors">{t('footer.howToUse')}</Link></li>
+                <li><Link to="/contact" className="hover:text-primary transition-colors">{t('footer.contactUs')}</Link></li>
               </ul>
             </div>
           </div>
