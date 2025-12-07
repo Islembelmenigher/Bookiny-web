@@ -16,6 +16,8 @@ import Profile from "./pages/Profile";
 import BusinessCreate from "./pages/BusinessCreate";
 import BusinessManage from "./pages/BusinessManage";
 import Payment from "./pages/Payment";
+import HowToUse from "./pages/HowToUse";
+import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +37,8 @@ function AppContent() {
             <Route path="/search" element={<Search />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/payment" element={<Payment />} />
+            <Route path="/how-to-use" element={<HowToUse />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/business/new" element={<BusinessCreate />} />
             <Route path="/business/:id" element={<Business />} />
             <Route path="/business/:id/manage" element={<BusinessManage />} />
