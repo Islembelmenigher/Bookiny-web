@@ -153,7 +153,11 @@
     "tryDifferent": "Essayez d'autres termes de recherche ou filtres",
     "filterByLocation": "Filtrer par Emplacement",
     "filterByArea": "Filtrer par Zone",
-    "applyFilters": "Appliquer les Filtres"
+    "applyFilters": "Appliquer les Filtres",
+    "usingPreferredLocation": "Utilisation de votre emplacement préféré",
+    "found": "Trouvé",
+    "business": "entreprise",
+    "businesses": "entreprises"
   },
   "business": {
     "about": "À propos",
@@ -188,7 +192,7 @@
     "manage": "Gérer votre entreprise et vos réservations",
     "backToDashboard": "Retour au Tableau de Bord"
   },
-  "booking": {
+  "bookings": {
     "title": "Mes Réservations",
     "upcoming": "À venir",
     "past": "Passées",
@@ -197,6 +201,7 @@
     "confirmed": "Confirmée",
     "completed": "Terminée",
     "noShow": "Absent",
+    "no_show": "Absent",
     "cancel": "Annuler la Réservation",
     "reschedule": "Reprogrammer",
     "cancelConfirm": "Êtes-vous sûr de vouloir annuler cette réservation ?",
@@ -205,7 +210,11 @@
     "notes": "Notes",
     "addNotes": "Ajouter des notes pour votre rendez-vous",
     "clientPhone": "Téléphone du Client",
-    "noBookings": "Aucune réservation trouvée"
+    "noBookings": "Aucune réservation trouvée",
+    "markNoShow": "Absent",
+    "performedBy": "Réalisé par",
+    "notAssigned": "Non assigné",
+    "complete": "Terminer"
   },
   "dashboard": {
     "title": "Tableau de Bord",
@@ -231,7 +240,8 @@
     "activeServices": "Services Actifs",
     "mySchedule": "Mon Horaire",
     "myServices": "Mes Services",
-    "hours": "Heures"
+    "hours": "Heures",
+    "manageAppointments": "Gérer vos rendez-vous"
   },
   "profile": {
     "title": "Paramètres du Profil",
@@ -249,13 +259,19 @@
     "uploadPicture": "Télécharger une nouvelle photo",
     "uploading": "Téléchargement...",
     "imageFormat": "PNG, JPG jusqu'à 2Mo",
+    "imageOnly": "Veuillez télécharger un fichier image",
+    "imageTooLarge": "L'image doit faire moins de 2 Mo",
     "emailCannotChange": "L'email ne peut pas être modifié",
     "yourUserId": "Votre ID Utilisateur",
     "shareWithOwner": "Partagez ceci avec les propriétaires d'entreprise pour obtenir un accès personnel",
     "language": "Langue",
     "languagePreference": "Préférence de Langue",
     "selectLanguage": "Sélectionnez votre langue préférée",
-    "languageUpdated": "Préférence de langue mise à jour"
+    "languageUpdated": "Préférence de langue mise à jour",
+    "preferredLocation": "Emplacement Préféré",
+    "preferredLocationDesc": "Définissez votre emplacement préféré pour voir automatiquement les entreprises à proximité",
+    "locationUpdated": "Préférence d'emplacement mise à jour",
+    "clearLocation": "Effacer l'emplacement"
   },
   "settings": {
     "general": "Général",

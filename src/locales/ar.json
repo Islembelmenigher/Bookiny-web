@@ -153,7 +153,11 @@
     "tryDifferent": "جرب مصطلحات بحث أو فلاتر مختلفة",
     "filterByLocation": "تصفية حسب الموقع",
     "filterByArea": "تصفية حسب المنطقة",
-    "applyFilters": "تطبيق الفلاتر"
+    "applyFilters": "تطبيق الفلاتر",
+    "usingPreferredLocation": "استخدام موقعك المفضل",
+    "found": "تم العثور على",
+    "business": "نشاط تجاري",
+    "businesses": "أنشطة تجارية"
   },
   "business": {
     "about": "حول",
@@ -188,7 +192,7 @@
     "manage": "إدارة نشاطك التجاري وحجوزاتك",
     "backToDashboard": "العودة إلى لوحة التحكم"
   },
-  "booking": {
+  "bookings": {
     "title": "حجوزاتي",
     "upcoming": "القادمة",
     "past": "السابقة",
@@ -197,6 +201,7 @@
     "confirmed": "مؤكد",
     "completed": "مكتمل",
     "noShow": "لم يحضر",
+    "no_show": "لم يحضر",
     "cancel": "إلغاء الحجز",
     "reschedule": "إعادة الجدولة",
     "cancelConfirm": "هل أنت متأكد من إلغاء هذا الحجز؟",
@@ -205,7 +210,11 @@
     "notes": "ملاحظات",
     "addNotes": "أضف ملاحظات لموعدك",
     "clientPhone": "هاتف العميل",
-    "noBookings": "لا توجد حجوزات"
+    "noBookings": "لا توجد حجوزات",
+    "markNoShow": "لم يحضر",
+    "performedBy": "يقدمها",
+    "notAssigned": "غير معين",
+    "complete": "إكمال"
   },
   "dashboard": {
     "title": "لوحة التحكم",
@@ -231,7 +240,8 @@
     "activeServices": "الخدمات النشطة",
     "mySchedule": "جدولي",
     "myServices": "خدماتي",
-    "hours": "الساعات"
+    "hours": "الساعات",
+    "manageAppointments": "إدارة مواعيدك"
   },
   "profile": {
     "title": "إعدادات الملف الشخصي",
@@ -249,13 +259,19 @@
     "uploadPicture": "تحميل صورة جديدة",
     "uploading": "جاري التحميل...",
     "imageFormat": "PNG, JPG حتى 2 ميجابايت",
+    "imageOnly": "يرجى تحميل ملف صورة",
+    "imageTooLarge": "يجب أن تكون الصورة أقل من 2 ميجابايت",
     "emailCannotChange": "لا يمكن تغيير البريد الإلكتروني",
     "yourUserId": "معرف المستخدم الخاص بك",
     "shareWithOwner": "شارك هذا مع أصحاب الأنشطة التجارية للحصول على صلاحية موظف",
     "language": "اللغة",
     "languagePreference": "تفضيل اللغة",
     "selectLanguage": "اختر لغتك المفضلة",
-    "languageUpdated": "تم تحديث تفضيل اللغة"
+    "languageUpdated": "تم تحديث تفضيل اللغة",
+    "preferredLocation": "الموقع المفضل",
+    "preferredLocationDesc": "حدد موقعك المفضل لرؤية الأنشطة التجارية القريبة تلقائياً",
+    "locationUpdated": "تم تحديث تفضيل الموقع",
+    "clearLocation": "مسح الموقع"
   },
   "settings": {
     "general": "عام",

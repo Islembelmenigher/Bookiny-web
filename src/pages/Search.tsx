@@ -10,6 +10,7 @@ import { Search, MapPin, Star, Clock, Filter, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { WILAYAS, getCommunesByWilaya } from '@/lib/algeria';
+import { useAuth } from '@/lib/auth';
 import {
   Popover,
   PopoverContent,
@@ -25,6 +26,7 @@ import {
 
 export default function SearchPage() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,10 +36,47 @@ export default function SearchPage() {
   const [filterCity, setFilterCity] = useState(searchParams.get('city') || '');
   const [communes, setCommunes] = useState<string[]>([]);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [userPreferredLocation, setUserPreferredLocation] = useState<{ wilaya: string; city: string } | null>(null);
+
+  // Fetch user's preferred location on mount
+  useEffect(() => {
+    const fetchUserPreference = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('preferred_wilaya, preferred_city')
+          .eq('id', user.id)
+          .single();
+        
+        if (error) throw error;
+        
+        if (data?.preferred_wilaya) {
+          setUserPreferredLocation({
+            wilaya: data.preferred_wilaya,
+            city: data.preferred_city || ''
+          });
+          
+          // Only apply if no filter is already set in URL
+          if (!searchParams.get('wilaya') && !searchParams.get('city')) {
+            setFilterWilaya(data.preferred_wilaya);
+            if (data.preferred_city) {
+              setFilterCity(data.preferred_city);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch user preferences:', error);
+      }
+    };
+
+    fetchUserPreference();
+  }, [user]);
 
   useEffect(() => {
     fetchBusinesses();
-  }, [searchParams]);
+  }, [searchParams, filterWilaya, filterCity]);
 
   useEffect(() => {
     if (filterWilaya) {
@@ -71,8 +110,8 @@ export default function SearchPage() {
         query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
       }
 
-      // Filter by wilaya (stored in state field)
-      const wilayaParam = searchParams.get('wilaya');
+      // Filter by wilaya - use URL param or filter state
+      const wilayaParam = searchParams.get('wilaya') || filterWilaya;
       if (wilayaParam) {
         const wilayaName = WILAYAS.find(w => w.code === wilayaParam)?.name;
         if (wilayaName) {
@@ -80,8 +119,8 @@ export default function SearchPage() {
         }
       }
 
-      // Filter by city
-      const cityParam = searchParams.get('city');
+      // Filter by city - use URL param or filter state
+      const cityParam = searchParams.get('city') || filterCity;
       if (cityParam) {
         query = query.eq('city', cityParam);
       }
@@ -142,12 +181,12 @@ export default function SearchPage() {
   const hasActiveFilters = filterWilaya || filterCity;
 
   const categories = [
-    { label: 'All', value: '' },
-    { label: 'Barber for Men', value: 'barber_men' },
-    { label: 'Barber for Women', value: 'barber_women' },
-    { label: 'Nail Salon', value: 'nail_salon' },
-    { label: 'Doctor', value: 'doctor' },
-    { label: 'Dentist', value: 'dentist' },
+    { label: t('common.all'), value: '' },
+    { label: t('categories.barber_men'), value: 'barber_men' },
+    { label: t('categories.barber_women'), value: 'barber_women' },
+    { label: t('categories.nail_salon'), value: 'nail_salon' },
+    { label: t('categories.doctor'), value: 'doctor' },
+    { label: t('categories.dentist'), value: 'dentist' },
   ];
 
   const currentCategory = searchParams.get('category') || '';
@@ -250,6 +289,11 @@ export default function SearchPage() {
                   </button>
                 </Badge>
               )}
+              {userPreferredLocation && filterWilaya === userPreferredLocation.wilaya && (
+                <Badge variant="outline" className="gap-1 text-muted-foreground">
+                  {t('search.usingPreferredLocation')}
+                </Badge>
+              )}
             </div>
           )}
 
@@ -261,11 +305,12 @@ export default function SearchPage() {
                 variant={currentCategory === cat.value ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => {
-                  if (cat.value) {
-                    setSearchParams({ category: cat.value });
-                  } else {
-                    setSearchParams({});
-                  }
+                  const params: Record<string, string> = {};
+                  if (cat.value) params.category = cat.value;
+                  if (filterWilaya) params.wilaya = filterWilaya;
+                  if (filterCity) params.city = filterCity;
+                  if (searchQuery) params.q = searchQuery;
+                  setSearchParams(params);
                 }}
                 className="whitespace-nowrap"
               >
@@ -296,7 +341,7 @@ export default function SearchPage() {
           <>
             <div className="mb-4">
               <p className="text-muted-foreground">
-                Found {businesses.length} {businesses.length === 1 ? 'business' : 'businesses'}
+                {t('search.found')} {businesses.length} {businesses.length === 1 ? t('search.business') : t('search.businesses')}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -315,7 +360,7 @@ export default function SearchPage() {
                       <div className="flex items-start justify-between mb-2">
                         <h3 className="font-semibold text-lg line-clamp-1">{business.name}</h3>
                         <Badge variant="secondary" className="ml-2">
-                          {business.category.replace('_', ' ')}
+                          {t(`categories.${business.category}`)}
                         </Badge>
                       </div>
                       {business.description && (
