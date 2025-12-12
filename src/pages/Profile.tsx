@@ -8,10 +8,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { ArrowLeft, User, Mail, Phone, Copy, Upload, Globe } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, Copy, Upload, Globe, MapPin } from 'lucide-react';
 import { z } from 'zod';
 import { changeLanguage, getCurrentLanguage } from '@/lib/i18n';
-import { validateAlgerianPhone } from '@/lib/algeria';
+import { validateAlgerianPhone, WILAYAS, getCommunesByWilaya } from '@/lib/algeria';
 import {
   Select,
   SelectContent,
@@ -48,6 +48,9 @@ export default function Profile() {
   const [profile, setProfile] = useState({ full_name: '', phone: '', avatar_url: '' });
   const [passwords, setPasswords] = useState({ newPassword: '', confirmPassword: '' });
   const [selectedLanguage, setSelectedLanguage] = useState(getCurrentLanguage());
+  const [preferredWilaya, setPreferredWilaya] = useState('');
+  const [preferredCity, setPreferredCity] = useState('');
+  const [communes, setCommunes] = useState<string[]>([]);
 
   useEffect(() => {
     if (!user) {
@@ -57,11 +60,24 @@ export default function Profile() {
     fetchProfile();
   }, [user]);
 
+  useEffect(() => {
+    if (preferredWilaya) {
+      const wilayaCommunes = getCommunesByWilaya(preferredWilaya);
+      setCommunes(wilayaCommunes);
+      if (!wilayaCommunes.includes(preferredCity)) {
+        setPreferredCity('');
+      }
+    } else {
+      setCommunes([]);
+      setPreferredCity('');
+    }
+  }, [preferredWilaya]);
+
   const fetchProfile = async () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('full_name, phone, avatar_url, language_preference')
+        .select('full_name, phone, avatar_url, language_preference, preferred_wilaya, preferred_city')
         .eq('id', user?.id)
         .single();
 
@@ -75,6 +91,12 @@ export default function Profile() {
         if (data.language_preference) {
           setSelectedLanguage(data.language_preference);
           changeLanguage(data.language_preference);
+        }
+        if (data.preferred_wilaya) {
+          setPreferredWilaya(data.preferred_wilaya);
+        }
+        if (data.preferred_city) {
+          setPreferredCity(data.preferred_city);
         }
       }
     } catch (error: any) {
@@ -143,12 +165,12 @@ export default function Profile() {
     const file = e.target.files[0];
     
     if (!file.type.startsWith('image/')) {
-      toast.error('Please upload an image file');
+      toast.error(t('profile.imageOnly'));
       return;
     }
 
     if (file.size > 2 * 1024 * 1024) {
-      toast.error('Image must be less than 2MB');
+      toast.error(t('profile.imageTooLarge'));
       return;
     }
 
@@ -205,6 +227,43 @@ export default function Profile() {
     }
   };
 
+  const handleLocationChange = async (wilaya: string, city: string) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          preferred_wilaya: wilaya || null, 
+          preferred_city: city || null 
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+      toast.success(t('profile.locationUpdated'));
+    } catch (error) {
+      console.error('Failed to save location preference:', error);
+      toast.error(t('errors.somethingWrong'));
+    }
+  };
+
+  const handleWilayaChange = (value: string) => {
+    setPreferredWilaya(value);
+    setPreferredCity('');
+    handleLocationChange(value, '');
+  };
+
+  const handleCityChange = (value: string) => {
+    setPreferredCity(value);
+    handleLocationChange(preferredWilaya, value);
+  };
+
+  const clearLocation = async () => {
+    setPreferredWilaya('');
+    setPreferredCity('');
+    await handleLocationChange('', '');
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
@@ -235,7 +294,7 @@ export default function Profile() {
                     size="sm"
                     onClick={() => {
                       navigator.clipboard.writeText(user.id);
-                      toast.success('User ID copied to clipboard');
+                      toast.success(t('common.copied'));
                     }}
                   >
                     <Copy className="h-4 w-4" />
@@ -270,6 +329,60 @@ export default function Profile() {
                   ))}
                 </SelectContent>
               </Select>
+            </CardContent>
+          </Card>
+
+          {/* Preferred Location Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MapPin className="h-5 w-5" />
+                {t('profile.preferredLocation')}
+              </CardTitle>
+              <CardDescription>{t('profile.preferredLocationDesc')}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>{t('address.wilaya')}</Label>
+                  <Select value={preferredWilaya} onValueChange={handleWilayaChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('address.selectWilaya')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {WILAYAS.map((wilaya) => (
+                        <SelectItem key={wilaya.code} value={wilaya.code}>
+                          {wilaya.code} - {wilaya.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {communes.length > 0 && (
+                  <div className="space-y-2">
+                    <Label>{t('address.city')}</Label>
+                    <Select value={preferredCity} onValueChange={handleCityChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t('address.selectCity')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {communes.map((commune) => (
+                          <SelectItem key={commune} value={commune}>
+                            {commune}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
+
+              {(preferredWilaya || preferredCity) && (
+                <Button variant="outline" size="sm" onClick={clearLocation}>
+                  {t('profile.clearLocation')}
+                </Button>
+              )}
             </CardContent>
           </Card>
 

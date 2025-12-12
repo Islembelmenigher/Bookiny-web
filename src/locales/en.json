@@ -153,7 +153,11 @@
     "tryDifferent": "Try different search terms or filters",
     "filterByLocation": "Filter by Location",
     "filterByArea": "Filter by Area",
-    "applyFilters": "Apply Filters"
+    "applyFilters": "Apply Filters",
+    "usingPreferredLocation": "Using your preferred location",
+    "found": "Found",
+    "business": "business",
+    "businesses": "businesses"
   },
   "business": {
     "about": "About",
@@ -188,7 +192,7 @@
     "manage": "Manage your business and bookings",
     "backToDashboard": "Back to Dashboard"
   },
-  "booking": {
+  "bookings": {
     "title": "My Bookings",
     "upcoming": "Upcoming",
     "past": "Past",
@@ -197,6 +201,7 @@
     "confirmed": "Confirmed",
     "completed": "Completed",
     "noShow": "No Show",
+    "no_show": "No Show",
     "cancel": "Cancel Booking",
     "reschedule": "Reschedule",
     "cancelConfirm": "Are you sure you want to cancel this booking?",
@@ -205,7 +210,11 @@
     "notes": "Notes",
     "addNotes": "Add notes for your appointment",
     "clientPhone": "Client Phone",
-    "noBookings": "No bookings found"
+    "noBookings": "No bookings found",
+    "markNoShow": "No Show",
+    "performedBy": "Performed by",
+    "notAssigned": "Not assigned",
+    "complete": "Complete"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -231,7 +240,8 @@
     "activeServices": "Active Services",
     "mySchedule": "My Schedule",
     "myServices": "My Services",
-    "hours": "Hours"
+    "hours": "Hours",
+    "manageAppointments": "Manage your appointments"
   },
   "profile": {
     "title": "Profile Settings",
@@ -249,13 +259,19 @@
     "uploadPicture": "Upload new picture",
     "uploading": "Uploading...",
     "imageFormat": "PNG, JPG up to 2MB",
+    "imageOnly": "Please upload an image file",
+    "imageTooLarge": "Image must be less than 2MB",
     "emailCannotChange": "Email cannot be changed",
     "yourUserId": "Your User ID",
     "shareWithOwner": "Share this with business owners to get staff access",
     "language": "Language",
     "languagePreference": "Language Preference",
     "selectLanguage": "Select your preferred language",
-    "languageUpdated": "Language preference updated"
+    "languageUpdated": "Language preference updated",
+    "preferredLocation": "Preferred Location",
+    "preferredLocationDesc": "Set your preferred location to automatically see nearby businesses",
+    "locationUpdated": "Location preference updated",
+    "clearLocation": "Clear location"
   },
   "settings": {
     "general": "General",
