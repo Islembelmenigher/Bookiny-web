@@ -70,7 +70,8 @@
     "logout": "Logout",
     "myBookings": "My Bookings",
     "myBusiness": "My Business",
-    "createBusiness": "Create Business"
+    "createBusiness": "Create Business",
+    "subscription": "Subscription"
   },
   "auth": {
     "welcomeBack": "Welcome back",
@@ -208,7 +209,32 @@
     "contactPhone": "Contact Phone",
     "ourTeam": "Our Team",
     "manage": "Manage your business and bookings",
-    "backToDashboard": "Back to Dashboard"
+    "backToDashboard": "Back to Dashboard",
+    "pleaseSignIn": "Please sign in to book an appointment",
+    "selectAllDetails": "Please select all booking details",
+    "slotAlreadyBooked": "This time slot has just been booked. Please select another time.",
+    "businessNotFound": "Business not found",
+    "noServicesAvailable": "No services available",
+    "selectProfessional": "Select Professional",
+    "noStaffForService": "No staff members are available for this service.",
+    "selectDate": "Select Date",
+    "selectTime": "Select Time",
+    "staffNotAvailable": "is not available on this date or all slots are booked.",
+    "beFirstToReview": "No reviews yet. Be the first to review!",
+    "totalBookings": "Total Bookings",
+    "todayBookings": "Today's Bookings",
+    "activeServices": "Active Services",
+    "totalRevenue": "Total Revenue"
+  },
+  "tabs": {
+    "bookings": "Bookings",
+    "mySchedule": "My Schedule",
+    "myServices": "My Services",
+    "services": "Services",
+    "staff": "Staff",
+    "hours": "Hours",
+    "analytics": "Analytics",
+    "settings": "Settings"
   },
   "bookings": {
     "title": "My Bookings",
@@ -259,7 +285,19 @@
     "mySchedule": "My Schedule",
     "myServices": "My Services",
     "hours": "Hours",
-    "manageAppointments": "Manage your appointments"
+    "addBusiness": "Add Business",
+    "staffAccess": "Staff Access",
+    "noBookingsTitle": "No bookings yet",
+    "noBookingsDesc": "Start by searching for services and booking appointments",
+    "browseServices": "Browse Services",
+    "businessLimit": "You can only create up to {{limit}} businesses. You've reached the maximum limit.",
+    "noBusinessesTitle": "No businesses yet",
+    "noBusinessesDesc": "Add your business to start receiving bookings",
+    "addAnotherBusiness": "Add Another Business",
+    "manage": "Manage",
+    "staffAccessTitle": "Staff Dashboard Access",
+    "staffAccessDesc": "You have staff access to the following businesses. Click to open their dashboard.",
+    "openDashboard": "Open Business Dashboard"
   },
   "profile": {
     "title": "Profile Settings",
@@ -297,12 +335,67 @@
     "businessHours": "Business Hours",
     "notifications": "Notifications",
     "portfolio": "Portfolio",
+    "deleteAccount": "Delete Account",
     "dangerZone": "Danger Zone",
+    "dangerZoneDesc": "Irreversible actions that will permanently delete your business",
     "deleteBusiness": "Delete Business",
     "deleteBusinessConfirm": "Are you sure you want to delete this business? This action cannot be undone.",
-    "businessDeleted": "Business deleted successfully"
+    "deleteBusinessConfirmTitle": "Are you absolutely sure?",
+    "deleteBusinessConfirmDesc": "This action cannot be undone. This will permanently delete your business and remove all associated data including bookings, services, staff, hours, reviews, and images.",
+    "businessDeleted": "Business deleted successfully",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "coverImage": {
+      "title": "Business Cover Image",
+      "description": "Upload a cover image for your business profile",
+      "noImage": "No cover image",
+      "upload": "Upload Cover Image",
+      "uploading": "Uploading...",
+      "recommendation": "Recommended: 1200x400px, PNG or JPG up to 5MB",
+      "success": "Cover image updated successfully",
+      "error": "Failed to upload image",
+      "typeError": "Please upload an image file",
+      "sizeError": "Image must be less than 5MB"
+    },
+    "portfolioGallery": {
+      "title": "Portfolio Gallery",
+      "description": "Upload photos showcasing your work (before/after, finished projects, etc.)",
+      "upload": "Upload Images",
+      "uploadLabel": "Click to upload images (max 5MB each)",
+      "uploading": "Uploading...",
+      "noImages": "No portfolio images yet. Upload some to showcase your work!",
+      "success": "Images uploaded successfully",
+      "error": "Failed to upload images",
+      "deleteSuccess": "Image deleted",
+      "deleteError": "Failed to delete image",
+      "loadError": "Failed to load portfolio images",
+      "typeError": "{{fileName}} is not an image",
+      "sizeError": "{{fileName}} is too large (max 5MB)"
+    }
   },
   "staff": {
+    "access": {
+      "title": "Staff Access Management",
+      "subtitle": "Grant staff members access to manage this business",
+      "howToTitle": "How to add staff members:",
+      "step1": "Ask your staff member to create an account (if they haven't)",
+      "step2": "Staff member should go to their Profile page",
+      "step3": "They'll find their User ID at the top of their profile",
+      "step4": "Copy and paste that User ID below to grant them access",
+      "label": "Staff User ID",
+      "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "button": "Add Staff",
+      "buttonLoading": "Adding...",
+      "helpText": "User ID is a unique identifier found on the staff member's profile page",
+      "userNotFound": "User not found. Please verify the User ID.",
+      "alreadyStaff": "This user is already a staff member",
+      "addSuccess": "{{name}} added as staff member",
+      "addError": "Failed to add staff member",
+      "invalidFormat": "Invalid User ID format",
+      "currentStaff": "Current Staff Members",
+      "removeSuccess": "Staff member removed",
+      "removeError": "Failed to remove staff member"
+    },
     "addStaff": "Add Staff",
     "editStaff": "Edit Staff",
     "staffName": "Staff Name",
@@ -317,17 +410,56 @@
     "inviteSuccess": "Staff member invited successfully",
     "removeStaff": "Remove Staff",
     "removeConfirm": "Are you sure you want to remove this staff member?",
-    "completedBookings": "Completed Bookings"
+    "completedBookings": "Completed Bookings",
+    "title": "Staff Members",
+    "subtitle": "Manage your team members",
+    "noStaff": "No staff members yet. Add your first team member.",
+    "createSuccess": "Staff member added successfully",
+    "updateSuccess": "Staff member updated successfully",
+    "deleteSuccess": "Staff member removed",
+    "deleteError": "Failed to remove staff member",
+    "loadError": "Failed to load staff",
+    "saveError": "Failed to save staff member",
+    "fullName": "Full Name",
+    "placeholderName": "John Doe",
+    "placeholderTitle": "Senior Stylist",
+    "placeholderBio": "Brief bio or description..."
+  },
+  "hours": {
+    "title": "Business Hours",
+    "subtitle": "Set your operating hours for each day",
+    "save": "Save Changes",
+    "saving": "Saving...",
+    "open": "Open",
+    "closed": "Closed",
+    "to": "to",
+    "updateSuccess": "Hours updated successfully",
+    "updateError": "Failed to update hours",
+    "loadError": "Failed to load hours"
   },
   "services": {
+    "title": "Services",
+    "subtitle": "Manage the services you offer",
     "addService": "Add Service",
     "editService": "Edit Service",
     "serviceName": "Service Name",
     "serviceDescription": "Description",
-    "servicePrice": "Price",
+    "servicePrice": "Price (DZD)",
     "serviceDuration": "Duration (minutes)",
     "active": "Active",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "noServices": "No services yet. Add your first service to get started.",
+    "createSuccess": "Service created successfully",
+    "updateSuccess": "Service updated successfully",
+    "deleteSuccess": "Service deleted",
+    "deleteError": "Failed to delete service",
+    "loadError": "Failed to load services",
+    "saveError": "Failed to save service",
+    "deleteConfirm": "Are you sure you want to delete this service?",
+    "addServiceTitle": "Add New Service",
+    "editServiceTitle": "Edit Service",
+    "placeholderName": "Haircut & Style",
+    "placeholderDesc": "Describe this service..."
   },
   "languages": {
     "en": "English",
@@ -359,7 +491,10 @@
     "nameTooShort": "Name must be at least 2 characters",
     "somethingWrong": "Something went wrong. Please try again.",
     "unauthorized": "You are not authorized to perform this action",
-    "notFound": "The requested resource was not found"
+    "notFound": "The requested resource was not found",
+    "notFoundTitle": "404",
+    "notFoundMessage": "Oops! Page not found",
+    "returnHome": "Return to Home"
   },
   "howToUse": {
     "badge": "User Guide",
@@ -447,5 +582,73 @@
     "helpCenter": "Help Center",
     "contactUs": "Contact Us",
     "howToUse": "How to Use"
+  },
+  "payment": {
+    "title": "Choose Your Plan",
+    "subtitle": "Select the perfect plan for your business. All plans include a 14-day free trial.",
+    "period": "/month",
+    "subscribe": "Subscribe Now",
+    "mostPopular": "Most Popular",
+    "lifetimeAccess": "Lifetime Access",
+    "lifetimeDesc": "Pay once, use forever. Get all Professional features.",
+    "oneTimePayment": "one-time payment",
+    "getLifetime": "Get Lifetime Access",
+    "needHelp": "Need help choosing?",
+    "contactSales": "Contact our sales team",
+    "securePayment": "All payments are secure and encrypted. Cancel anytime.",
+    "plans": {
+      "basic": {
+        "name": "Basic",
+        "description": "Perfect for small businesses just getting started",
+        "features": {
+          "bookings": "Up to 50 bookings/month",
+          "staff": "1 staff member",
+          "analytics": "Basic analytics",
+          "notifications": "Email notifications",
+          "support": "Standard support"
+        }
+      },
+      "professional": {
+        "name": "Professional",
+        "description": "Ideal for growing businesses with more needs",
+        "features": {
+          "bookings": "Unlimited bookings",
+          "staff": "Up to 5 staff members",
+          "analytics": "Advanced analytics",
+          "notifications": "SMS & Email notifications",
+          "support": "Priority support",
+          "branding": "Custom branding"
+        }
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "For large businesses with complex requirements",
+        "features": {
+          "everything": "Everything in Professional",
+          "staff": "Unlimited staff members",
+          "api": "API access",
+          "accountManager": "Dedicated account manager",
+          "integrations": "Custom integrations",
+          "sla": "SLA guarantee"
+        }
+      }
+    }
+  },
+  "staffAnalytics": {
+    "staffPerformance": "Staff Performance",
+    "staffPerformanceDesc": "Bookings completed by each staff member",
+    "bookingsByStaff": "Bookings by Staff",
+    "bookingsByStaffDesc": "View recent bookings for each staff member",
+    "selectStaff": "Select staff",
+    "allStaff": "All Staff",
+    "noStaffFound": "No staff members found",
+    "noBookingsFound": "No bookings found",
+    "noBookingsFoundStaff": "No bookings found for this staff member",
+    "completed": "Completed",
+    "confirmed": "Confirmed",
+    "pending": "Pending",
+    "total": "Total",
+    "staffLabel": "Staff:",
+    "loadError": "Failed to load staff analytics"
   }
 }

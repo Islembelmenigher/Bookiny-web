@@ -181,6 +181,43 @@ This is a **production-ready** booking platform similar to Booksy, built with Re
 
 ---
 
+## 📂 Project Structure
+
+### `src/pages`
+Core application pages handling routing and main views:
+- **Home.tsx**: Landing page featuring search functionality, categories, and featured businesses.
+- **Auth.tsx**: Authentication page handling both Login and Signup flows.
+- **Search.tsx**: Advanced search results page with filtering by category, location, and price.
+- **Business.tsx**: Public-facing business profile view for clients to browse services and book appointments.
+- **BusinessCreate.tsx**: Multi-step wizard for business owners to register their business.
+- **BusinessManage.tsx**: Comprehensive dashboard for business owners to manage their operations.
+- **Dashboard.tsx**: Client dashboard for viewing upcoming/past bookings and favorite businesses.
+- **Profile.tsx**: User settings page for profile management.
+- **NotFound.tsx**: Custom 404 error page.
+
+### `src/components/business`
+Business logic and management components:
+- **BookingsManager.tsx**: Interface for processing bookings (confirm, cancel, complete).
+- **BusinessAnalytics.tsx**: Visual charts and metrics for business performance tracking.
+- **HoursManager.tsx**: Tool for configuring weekly operating hours and exceptions.
+- **ServicesManager.tsx**: CRUD interface for managing service menu, pricing, and durations.
+- **StaffManager.tsx**: Staff member management (add, edit, remove).
+- **StaffScheduleManager.tsx**: Individual schedule management for staff members.
+- **ReviewForm.tsx**: Component allowing clients to submit reviews and ratings.
+- **PortfolioManager.tsx** & **PortfolioGallery.tsx**: Image management for business portfolios.
+
+### `src/lib`
+Core utilities and configuration:
+- **auth.tsx**: React Context provider for Supabase authentication state.
+- **i18n.ts**: Internationalization configuration (i18next).
+- **algeria.ts**: Geographic data for Algeria (Wilayas and Communes).
+- **utils.ts**: Shared helper functions and type definitions.
+
+### `src/components/ui`
+Reusable design system components built with Radix UI and Tailwind CSS (e.g., Button, Dialog, Input, Toast).
+
+---
+
 ## 🎨 Customization
 
 ### Changing Colors

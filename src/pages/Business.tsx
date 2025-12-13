@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -19,7 +20,8 @@ export default function Business() {
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
-  
+  const { t } = useTranslation();
+
   const [business, setBusiness] = useState<any>(null);
   const [services, setServices] = useState<any[]>([]);
   const [staff, setStaff] = useState<any[]>([]);
@@ -27,7 +29,7 @@ export default function Business() {
   const [reviews, setReviews] = useState<any[]>([]);
   const [averageRating, setAverageRating] = useState<number>(0);
   const [loading, setLoading] = useState(true);
-  
+
   const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<any>(null);
   const [selectedStaff, setSelectedStaff] = useState<any>(null);
@@ -95,7 +97,7 @@ export default function Business() {
       }
     } else {
       // If no service selected, show staff who have at least one service assigned
-      const staffWithServices = staff.filter(s => 
+      const staffWithServices = staff.filter(s =>
         staffServices.some(ss => ss.staff_id === s.id)
       );
       setFilteredStaff(staffWithServices);
@@ -137,7 +139,7 @@ export default function Business() {
       setReviews(reviewsRes.data || []);
       setAverageRating(ratingRes.data || 0);
     } catch (error: any) {
-      toast.error('Failed to load business details');
+      toast.error(t('errors.somethingWrong'));
       console.error(error);
     } finally {
       setLoading(false);
@@ -149,7 +151,7 @@ export default function Business() {
       .from('staff_services')
       .select('staff_id, service_id')
       .in('staff_id', staff.map(s => s.id));
-    
+
     setStaffServices(data || []);
   };
 
@@ -159,13 +161,13 @@ export default function Business() {
       .select('*')
       .eq('staff_id', staffId)
       .eq('is_available', true);
-    
+
     setStaffHours(data || []);
   };
 
   const fetchExistingBookings = async () => {
     if (!selectedDate || !selectedStaff) return;
-    
+
     const { data } = await supabase
       .from('bookings')
       .select('start_time, end_time, staff_id')
@@ -173,13 +175,13 @@ export default function Business() {
       .eq('staff_id', selectedStaff.id)
       .eq('booking_date', format(selectedDate, 'yyyy-MM-dd'))
       .in('status', ['pending', 'confirmed']);
-    
+
     setExistingBookings(data || []);
   };
 
   const handleBookService = (service: any) => {
     if (!user) {
-      toast.error('Please sign in to book an appointment');
+      toast.error(t('business.pleaseSignIn'));
       navigate('/auth');
       return;
     }
@@ -193,13 +195,13 @@ export default function Business() {
 
   const handleConfirmBooking = async () => {
     if (!selectedService || !selectedStaff || !selectedDate || !selectedTime) {
-      toast.error('Please select all booking details');
+      toast.error(t('business.selectAllDetails'));
       return;
     }
 
     const bookingDate = format(selectedDate, 'yyyy-MM-dd');
     const endTime = calculateEndTime(selectedTime, selectedService.duration_minutes);
-    
+
     // Check for conflicts
     const { data: conflictCheck } = await supabase
       .from('bookings')
@@ -209,9 +211,9 @@ export default function Business() {
       .eq('booking_date', bookingDate)
       .in('status', ['pending', 'confirmed'])
       .or(`and(start_time.lt.${endTime},end_time.gt.${selectedTime})`);
-    
+
     if (conflictCheck && conflictCheck.length > 0) {
-      toast.error('This time slot has just been booked. Please select another time.');
+      toast.error(t('business.slotAlreadyBooked'));
       await fetchExistingBookings();
       setSelectedTime('');
       return;
@@ -231,11 +233,11 @@ export default function Business() {
 
       if (error) throw error;
 
-      toast.success('Booking confirmed!');
+      toast.success(t('business.bookingConfirmed'));
       setBookingDialogOpen(false);
       navigate('/dashboard');
     } catch (error: any) {
-      toast.error(error.message || 'Failed to create booking');
+      toast.error(error.message || t('errors.somethingWrong'));
       console.error(error);
     }
   };
@@ -257,7 +259,7 @@ export default function Business() {
     if (!selectedService) return false;
     const slotStart = timeToMinutes(time);
     const slotEnd = slotStart + selectedService.duration_minutes;
-    
+
     return existingBookings.some(b => {
       const bookingStart = timeToMinutes(b.start_time);
       const bookingEnd = timeToMinutes(b.end_time);
@@ -279,7 +281,7 @@ export default function Business() {
 
     // Get staff hours for this day
     const staffDayHours = staffHours.find(h => h.day_of_week === dayOfWeek);
-    
+
     // If staff has no hours set for this day, use business hours
     // If staff has hours, use the intersection of business and staff hours
     let startTime: string;
@@ -315,23 +317,23 @@ export default function Business() {
     const [startHour, startMin] = startTime.split(':').map(Number);
     const [endHour, endMin] = endTime.split(':').map(Number);
     const serviceDuration = selectedService.duration_minutes;
-    
+
     let currentHour = startHour;
     let currentMin = startMin;
 
     while (currentHour < endHour || (currentHour === endHour && currentMin < endMin)) {
       const time = `${String(currentHour).padStart(2, '0')}:${String(currentMin).padStart(2, '0')}`;
-      
+
       // Check if this slot + service duration would fit before end time
       const slotStart = timeToMinutes(time);
       const slotEnd = slotStart + serviceDuration;
       const dayEnd = timeToMinutes(endTime);
-      
+
       // Only add slot if it doesn't overlap with existing bookings AND fits within working hours
       if (slotEnd <= dayEnd && !isSlotReserved(time)) {
         slots.push(time);
       }
-      
+
       currentMin += 5;
       if (currentMin >= 60) {
         currentMin = 0;
@@ -360,7 +362,7 @@ export default function Business() {
     return (
       <Layout>
         <div className="container py-8 text-center">
-          <p className="text-muted-foreground">Business not found</p>
+          <p className="text-muted-foreground">{t('business.businessNotFound')}</p>
         </div>
       </Layout>
     );
@@ -396,7 +398,7 @@ export default function Business() {
               {averageRating > 0 && (
                 <div className="flex items-center gap-1 backdrop-blur-sm bg-black/20 px-3 py-1 rounded-full">
                   <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  <span>{averageRating} ({reviews.length} reviews)</span>
+                  <span>{averageRating} ({reviews.length} {t('business.reviewsCount')})</span>
                 </div>
               )}
             </div>
@@ -429,7 +431,7 @@ export default function Business() {
           {business.description && (
             <Card className="mb-6">
               <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-3">About</h2>
+                <h2 className="text-xl font-semibold mb-3">{t('business.about')}</h2>
                 <p className="text-muted-foreground">{business.description}</p>
               </CardContent>
             </Card>
@@ -503,11 +505,11 @@ export default function Business() {
           {/* Reviews Section */}
           <div>
             <h2 className="text-2xl font-semibold mb-4">Reviews</h2>
-            
+
             {user && (
               <div className="mb-6">
-                <ReviewForm 
-                  businessId={id!} 
+                <ReviewForm
+                  businessId={id!}
                   onReviewSubmitted={fetchBusinessDetails}
                 />
               </div>
@@ -545,11 +547,10 @@ export default function Business() {
                               {Array.from({ length: 5 }).map((_, i) => (
                                 <Star
                                   key={i}
-                                  className={`h-4 w-4 ${
-                                    i < review.rating
-                                      ? 'fill-yellow-400 text-yellow-400'
-                                      : 'text-muted-foreground'
-                                  }`}
+                                  className={`h-4 w-4 ${i < review.rating
+                                    ? 'fill-yellow-400 text-yellow-400'
+                                    : 'text-muted-foreground'
+                                    }`}
                                 />
                               ))}
                             </div>
@@ -582,15 +583,15 @@ export default function Business() {
       <Dialog open={bookingDialogOpen} onOpenChange={setBookingDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Book {selectedService?.name}</DialogTitle>
+            <DialogTitle>{t('business.book')} {selectedService?.name}</DialogTitle>
           </DialogHeader>
           <div className="space-y-6">
             {/* Step 1: Select Staff First */}
             <div>
-              <h3 className="font-semibold mb-3">1. Select Professional</h3>
+              <h3 className="font-semibold mb-3">1. {t('business.selectProfessional')}</h3>
               {filteredStaff.length === 0 ? (
                 <p className="text-sm text-muted-foreground">
-                  No staff members are available for this service.
+                  {t('business.noStaffForService')}
                 </p>
               ) : (
                 <div className="grid grid-cols-2 gap-2">
@@ -616,7 +617,7 @@ export default function Business() {
             {/* Step 2: Select Date (only show after staff selected) */}
             {selectedStaff && (
               <div>
-                <h3 className="font-semibold mb-3">2. Select Date</h3>
+                <h3 className="font-semibold mb-3">2. {t('business.selectDate')}</h3>
                 <Calendar
                   mode="single"
                   selected={selectedDate}
@@ -633,16 +634,16 @@ export default function Business() {
             {/* Step 3: Select Time (only show after date selected) */}
             {selectedStaff && selectedDate && (
               <div>
-                <h3 className="font-semibold mb-3">3. Select Time</h3>
+                <h3 className="font-semibold mb-3">3. {t('business.selectTime')}</h3>
                 <div className="flex gap-2 mb-3 text-sm">
                   <div className="flex items-center gap-1">
                     <div className="w-4 h-4 rounded bg-green-500/20 border border-green-500" />
-                    <span>Available slots only</span>
+                    <span>{t('business.availableSlotsOnly')}</span>
                   </div>
                 </div>
                 {timeSlots.length === 0 ? (
                   <p className="text-sm text-muted-foreground">
-                    {selectedStaff.name} is not available on this date or all slots are booked.
+                    {selectedStaff.name} {t('business.staffNotAvailable')}
                   </p>
                 ) : (
                   <div className="grid grid-cols-4 gap-2 max-h-64 overflow-y-auto">
@@ -671,7 +672,7 @@ export default function Business() {
               onClick={handleConfirmBooking}
               disabled={!selectedStaff || !selectedDate || !selectedTime}
             >
-              Confirm Booking
+              {t('business.confirmBooking')}
             </Button>
           </div>
         </DialogContent>

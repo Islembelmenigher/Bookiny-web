@@ -5,58 +5,59 @@ import { Badge } from '@/components/ui/badge';
 import { Check, CreditCard, Star, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const plans = [
-  {
-    id: 'basic',
-    name: 'Basic',
-    price: 2500,
-    period: 'month',
-    description: 'Perfect for small businesses just getting started',
-    features: [
-      'Up to 50 bookings/month',
-      '1 staff member',
-      'Basic analytics',
-      'Email notifications',
-      'Standard support'
-    ],
-    popular: false
-  },
-  {
-    id: 'professional',
-    name: 'Professional',
-    price: 5000,
-    period: 'month',
-    description: 'Ideal for growing businesses with more needs',
-    features: [
-      'Unlimited bookings',
-      'Up to 5 staff members',
-      'Advanced analytics',
-      'SMS & Email notifications',
-      'Priority support',
-      'Custom branding'
-    ],
-    popular: true
-  },
-  {
-    id: 'enterprise',
-    name: 'Enterprise',
-    price: 10000,
-    period: 'month',
-    description: 'For large businesses with complex requirements',
-    features: [
-      'Everything in Professional',
-      'Unlimited staff members',
-      'API access',
-      'Dedicated account manager',
-      'Custom integrations',
-      'SLA guarantee'
-    ],
-    popular: false
-  }
-];
 
 export default function Payment() {
   const { t } = useTranslation();
+
+  const plans = [
+    {
+      id: 'basic',
+      name: t('payment.plans.basic.name'),
+      price: 2500,
+      period: t('payment.period'),
+      description: t('payment.plans.basic.description'),
+      features: [
+        t('payment.plans.basic.features.bookings'),
+        t('payment.plans.basic.features.staff'),
+        t('payment.plans.basic.features.analytics'),
+        t('payment.plans.basic.features.notifications'),
+        t('payment.plans.basic.features.support')
+      ],
+      popular: false
+    },
+    {
+      id: 'professional',
+      name: t('payment.plans.professional.name'),
+      price: 5000,
+      period: t('payment.period'),
+      description: t('payment.plans.professional.description'),
+      features: [
+        t('payment.plans.professional.features.bookings'),
+        t('payment.plans.professional.features.staff'),
+        t('payment.plans.professional.features.analytics'),
+        t('payment.plans.professional.features.notifications'),
+        t('payment.plans.professional.features.support'),
+        t('payment.plans.professional.features.branding')
+      ],
+      popular: true
+    },
+    {
+      id: 'enterprise',
+      name: t('payment.plans.enterprise.name'),
+      price: 10000,
+      period: t('payment.period'),
+      description: t('payment.plans.enterprise.description'),
+      features: [
+        t('payment.plans.enterprise.features.everything'),
+        t('payment.plans.enterprise.features.staff'),
+        t('payment.plans.enterprise.features.api'),
+        t('payment.plans.enterprise.features.accountManager'),
+        t('payment.plans.enterprise.features.integrations'),
+        t('payment.plans.enterprise.features.sla')
+      ],
+      popular: false
+    }
+  ];
 
   const handleSubscribe = (planId: string) => {
     // For now, show a toast - in production, this would integrate with a payment provider
@@ -76,25 +77,24 @@ export default function Payment() {
     <Layout>
       <div className="container py-12 px-4">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Choose Your Plan</h1>
+          <h1 className="text-4xl font-bold mb-4">{t('payment.title')}</h1>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Select the perfect plan for your business. All plans include a 14-day free trial.
+            {t('payment.subtitle')}
           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {plans.map((plan) => (
-            <Card 
-              key={plan.id} 
-              className={`relative overflow-hidden transition-all hover:shadow-lg ${
-                plan.popular ? 'border-primary shadow-md scale-105' : ''
-              }`}
+            <Card
+              key={plan.id}
+              className={`relative overflow-hidden transition-all hover:shadow-lg ${plan.popular ? 'border-primary shadow-md scale-105' : ''
+                }`}
             >
               {plan.popular && (
                 <div className="absolute top-0 right-0">
                   <Badge className="rounded-none rounded-bl-lg bg-primary text-primary-foreground">
                     <Star className="h-3 w-3 mr-1 fill-current" />
-                    Most Popular
+                    {t('payment.mostPopular')}
                   </Badge>
                 </div>
               )}
@@ -105,7 +105,7 @@ export default function Payment() {
               <CardContent className="space-y-6">
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-bold">{formatPrice(plan.price)}</span>
-                  <span className="text-muted-foreground">/{plan.period}</span>
+                  <span className="text-muted-foreground">{plan.period}</span>
                 </div>
 
                 <ul className="space-y-3">
@@ -117,13 +117,13 @@ export default function Payment() {
                   ))}
                 </ul>
 
-                <Button 
-                  className="w-full" 
+                <Button
+                  className="w-full"
                   variant={plan.popular ? 'default' : 'outline'}
                   onClick={() => handleSubscribe(plan.id)}
                 >
                   <CreditCard className="h-4 w-4 mr-2" />
-                  Subscribe Now
+                  {t('payment.subscribe')}
                 </Button>
               </CardContent>
             </Card>
@@ -140,19 +140,19 @@ export default function Payment() {
                     <Zap className="h-7 w-7 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold">Lifetime Access</h3>
+                    <h3 className="text-xl font-bold">{t('payment.lifetimeAccess')}</h3>
                     <p className="text-muted-foreground">
-                      Pay once, use forever. Get all Professional features.
+                      {t('payment.lifetimeDesc')}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-right">
                     <p className="text-3xl font-bold">{formatPrice(50000)}</p>
-                    <p className="text-sm text-muted-foreground">one-time payment</p>
+                    <p className="text-sm text-muted-foreground">{t('payment.oneTimePayment')}</p>
                   </div>
                   <Button size="lg" onClick={() => handleSubscribe('lifetime')}>
-                    Get Lifetime Access
+                    {t('payment.getLifetime')}
                   </Button>
                 </div>
               </div>
@@ -163,10 +163,10 @@ export default function Payment() {
         {/* FAQ or additional info */}
         <div className="mt-12 text-center text-muted-foreground">
           <p>
-            Need help choosing? <a href="#" className="text-primary hover:underline">Contact our sales team</a>
+            {t('payment.needHelp')} <a href="#" className="text-primary hover:underline">{t('payment.contactSales')}</a>
           </p>
           <p className="mt-2 text-sm">
-            All payments are secure and encrypted. Cancel anytime.
+            {t('payment.securePayment')}
           </p>
         </div>
       </div>

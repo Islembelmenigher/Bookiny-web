@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface PortfolioManagerProps {
   businessId: string;
@@ -19,6 +20,7 @@ interface PortfolioImage {
 }
 
 export function PortfolioManager({ businessId }: PortfolioManagerProps) {
+  const { t } = useTranslation();
   const [images, setImages] = useState<PortfolioImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -38,7 +40,7 @@ export function PortfolioManager({ businessId }: PortfolioManagerProps) {
       if (error) throw error;
       setImages(data || []);
     } catch (error: any) {
-      toast.error('Failed to load portfolio images');
+      toast.error(t('settings.portfolioGallery.loadError'));
       console.error(error);
     } finally {
       setLoading(false);
@@ -54,12 +56,12 @@ export function PortfolioManager({ businessId }: PortfolioManagerProps) {
     try {
       for (const file of Array.from(files)) {
         if (!file.type.startsWith('image/')) {
-          toast.error(`${file.name} is not an image`);
+          toast.error(t('settings.portfolioGallery.typeError', { fileName: file.name }));
           continue;
         }
 
         if (file.size > 5 * 1024 * 1024) {
-          toast.error(`${file.name} is too large (max 5MB)`);
+          toast.error(t('settings.portfolioGallery.sizeError', { fileName: file.name }));
           continue;
         }
 
@@ -87,10 +89,10 @@ export function PortfolioManager({ businessId }: PortfolioManagerProps) {
         if (insertError) throw insertError;
       }
 
-      toast.success('Images uploaded successfully');
+      toast.success(t('settings.portfolioGallery.success'));
       fetchPortfolioImages();
     } catch (error: any) {
-      toast.error('Failed to upload images');
+      toast.error(t('settings.portfolioGallery.error'));
       console.error(error);
     } finally {
       setUploading(false);
@@ -115,10 +117,10 @@ export function PortfolioManager({ businessId }: PortfolioManagerProps) {
 
       if (error) throw error;
 
-      toast.success('Image deleted');
+      toast.success(t('settings.portfolioGallery.deleteSuccess'));
       fetchPortfolioImages();
     } catch (error: any) {
-      toast.error('Failed to delete image');
+      toast.error(t('settings.portfolioGallery.deleteError'));
       console.error(error);
     }
   };
@@ -140,17 +142,17 @@ export function PortfolioManager({ businessId }: PortfolioManagerProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <ImageIcon className="h-5 w-5" />
-          Portfolio Gallery
+          {t('settings.portfolioGallery.title')}
         </CardTitle>
         <CardDescription>
-          Upload photos showcasing your work (before/after, finished projects, etc.)
+          {t('settings.portfolioGallery.description')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Upload Button */}
         <div>
           <Label htmlFor="portfolio-upload" className="sr-only">
-            Upload Images
+            {t('settings.portfolioGallery.upload')}
           </Label>
           <Input
             id="portfolio-upload"
@@ -163,19 +165,18 @@ export function PortfolioManager({ businessId }: PortfolioManagerProps) {
           />
           <Label
             htmlFor="portfolio-upload"
-            className={`flex items-center justify-center gap-2 border-2 border-dashed rounded-lg p-6 cursor-pointer hover:border-primary transition-colors ${
-              uploading ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            className={`flex items-center justify-center gap-2 border-2 border-dashed rounded-lg p-6 cursor-pointer hover:border-primary transition-colors ${uploading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
           >
             {uploading ? (
               <>
                 <Loader2 className="h-5 w-5 animate-spin" />
-                <span>Uploading...</span>
+                <span>{t('settings.portfolioGallery.uploading')}</span>
               </>
             ) : (
               <>
                 <Upload className="h-5 w-5" />
-                <span>Click to upload images (max 5MB each)</span>
+                <span>{t('settings.portfolioGallery.uploadLabel')}</span>
               </>
             )}
           </Label>
@@ -184,7 +185,7 @@ export function PortfolioManager({ businessId }: PortfolioManagerProps) {
         {/* Image Grid */}
         {images.length === 0 ? (
           <p className="text-center text-muted-foreground py-8">
-            No portfolio images yet. Upload some to showcase your work!
+            {t('settings.portfolioGallery.noImages')}
           </p>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

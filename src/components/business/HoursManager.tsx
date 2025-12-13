@@ -7,25 +7,28 @@ import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Clock, Save } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface HoursManagerProps {
   businessId: string;
 }
 
-const DAYS = [
-  { value: 0, label: 'Sunday' },
-  { value: 1, label: 'Monday' },
-  { value: 2, label: 'Tuesday' },
-  { value: 3, label: 'Wednesday' },
-  { value: 4, label: 'Thursday' },
-  { value: 5, label: 'Friday' },
-  { value: 6, label: 'Saturday' },
+const getDAYS = (t: any) => [
+  { value: 0, label: t('days.sunday') },
+  { value: 1, label: t('days.monday') },
+  { value: 2, label: t('days.tuesday') },
+  { value: 3, label: t('days.wednesday') },
+  { value: 4, label: t('days.thursday') },
+  { value: 5, label: t('days.friday') },
+  { value: 6, label: t('days.saturday') },
 ];
 
 export function HoursManager({ businessId }: HoursManagerProps) {
+  const { t } = useTranslation();
   const [hours, setHours] = useState<Record<number, any>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const DAYS = getDAYS(t);
 
   useEffect(() => {
     fetchHours();
@@ -47,7 +50,7 @@ export function HoursManager({ businessId }: HoursManagerProps) {
 
       setHours(hoursMap);
     } catch (error: any) {
-      toast.error('Failed to load hours');
+      toast.error(t('hours.loadError'));
       console.error(error);
     } finally {
       setLoading(false);
@@ -92,10 +95,10 @@ export function HoursManager({ businessId }: HoursManagerProps) {
       }
 
       await Promise.all(updates);
-      toast.success('Hours updated successfully');
+      toast.success(t('hours.updateSuccess'));
       fetchHours();
     } catch (error: any) {
-      toast.error('Failed to update hours');
+      toast.error(t('hours.updateError'));
       console.error(error);
     } finally {
       setSaving(false);
@@ -114,7 +117,7 @@ export function HoursManager({ businessId }: HoursManagerProps) {
   };
 
   if (loading) {
-    return <div className="animate-pulse space-y-4">Loading hours...</div>;
+    return <div className="animate-pulse space-y-4">{t('common.loading')}</div>;
   }
 
   return (
@@ -122,12 +125,12 @@ export function HoursManager({ businessId }: HoursManagerProps) {
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>Business Hours</CardTitle>
-            <CardDescription>Set your operating hours for each day</CardDescription>
+            <CardTitle>{t('hours.title')}</CardTitle>
+            <CardDescription>{t('hours.subtitle')}</CardDescription>
           </div>
           <Button onClick={handleSave} disabled={saving}>
             <Save className="h-4 w-4 mr-2" />
-            {saving ? 'Saving...' : 'Save Changes'}
+            {saving ? t('hours.saving') : t('hours.save')}
           </Button>
         </div>
       </CardHeader>
@@ -147,7 +150,7 @@ export function HoursManager({ businessId }: HoursManagerProps) {
                 className="flex items-center gap-4 p-4 border rounded-lg"
               >
                 <div className="w-32 font-semibold">{day.label}</div>
-                
+
                 <div className="flex items-center gap-2">
                   <Switch
                     checked={!dayData.is_closed}
@@ -155,7 +158,7 @@ export function HoursManager({ businessId }: HoursManagerProps) {
                       updateDay(day.value, 'is_closed', !checked)
                     }
                   />
-                  <Label className="text-sm">Open</Label>
+                  <Label className="text-sm">{t('hours.open')}</Label>
                 </div>
 
                 {!dayData.is_closed && (
@@ -170,7 +173,7 @@ export function HoursManager({ businessId }: HoursManagerProps) {
                         }
                         className="w-32"
                       />
-                      <span className="text-muted-foreground">to</span>
+                      <span className="text-muted-foreground">{t('hours.to')}</span>
                       <Input
                         type="time"
                         value={dayData.end_time}
@@ -184,7 +187,7 @@ export function HoursManager({ businessId }: HoursManagerProps) {
                 )}
 
                 {dayData.is_closed && (
-                  <span className="text-muted-foreground text-sm">Closed</span>
+                  <span className="text-muted-foreground text-sm">{t('hours.closed')}</span>
                 )}
               </div>
             );

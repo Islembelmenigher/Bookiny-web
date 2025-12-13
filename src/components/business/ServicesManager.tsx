@@ -10,17 +10,19 @@ import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, Clock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { formatDZD } from '@/lib/algeria';
+import { useTranslation } from 'react-i18next';
 
 interface ServicesManagerProps {
   businessId: string;
 }
 
 export function ServicesManager({ businessId }: ServicesManagerProps) {
+  const { t } = useTranslation();
   const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingService, setEditingService] = useState<any>(null);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -43,7 +45,7 @@ export function ServicesManager({ businessId }: ServicesManagerProps) {
       if (error) throw error;
       setServices(data || []);
     } catch (error: any) {
-      toast.error('Failed to load services');
+      toast.error(t('services.loadError'));
       console.error(error);
     } finally {
       setLoading(false);
@@ -82,7 +84,7 @@ export function ServicesManager({ businessId }: ServicesManagerProps) {
           .eq('id', editingService.id);
 
         if (error) throw error;
-        toast.success('Service updated successfully');
+        toast.success(t('services.updateSuccess'));
       } else {
         const { error } = await supabase
           .from('services')
@@ -92,19 +94,19 @@ export function ServicesManager({ businessId }: ServicesManagerProps) {
           });
 
         if (error) throw error;
-        toast.success('Service created successfully');
+        toast.success(t('services.createSuccess'));
       }
 
       setDialogOpen(false);
       fetchServices();
     } catch (error: any) {
-      toast.error(error.message || 'Failed to save service');
+      toast.error(error.message || t('services.saveError'));
       console.error(error);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this service?')) return;
+    if (!confirm(t('services.deleteConfirm'))) return;
 
     try {
       const { error } = await supabase
@@ -113,16 +115,16 @@ export function ServicesManager({ businessId }: ServicesManagerProps) {
         .eq('id', id);
 
       if (error) throw error;
-      toast.success('Service deleted');
+      toast.success(t('services.deleteSuccess'));
       fetchServices();
     } catch (error: any) {
-      toast.error('Failed to delete service');
+      toast.error(t('services.deleteError'));
       console.error(error);
     }
   };
 
   if (loading) {
-    return <div className="animate-pulse space-y-4">Loading services...</div>;
+    return <div className="animate-pulse space-y-4">{t('common.loading')}</div>;
   }
 
   return (
@@ -131,19 +133,19 @@ export function ServicesManager({ businessId }: ServicesManagerProps) {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Services</CardTitle>
-              <CardDescription>Manage the services you offer</CardDescription>
+              <CardTitle>{t('services.title')}</CardTitle>
+              <CardDescription>{t('services.subtitle')}</CardDescription>
             </div>
             <Button onClick={() => handleOpenDialog()}>
               <Plus className="h-4 w-4 mr-2" />
-              Add Service
+              {t('services.addService')}
             </Button>
           </div>
         </CardHeader>
         <CardContent>
           {services.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              No services yet. Add your first service to get started.
+              {t('services.noServices')}
             </div>
           ) : (
             <div className="space-y-3">
@@ -156,7 +158,7 @@ export function ServicesManager({ businessId }: ServicesManagerProps) {
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-semibold">{service.name}</h3>
                       {!service.is_active && (
-                        <Badge variant="secondary">Inactive</Badge>
+                        <Badge variant="secondary">{t('services.inactive')}</Badge>
                       )}
                     </div>
                     {service.description && (
@@ -201,15 +203,15 @@ export function ServicesManager({ businessId }: ServicesManagerProps) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingService ? 'Edit Service' : 'Add New Service'}
+              {editingService ? t('services.editServiceTitle') : t('services.addServiceTitle')}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Service Name *</Label>
+              <Label htmlFor="name">{t('services.serviceName')} *</Label>
               <Input
                 id="name"
-                placeholder="Haircut & Style"
+                placeholder={t('services.placeholderName')}
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
@@ -217,10 +219,10 @@ export function ServicesManager({ businessId }: ServicesManagerProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">{t('services.serviceDescription')}</Label>
               <Textarea
                 id="description"
-                placeholder="Describe this service..."
+                placeholder={t('services.placeholderDesc')}
                 rows={3}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -229,7 +231,7 @@ export function ServicesManager({ businessId }: ServicesManagerProps) {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="duration">Duration (minutes) *</Label>
+                <Label htmlFor="duration">{t('services.serviceDuration')} *</Label>
                 <Input
                   id="duration"
                   type="number"
@@ -244,7 +246,7 @@ export function ServicesManager({ businessId }: ServicesManagerProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="price">Price (DZD) *</Label>
+                <Label htmlFor="price">{t('services.servicePrice')} *</Label>
                 <Input
                   id="price"
                   type="number"
@@ -266,10 +268,10 @@ export function ServicesManager({ businessId }: ServicesManagerProps) {
                 className="flex-1"
                 onClick={() => setDialogOpen(false)}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button type="submit" className="flex-1">
-                {editingService ? 'Update' : 'Create'} Service
+                {editingService ? t('services.editService') : t('services.addService')}
               </Button>
             </div>
           </form>

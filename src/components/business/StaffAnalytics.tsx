@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { User, CheckCircle, TrendingUp } from 'lucide-react';
 import { formatDZD } from '@/lib/algeria';
+import { useTranslation } from 'react-i18next';
 
 interface StaffAnalyticsProps {
   businessId: string;
@@ -20,6 +21,7 @@ interface StaffBookingStats {
 }
 
 export function StaffAnalytics({ businessId }: StaffAnalyticsProps) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [staffStats, setStaffStats] = useState<StaffBookingStats[]>([]);
   const [selectedStaff, setSelectedStaff] = useState<string>('all');
@@ -73,7 +75,7 @@ export function StaffAnalytics({ businessId }: StaffAnalyticsProps) {
       stats.sort((a, b) => b.completedBookings - a.completedBookings);
       setStaffStats(stats);
     } catch (error: any) {
-      toast.error('Failed to load staff analytics');
+      toast.error(t('staffAnalytics.loadError'));
       console.error(error);
     } finally {
       setLoading(false);
@@ -124,7 +126,7 @@ export function StaffAnalytics({ businessId }: StaffAnalyticsProps) {
   };
 
   if (loading) {
-    return <div className="animate-pulse">Loading staff analytics...</div>;
+    return <div className="animate-pulse">{t('common.loading')}</div>;
   }
 
   return (
@@ -134,14 +136,14 @@ export function StaffAnalytics({ businessId }: StaffAnalyticsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary" />
-            Staff Performance
+            {t('staffAnalytics.staffPerformance')}
           </CardTitle>
-          <CardDescription>Bookings completed by each staff member</CardDescription>
+          <CardDescription>{t('staffAnalytics.staffPerformanceDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           {staffStats.length === 0 ? (
             <p className="text-center text-muted-foreground py-4">
-              No staff members found
+              {t('staffAnalytics.noStaffFound')}
             </p>
           ) : (
             <div className="space-y-3">
@@ -162,19 +164,19 @@ export function StaffAnalytics({ businessId }: StaffAnalyticsProps) {
                   <div className="flex items-center gap-6 text-sm">
                     <div className="text-center">
                       <p className="font-bold text-lg text-green-600">{stat.completedBookings}</p>
-                      <p className="text-xs text-muted-foreground">Completed</p>
+                      <p className="text-xs text-muted-foreground">{t('staffAnalytics.completed')}</p>
                     </div>
                     <div className="text-center">
                       <p className="font-bold text-lg text-blue-600">{stat.confirmedBookings}</p>
-                      <p className="text-xs text-muted-foreground">Confirmed</p>
+                      <p className="text-xs text-muted-foreground">{t('staffAnalytics.confirmed')}</p>
                     </div>
                     <div className="text-center">
                       <p className="font-bold text-lg text-yellow-600">{stat.pendingBookings}</p>
-                      <p className="text-xs text-muted-foreground">Pending</p>
+                      <p className="text-xs text-muted-foreground">{t('staffAnalytics.pending')}</p>
                     </div>
                     <div className="text-center">
                       <p className="font-bold text-lg">{stat.totalBookings}</p>
-                      <p className="text-xs text-muted-foreground">Total</p>
+                      <p className="text-xs text-muted-foreground">{t('staffAnalytics.total')}</p>
                     </div>
                   </div>
                 </div>
@@ -191,16 +193,16 @@ export function StaffAnalytics({ businessId }: StaffAnalyticsProps) {
             <div>
               <CardTitle className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-primary" />
-                Bookings by Staff
+                {t('staffAnalytics.bookingsByStaff')}
               </CardTitle>
-              <CardDescription>View recent bookings for each staff member</CardDescription>
+              <CardDescription>{t('staffAnalytics.bookingsByStaffDesc')}</CardDescription>
             </div>
             <Select value={selectedStaff} onValueChange={setSelectedStaff}>
               <SelectTrigger className="w-48">
-                <SelectValue placeholder="Select staff" />
+                <SelectValue placeholder={t('staffAnalytics.selectStaff')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Staff</SelectItem>
+                <SelectItem value="all">{t('staffAnalytics.allStaff')}</SelectItem>
                 {staffStats.map(stat => (
                   <SelectItem key={stat.staffId} value={stat.staffId}>
                     {stat.staffName}
@@ -213,7 +215,7 @@ export function StaffAnalytics({ businessId }: StaffAnalyticsProps) {
         <CardContent>
           {staffBookings.length === 0 ? (
             <p className="text-center text-muted-foreground py-4">
-              {selectedStaff === 'all' ? 'No bookings found' : 'No bookings found for this staff member'}
+              {selectedStaff === 'all' ? t('staffAnalytics.noBookingsFound') : t('staffAnalytics.noBookingsFoundStaff')}
             </p>
           ) : (
             <div className="space-y-3">
@@ -228,7 +230,7 @@ export function StaffAnalytics({ businessId }: StaffAnalyticsProps) {
                       {booking.profiles?.full_name} · {formatDZD(booking.services?.price || 0)}
                     </p>
                     {selectedStaff === 'all' && booking.staff?.name && (
-                      <p className="text-xs text-primary">Staff: {booking.staff.name}</p>
+                      <p className="text-xs text-primary">{t('staffAnalytics.staffLabel')} {booking.staff.name}</p>
                     )}
                   </div>
                   <div className="text-right">

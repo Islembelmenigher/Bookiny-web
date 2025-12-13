@@ -104,7 +104,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="font-medium text-foreground">{t('contact.phoneLabel')}</h3>
-                    <p className="text-sm text-muted-foreground">+213 XX XXX XXXX</p>
+                    <p className="text-sm text-muted-foreground">+48 516 304 549</p>
                   </div>
                 </div>
               </CardContent>

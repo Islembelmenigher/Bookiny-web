@@ -70,7 +70,8 @@
     "logout": "تسجيل الخروج",
     "myBookings": "حجوزاتي",
     "myBusiness": "نشاطي التجاري",
-    "createBusiness": "إنشاء نشاط تجاري"
+    "createBusiness": "إنشاء نشاط تجاري",
+    "subscription": "الاشتراك"
   },
   "auth": {
     "welcomeBack": "مرحباً بعودتك",
@@ -208,7 +209,32 @@
     "contactPhone": "رقم الهاتف",
     "ourTeam": "فريقنا",
     "manage": "إدارة نشاطك التجاري وحجوزاتك",
-    "backToDashboard": "العودة إلى لوحة التحكم"
+    "backToDashboard": "العودة إلى لوحة التحكم",
+    "pleaseSignIn": "الرجاء تسجيل الدخول لحجز موعد",
+    "selectAllDetails": "الرجاء اختيار جميع تفاصيل الحجز",
+    "slotAlreadyBooked": "تم حجز هذا الوقت للتو. الرجاء اختيار وقت آخر.",
+    "businessNotFound": "النشاط التجاري غير موجود",
+    "noServicesAvailable": "لا توجد خدمات متاحة",
+    "selectProfessional": "اختر محترف",
+    "noStaffForService": "لا يوجد موظفون متاحون لهذه الخدمة.",
+    "selectDate": "اختر التاريخ",
+    "selectTime": "اختر الوقت",
+    "staffNotAvailable": "غير متاح في هذا التاريخ أو جميع الأوقات محجوزة.",
+    "beFirstToReview": "لا توجد تقييمات بعد. كن أول من يقيّم!",
+    "totalBookings": "إجمالي الحجوزات",
+    "todayBookings": "حجوزات اليوم",
+    "activeServices": "الخدمات النشطة",
+    "totalRevenue": "إجمالي الإيرادات"
+  },
+  "tabs": {
+    "bookings": "الحجوزات",
+    "mySchedule": "جدولي",
+    "myServices": "خدماتي",
+    "services": "الخدمات",
+    "staff": "الموظفون",
+    "hours": "ساعات العمل",
+    "analytics": "التحليلات",
+    "settings": "الإعدادات"
   },
   "bookings": {
     "title": "حجوزاتي",
@@ -259,7 +285,19 @@
     "mySchedule": "جدولي",
     "myServices": "خدماتي",
     "hours": "الساعات",
-    "manageAppointments": "إدارة مواعيدك"
+    "addBusiness": "إضافة نشاط تجاري",
+    "staffAccess": "وصول الموظفين",
+    "noBookingsTitle": "لا توجد حجوزات بعد",
+    "noBookingsDesc": "ابدأ بالبحث عن الخدمات وحجز المواعيد",
+    "browseServices": "تصفح الخدمات",
+    "businessLimit": "يمكنك إنشاء ما يصل إلى {{limit}} أنشطة تجارية فقط. لقد وصلت إلى الحد الأقصى.",
+    "noBusinessesTitle": "لا توجد أنشطة تجارية بعد",
+    "noBusinessesDesc": "أضف نشاطك التجاري لبدء تلقي الحجوزات",
+    "addAnotherBusiness": "إضافة نشاط تجاري آخر",
+    "manage": "إدارة",
+    "staffAccessTitle": "لوحة تحكم وصول الموظفين",
+    "staffAccessDesc": "لديك صلاحية موظف للأنشطة التجارية التالية. انقر لفتح لوحة التحكم الخاصة بهم.",
+    "openDashboard": "فتح لوحة تحكم النشاط التجاري"
   },
   "profile": {
     "title": "إعدادات الملف الشخصي",
@@ -297,12 +335,67 @@
     "businessHours": "ساعات العمل",
     "notifications": "الإشعارات",
     "portfolio": "معرض الأعمال",
+    "deleteAccount": "حذف الحساب",
     "dangerZone": "منطقة الخطر",
+    "dangerZoneDesc": "إجراءات لا رجعة فيها ستحذف نشاطك التجاري نهائيًا",
     "deleteBusiness": "حذف النشاط التجاري",
     "deleteBusinessConfirm": "هل أنت متأكد من حذف هذا النشاط التجاري؟ لا يمكن التراجع عن هذا الإجراء.",
-    "businessDeleted": "تم حذف النشاط التجاري بنجاح"
+    "deleteBusinessConfirmTitle": "هل أنت متأكد تمامًا؟",
+    "deleteBusinessConfirmDesc": "هذا الإجراء لا يمكن التراجع عنه. سيقوم بحذف نشاطك التجاري وجميع البيانات المرتبطة به نهائيًا بما في ذلك الحجوزات والخدمات والموظفين وساعات العمل والتقييمات والصور.",
+    "businessDeleted": "تم حذف النشاط التجاري بنجاح",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "coverImage": {
+      "title": "صورة الغلاف",
+      "description": "قم بتحميل صورة غلاف لملف نشاطك التجاري",
+      "noImage": "لا توجد صورة غلاف",
+      "upload": "تحميل صورة الغلاف",
+      "uploading": "جاري التحميل...",
+      "recommendation": "موصى به: 1200x400 بكسل، PNG أو JPG حتى 5 ميجابايت",
+      "success": "تم تحديث صورة الغلاف بنجاح",
+      "error": "فشل تحميل الصورة",
+      "typeError": "يرجى تحميل ملف صورة",
+      "sizeError": "يجب أن تكون الصورة أقل من 5 ميجابايت"
+    },
+    "portfolioGallery": {
+      "title": "معرض الأعمال",
+      "description": "قم بتحميل صور تعرض أعمالك (قبل/بعد، مشاريع منتهية، إلخ)",
+      "upload": "تحميل الصور",
+      "uploadLabel": "انقر لتحميل الصور (بحد أقصى 5 ميجابايت لكل منها)",
+      "uploading": "جاري التحميل...",
+      "noImages": "لا توجد صور في المعرض بعد. قم بتحميل بعض الصور لعرض أعمالك!",
+      "success": "تم تحميل الصور بنجاح",
+      "error": "فشل تحميل الصور",
+      "deleteSuccess": "تم حذف الصورة",
+      "deleteError": "فشل حذف الصورة",
+      "loadError": "فشل تحميل صور المعرض",
+      "typeError": "{{fileName}} ليس ملف صورة",
+      "sizeError": "{{fileName}} كبير جداً (بحد أقصى 5 ميجابايت)"
+    }
   },
   "staff": {
+    "access": {
+      "title": "إدارة وصول الموظفين",
+      "subtitle": "منح الموظفين صلاحية الوصول لإدارة هذا النشاط التجاري",
+      "howToTitle": "كيفية إضافة موظفين:",
+      "step1": "اطلب من الموظف إنشاء حساب (إذا لم يكن لديه واحد)",
+      "step2": "يجب على الموظف الذهاب إلى صفحة الملف الشخصي",
+      "step3": "سيجدون معرف المستخدم الخاص بهم في أعلى ملفهم الشخصي",
+      "step4": "انسخ والصق معرف المستخدم أدناه لمنحهم حق الوصول",
+      "label": "معرف المستخدم للموظف",
+      "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "button": "إضافة موظف",
+      "buttonLoading": "جاري الإضافة...",
+      "helpText": "معرف المستخدم هو معرف فريد موجود في صفحة الملف الشخصي للموظف",
+      "userNotFound": "المستخدم غير موجود. يرجى التحقق من معرف المستخدم.",
+      "alreadyStaff": "هذا المستخدم هو بالفعل موظف",
+      "addSuccess": "تم إضافة {{name}} كموظف",
+      "addError": "فشل إضافة الموظف",
+      "invalidFormat": "تنسيق معرف المستخدم غير صالح",
+      "currentStaff": "أعضاء الفريق الحاليين",
+      "removeSuccess": "تم إزالة الموظف",
+      "removeError": "فشل إزالة الموظف"
+    },
     "addStaff": "إضافة موظف",
     "editStaff": "تعديل الموظف",
     "staffName": "اسم الموظف",
@@ -317,17 +410,56 @@
     "inviteSuccess": "تمت دعوة الموظف بنجاح",
     "removeStaff": "إزالة الموظف",
     "removeConfirm": "هل أنت متأكد من إزالة هذا الموظف؟",
-    "completedBookings": "الحجوزات المكتملة"
+    "completedBookings": "الحجوزات المكتملة",
+    "title": "أعضاء الفريق",
+    "subtitle": "إدارة أعضاء فريقك",
+    "noStaff": "لا يوجد موظفون بعد. أضف عضو فريقك الأول.",
+    "createSuccess": "تم إضافة الموظف بنجاح",
+    "updateSuccess": "تم تحديث الموظف بنجاح",
+    "deleteSuccess": "تم حذف الموظف",
+    "deleteError": "فشل حذف الموظف",
+    "loadError": "فشل تحميل الموظفين",
+    "saveError": "فشل حفظ الموظف",
+    "fullName": "الاسم الكامل",
+    "placeholderName": "أحمد محمد",
+    "placeholderTitle": "مصفف شعر أول",
+    "placeholderBio": "سيرة مختصرة أو وصف..."
+  },
+  "hours": {
+    "title": "ساعات العمل",
+    "subtitle": "حدد ساعات العمل لكل يوم",
+    "save": "حفظ التغييرات",
+    "saving": "جاري الحفظ...",
+    "open": "مفتوح",
+    "closed": "مغلق",
+    "to": "إلى",
+    "updateSuccess": "تم تحديث الساعات بنجاح",
+    "updateError": "فشل تحديث الساعات",
+    "loadError": "فشل تحميل الساعات"
   },
   "services": {
+    "title": "الخدمات",
+    "subtitle": "إدارة الخدمات التي تقدمها",
     "addService": "إضافة خدمة",
     "editService": "تعديل الخدمة",
     "serviceName": "اسم الخدمة",
     "serviceDescription": "الوصف",
-    "servicePrice": "السعر",
-    "serviceDuration": "المدة (بالدقائق)",
+    "servicePrice": "السعر (دج)",
+    "serviceDuration": "المدة (دقائق)",
     "active": "نشط",
-    "inactive": "غير نشط"
+    "inactive": "غير نشط",
+    "noServices": "لا توجد خدمات بعد. أضف خدمتك الأولى للبدء.",
+    "createSuccess": "تم إنشاء الخدمة بنجاح",
+    "updateSuccess": "تم تحديث الخدمة بنجاح",
+    "deleteSuccess": "تم حذف الخدمة",
+    "deleteError": "فشل حذف الخدمة",
+    "loadError": "فشل تحميل الخدمات",
+    "saveError": "فشل حفظ الخدمة",
+    "deleteConfirm": "هل أنت متأكد من حذف هذه الخدمة؟",
+    "addServiceTitle": "إضافة خدمة جديدة",
+    "editServiceTitle": "تعديل الخدمة",
+    "placeholderName": "قص وتصفيف شعر",
+    "placeholderDesc": "صف هذه الخدمة..."
   },
   "languages": {
     "en": "English",
@@ -359,7 +491,10 @@
     "nameTooShort": "يجب أن يتكون الاسم من حرفين على الأقل",
     "somethingWrong": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
     "unauthorized": "غير مصرح لك بتنفيذ هذا الإجراء",
-    "notFound": "لم يتم العثور على المورد المطلوب"
+    "notFound": "لم يتم العثور على المورد المطلوب",
+    "notFoundTitle": "404",
+    "notFoundMessage": "عذراً! الصفحة غير موجودة",
+    "returnHome": "العودة إلى الصفحة الرئيسية"
   },
   "howToUse": {
     "badge": "دليل الاستخدام",
@@ -447,5 +582,73 @@
     "helpCenter": "مركز المساعدة",
     "contactUs": "اتصل بنا",
     "howToUse": "كيفية الاستخدام"
+  },
+  "payment": {
+    "title": "اختر خطتك",
+    "subtitle": "اختر الخطة المثالية لعملك. تشمل جميع الخطط فترة تجريبية مجانية لمدة 14 يومًا.",
+    "period": "/شهر",
+    "subscribe": "اشترك الآن",
+    "mostPopular": "الأكثر شيوعًا",
+    "lifetimeAccess": "وصول مدى الحياة",
+    "lifetimeDesc": "ادفع مرة واحدة، واستخدم للأبد. احصل على جميع ميزات المحترفين.",
+    "oneTimePayment": "دفع لمرة واحدة",
+    "getLifetime": "احصل على وصول مدى الحياة",
+    "needHelp": "تحتاج مساعدة في الاختيار؟",
+    "contactSales": "تواصل مع فريق المبيعات",
+    "securePayment": "جميع المدفوعات آمنة ومشفرة. إلغاء في أي وقت.",
+    "plans": {
+      "basic": {
+        "name": "أساسي",
+        "description": "مثالي للشركات الصغيرة التي بدأت للتو",
+        "features": {
+          "bookings": "ما يصل إلى 50 حجزًا/شهر",
+          "staff": "موظف واحد",
+          "analytics": "تحليلات أساسية",
+          "notifications": "إشعارات البريد الإلكتروني",
+          "support": "دعم قياسي"
+        }
+      },
+      "professional": {
+        "name": "محترف",
+        "description": "مثالي للشركات النامية ذات الاحتياجات المتزايدة",
+        "features": {
+          "bookings": "حجوزات غير محدودة",
+          "staff": "ما يصل إلى 5 موظفين",
+          "analytics": "تحليلات متقدمة",
+          "notifications": "إشعارات الرسائل القصيرة والبريد الإلكتروني",
+          "support": "أولوية الدعم",
+          "branding": "علامة تجارية مخصصة"
+        }
+      },
+      "enterprise": {
+        "name": "مؤسسة",
+        "description": "للشركات الكبيرة ذات المتطلبات المعقدة",
+        "features": {
+          "everything": "كل شيء في المحترف",
+          "staff": "عدد غير محدود من الموظفين",
+          "api": "وصول API",
+          "accountManager": "مدير حساب مخصص",
+          "integrations": "تكاملات مخصصة",
+          "sla": "ضمان مستوى الخدمة (SLA)"
+        }
+      }
+    }
+  },
+  "staffAnalytics": {
+    "staffPerformance": "أداء الموظفين",
+    "staffPerformanceDesc": "الحجوزات المكتملة بواسطة كل موظف",
+    "bookingsByStaff": "الحجوزات حسب الموظف",
+    "bookingsByStaffDesc": "عرض الحجوزات الأخيرة لكل موظف",
+    "selectStaff": "اختر الموظف",
+    "allStaff": "جميع الموظفين",
+    "noStaffFound": "لم يتم العثور على موظفين",
+    "noBookingsFound": "لم يتم العثور على حجوزات",
+    "noBookingsFoundStaff": "لم يتم العثور على حجوزات لهذا الموظف",
+    "completed": "مكتمل",
+    "confirmed": "مؤكد",
+    "pending": "قيد الانتظار",
+    "total": "المجموع",
+    "staffLabel": "الموظف:",
+    "loadError": "فشل تحميل تحليلات الموظفين"
   }
 }

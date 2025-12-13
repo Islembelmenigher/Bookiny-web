@@ -165,3 +165,6 @@ const handler = async (req: Request): Promise<Response> => {
 };
 
 serve(handler);
+
+// To be edited after buying a domain nmae for the website then we can use it to creat some emails with resend 
+// then we can connect it using API key from resend into this page 

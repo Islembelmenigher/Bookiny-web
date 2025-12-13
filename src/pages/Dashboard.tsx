@@ -10,6 +10,7 @@ import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { DemoDataSeeder } from '@/components/DemoDataSeeder';
 import { RescheduleDialog } from '@/components/business/RescheduleDialog';
 import { formatDZD } from '@/lib/algeria';
@@ -19,6 +20,7 @@ const MAX_BUSINESSES = 3;
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [profile, setProfile] = useState<any>(null);
   const [bookings, setBookings] = useState<any[]>([]);
   const [businesses, setBusinesses] = useState<any[]>([]);
@@ -72,7 +74,7 @@ export default function Dashboard() {
         setStaffBusinesses(staffBiz);
       }
     } catch (error: any) {
-      toast.error('Failed to load dashboard data');
+      toast.error(t('errors.somethingWrong'));
       console.error(error);
     } finally {
       setLoading(false);
@@ -88,10 +90,10 @@ export default function Dashboard() {
 
       if (error) throw error;
 
-      toast.success('Booking cancelled');
+      toast.success(t('bookings.cancelSuccess'));
       fetchData();
     } catch (error: any) {
-      toast.error('Failed to cancel booking');
+      toast.error(t('errors.somethingWrong'));
       console.error(error);
     }
   };
@@ -129,8 +131,8 @@ export default function Dashboard() {
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold">Dashboard</h1>
-              <p className="text-muted-foreground">Welcome back, {profile?.full_name || 'User'}</p>
+              <h1 className="text-3xl font-bold">{t('dashboard.title')}</h1>
+              <p className="text-muted-foreground">{t('auth.welcomeBack')}, {profile?.full_name || 'User'}</p>
             </div>
             <div className="flex gap-2">
               {isBusinessOwner && canCreateMoreBusinesses && (
@@ -139,7 +141,7 @@ export default function Dashboard() {
                   <Button asChild>
                     <Link to="/business/new">
                       <Plus className="h-4 w-4 mr-2" />
-                      Add Business
+                      {t('dashboard.addBusiness')}
                     </Link>
                   </Button>
                 </>
@@ -149,9 +151,9 @@ export default function Dashboard() {
 
           <Tabs defaultValue="bookings" className="space-y-6">
             <TabsList>
-              <TabsTrigger value="bookings">My Bookings</TabsTrigger>
-              {isBusinessOwner && <TabsTrigger value="businesses">My Businesses</TabsTrigger>}
-              {staffBusinesses.length > 0 && <TabsTrigger value="staff">Staff Access</TabsTrigger>}
+              <TabsTrigger value="bookings">{t('nav.myBookings')}</TabsTrigger>
+              {isBusinessOwner && <TabsTrigger value="businesses">{t('nav.myBusiness')}</TabsTrigger>}
+              {staffBusinesses.length > 0 && <TabsTrigger value="staff">{t('dashboard.staffAccess')}</TabsTrigger>}
             </TabsList>
 
             <TabsContent value="bookings" className="space-y-4">
@@ -159,12 +161,12 @@ export default function Dashboard() {
                 <Card>
                   <CardContent className="p-12 text-center">
                     <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No bookings yet</h3>
+                    <h3 className="text-lg font-semibold mb-2">{t('dashboard.noBookingsTitle')}</h3>
                     <p className="text-muted-foreground mb-4">
-                      Start by searching for services and booking appointments
+                      {t('dashboard.noBookingsDesc')}
                     </p>
                     <Button asChild>
-                      <Link to="/search">Browse Services</Link>
+                      <Link to="/search">{t('dashboard.browseServices')}</Link>
                     </Button>
                   </CardContent>
                 </Card>
@@ -202,7 +204,7 @@ export default function Dashboard() {
                                 <span>{formatDZD(booking.services?.price || 0)}</span>
                               </div>
                               <div className="text-primary font-medium">
-                                Performed by: {booking.staff?.name || 'Not assigned'}
+                                {t('business.performedBy')}: {booking.staff?.name || t('bookings.notAssigned')}
                               </div>
                             </div>
                           </div>
@@ -214,7 +216,7 @@ export default function Dashboard() {
                                 onClick={() => setRescheduleBooking(booking)}
                               >
                                 <RefreshCw className="h-4 w-4 mr-2" />
-                                Reschedule
+                                {t('bookings.reschedule')}
                               </Button>
                             )}
                             {booking.status === 'pending' && (
@@ -224,7 +226,7 @@ export default function Dashboard() {
                                 onClick={() => handleCancelBooking(booking.id)}
                               >
                                 <X className="h-4 w-4 mr-2" />
-                                Cancel
+                                {t('common.cancel')}
                               </Button>
                             )}
                           </div>
@@ -244,7 +246,7 @@ export default function Dashboard() {
                     <CardContent className="p-4 flex items-center gap-3">
                       <AlertCircle className="h-5 w-5 text-accent shrink-0" />
                       <p className="text-sm text-muted-foreground">
-                        You can only create up to {MAX_BUSINESSES} businesses. You've reached the maximum limit.
+                        {t('dashboard.businessLimit', { limit: MAX_BUSINESSES })}
                       </p>
                     </CardContent>
                   </Card>
@@ -254,14 +256,14 @@ export default function Dashboard() {
                   <Card>
                     <CardContent className="p-12 text-center">
                       <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold mb-2">No businesses yet</h3>
+                      <h3 className="text-lg font-semibold mb-2">{t('dashboard.noBusinessesTitle')}</h3>
                       <p className="text-muted-foreground mb-4">
-                        Add your business to start receiving bookings
+                        {t('dashboard.noBusinessesDesc')}
                       </p>
                       <Button asChild>
                         <Link to="/business/new">
                           <Plus className="h-4 w-4 mr-2" />
-                          Add Business
+                          {t('dashboard.addBusiness')}
                         </Link>
                       </Button>
                     </CardContent>
@@ -274,12 +276,12 @@ export default function Dashboard() {
                         <Button asChild>
                           <Link to="/business/new">
                             <Plus className="h-4 w-4 mr-2" />
-                            Add Another Business ({businesses.length}/{MAX_BUSINESSES})
+                            {t('dashboard.addAnotherBusiness')} ({businesses.length}/{MAX_BUSINESSES})
                           </Link>
                         </Button>
                       </div>
                     )}
-                    
+
                     <div className="grid md:grid-cols-2 gap-4">
                       {businesses.map((business) => (
                         <Card key={business.id}>
@@ -298,10 +300,10 @@ export default function Dashboard() {
                             </div>
                             <div className="mt-4 flex gap-2">
                               <Button variant="outline" size="sm" asChild className="flex-1">
-                                <Link to={`/business/${business.id}`}>View</Link>
+                                <Link to={`/business/${business.id}`}>{t('common.view')}</Link>
                               </Button>
                               <Button size="sm" asChild className="flex-1">
-                                <Link to={`/business/${business.id}/manage`}>Manage</Link>
+                                <Link to={`/business/${business.id}/manage`}>{t('dashboard.manage')}</Link>
                               </Button>
                             </div>
                           </CardContent>
@@ -317,11 +319,11 @@ export default function Dashboard() {
               <TabsContent value="staff" className="space-y-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Staff Dashboard Access</CardTitle>
+                    <CardTitle>{t('dashboard.staffAccessTitle')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground mb-4">
-                      You have staff access to the following businesses. Click to open their dashboard.
+                      {t('dashboard.staffAccessDesc')}
                     </p>
                     <div className="grid md:grid-cols-2 gap-4">
                       {staffBusinesses.map((business) => (
@@ -343,7 +345,7 @@ export default function Dashboard() {
                               <Button size="sm" asChild className="w-full">
                                 <Link to={`/business/${business.id}/manage`}>
                                   <Building2 className="h-4 w-4 mr-2" />
-                                  Open Business Dashboard
+                                  {t('dashboard.openDashboard')}
                                 </Link>
                               </Button>
                             </div>
