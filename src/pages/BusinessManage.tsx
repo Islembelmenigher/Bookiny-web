@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,7 +28,8 @@ export default function BusinessManage() {
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
-  
+  const { t } = useTranslation();
+
   const [business, setBusiness] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState<'owner' | 'staff' | null>(null);
@@ -74,7 +76,7 @@ export default function BusinessManage() {
         if (roleData) {
           setUserRole('staff');
         } else {
-          toast.error('You do not have permission to access this business');
+          toast.error(t('errors.noPermission'));
           navigate('/dashboard');
           return;
         }
@@ -107,7 +109,7 @@ export default function BusinessManage() {
         activeServices: servicesCountRes.count || 0,
       });
     } catch (error: any) {
-      toast.error('Failed to load business data');
+      toast.error(t('errors.somethingWrong'));
       console.error(error);
     } finally {
       setLoading(false);
@@ -123,11 +125,11 @@ export default function BusinessManage() {
 
       if (error) throw error;
 
-      toast.success('Business deleted successfully');
+      toast.success(t('business.deleteSuccess'));
       navigate('/dashboard');
     } catch (error: any) {
       console.error('Error deleting business:', error);
-      toast.error('Failed to delete business');
+      toast.error(t('errors.deleteFailed'));
     }
   };
 
@@ -148,7 +150,7 @@ export default function BusinessManage() {
     return (
       <Layout>
         <div className="container py-8 text-center">
-          <p className="text-muted-foreground">Business not found</p>
+          <p className="text-muted-foreground">{t('business.businessNotFound')}</p>
         </div>
       </Layout>
     );
@@ -167,11 +169,11 @@ export default function BusinessManage() {
               className="mb-4"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
+              {t('business.backToDashboard')}
             </Button>
             <h1 className="text-3xl font-bold mb-2">{business.name}</h1>
             <div className="flex flex-wrap items-center gap-4">
-              <p className="text-muted-foreground">Manage your business and bookings</p>
+              <p className="text-muted-foreground">{t('business.manage')}</p>
               {business.phone && (
                 <button
                   onClick={() => {
@@ -199,7 +201,7 @@ export default function BusinessManage() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Total Bookings</p>
+                    <p className="text-sm text-muted-foreground">{t('business.totalBookings')}</p>
                     <p className="text-2xl font-bold">{stats.totalBookings}</p>
                   </div>
                   <Calendar className="h-8 w-8 text-primary" />
@@ -211,7 +213,7 @@ export default function BusinessManage() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Today's Bookings</p>
+                    <p className="text-sm text-muted-foreground">{t('business.todayBookings')}</p>
                     <p className="text-2xl font-bold">{stats.todayBookings}</p>
                   </div>
                   <TrendingUp className="h-8 w-8 text-accent" />
@@ -223,7 +225,7 @@ export default function BusinessManage() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Active Services</p>
+                    <p className="text-sm text-muted-foreground">{t('business.activeServices')}</p>
                     <p className="text-2xl font-bold">{stats.activeServices}</p>
                   </div>
                   <DollarSign className="h-8 w-8 text-green-500" />
@@ -236,7 +238,7 @@ export default function BusinessManage() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Total Revenue</p>
+                      <p className="text-sm text-muted-foreground">{t('business.totalRevenue')}</p>
                       <p className="text-2xl font-bold">{formatDZD(stats.totalRevenue)}</p>
                     </div>
                     <Users className="h-8 w-8 text-blue-500" />
@@ -249,14 +251,14 @@ export default function BusinessManage() {
           {/* Management Tabs */}
           <Tabs defaultValue="bookings" className="space-y-6">
             <TabsList className={`grid w-full ${userRole === 'staff' ? 'grid-cols-3' : 'grid-cols-6'}`}>
-              <TabsTrigger value="bookings">Bookings</TabsTrigger>
-              {userRole === 'staff' && <TabsTrigger value="my-schedule">My Schedule</TabsTrigger>}
-              {userRole === 'staff' && <TabsTrigger value="my-services">My Services</TabsTrigger>}
-              {userRole === 'owner' && <TabsTrigger value="services">Services</TabsTrigger>}
-              {userRole === 'owner' && <TabsTrigger value="staff">Staff</TabsTrigger>}
-              {userRole === 'owner' && <TabsTrigger value="hours">Hours</TabsTrigger>}
-              {userRole === 'owner' && <TabsTrigger value="analytics">Analytics</TabsTrigger>}
-              {userRole === 'owner' && <TabsTrigger value="settings">Settings</TabsTrigger>}
+              <TabsTrigger value="bookings">{t('tabs.bookings')}</TabsTrigger>
+              {userRole === 'staff' && <TabsTrigger value="my-schedule">{t('tabs.mySchedule')}</TabsTrigger>}
+              {userRole === 'staff' && <TabsTrigger value="my-services">{t('tabs.myServices')}</TabsTrigger>}
+              {userRole === 'owner' && <TabsTrigger value="services">{t('tabs.services')}</TabsTrigger>}
+              {userRole === 'owner' && <TabsTrigger value="staff">{t('tabs.staff')}</TabsTrigger>}
+              {userRole === 'owner' && <TabsTrigger value="hours">{t('tabs.hours')}</TabsTrigger>}
+              {userRole === 'owner' && <TabsTrigger value="analytics">{t('tabs.analytics')}</TabsTrigger>}
+              {userRole === 'owner' && <TabsTrigger value="settings">{t('tabs.settings')}</TabsTrigger>}
             </TabsList>
 
             <TabsContent value="bookings">
@@ -296,20 +298,20 @@ export default function BusinessManage() {
                 </TabsContent>
 
                 <TabsContent value="settings" className="space-y-6">
-                  <BusinessCoverUpload 
-                    businessId={id!} 
+                  <BusinessCoverUpload
+                    businessId={id!}
                     currentCoverUrl={business?.cover_image_url}
                     onUploadSuccess={(url) => setBusiness({ ...business, cover_image_url: url })}
                   />
 
                   <PortfolioManager businessId={id!} />
-                  
+
                   {/* Danger Zone */}
                   <Card className="border-destructive">
                     <CardHeader>
-                      <CardTitle className="text-destructive">Danger Zone</CardTitle>
+                      <CardTitle className="text-destructive">{t('settings.dangerZone')}</CardTitle>
                       <CardDescription>
-                        Irreversible actions that will permanently delete your business
+                        {t('settings.dangerZoneDesc')}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -317,15 +319,14 @@ export default function BusinessManage() {
                         <AlertDialogTrigger asChild>
                           <Button variant="destructive" className="w-full sm:w-auto">
                             <Trash2 className="h-4 w-4 mr-2" />
-                            Delete Business
+                            {t('settings.deleteBusiness')}
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogTitle>{t('settings.deleteBusinessConfirmTitle')}</AlertDialogTitle>
                             <AlertDialogDescription>
-                              This action cannot be undone. This will permanently delete your business
-                              and remove all associated data including:
+                              {t('settings.deleteBusinessConfirmDesc')}
                               <ul className="list-disc list-inside mt-2 space-y-1">
                                 <li>All bookings</li>
                                 <li>All services</li>
@@ -337,12 +338,12 @@ export default function BusinessManage() {
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogCancel>{t('settings.cancel')}</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={handleDeleteBusiness}
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
-                              Delete Business
+                              {t('settings.deleteBusiness')}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

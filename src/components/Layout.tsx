@@ -77,7 +77,7 @@ export function Layout({ children }: LayoutProps) {
 
           <div className="flex items-center gap-3">
             <LanguageSelector variant="minimal" />
-            
+
             {user ? (
               <>
                 <NotificationPanel />
@@ -87,7 +87,7 @@ export function Layout({ children }: LayoutProps) {
                     {t('nav.dashboard')}
                   </Link>
                 </Button>
-                
+
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="icon">
@@ -105,7 +105,7 @@ export function Layout({ children }: LayoutProps) {
                       <DropdownMenuItem asChild>
                         <Link to="/payment">
                           <CreditCard className="h-4 w-4 me-2" />
-                          Subscription
+                          {t('nav.subscription')}
                         </Link>
                       </DropdownMenuItem>
                     )}
@@ -157,7 +157,7 @@ export function Layout({ children }: LayoutProps) {
                       {isBusinessOwner && (
                         <Link to="/payment" className="text-lg font-medium hover:text-primary transition-colors flex items-center">
                           <CreditCard className="h-4 w-4 me-2" />
-                          Subscription
+                          {t('nav.subscription')}
                         </Link>
                       )}
                       <Button onClick={handleSignOut} variant="outline" className="w-full justify-start">

@@ -95,7 +95,6 @@ export function BookingsManager({ businessId }: BookingsManagerProps) {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <CardTitle>{t('dashboard.bookings')}</CardTitle>
-              <CardDescription>{t('dashboard.manageAppointments')}</CardDescription>
             </div>
             <Select value={filter} onValueChange={(value: any) => setFilter(value)}>
               <SelectTrigger className="w-40">

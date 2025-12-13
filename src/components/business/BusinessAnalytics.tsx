@@ -122,7 +122,7 @@ export function BusinessAnalytics({ businessId, stats }: BusinessAnalyticsProps)
         recentBookings: recentBookings || [],
       });
     } catch (error: any) {
-      toast.error('Failed to load analytics');
+      toast.error(t('errors.somethingWrong'));
       console.error(error);
     } finally {
       setLoading(false);

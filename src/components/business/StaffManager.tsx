@@ -9,18 +9,20 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, User, Briefcase } from 'lucide-react';
 import { OwnerStaffServicesManager } from './OwnerStaffServicesManager';
+import { useTranslation } from 'react-i18next';
 
 interface StaffManagerProps {
   businessId: string;
 }
 
 export function StaffManager({ businessId }: StaffManagerProps) {
+  const { t } = useTranslation();
   const [staff, setStaff] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState<any>(null);
   const [servicesStaff, setServicesStaff] = useState<any>(null);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     title: '',
@@ -43,7 +45,7 @@ export function StaffManager({ businessId }: StaffManagerProps) {
       if (error) throw error;
       setStaff(data || []);
     } catch (error: any) {
-      toast.error('Failed to load staff');
+      toast.error(t('staff.loadError'));
       console.error(error);
     } finally {
       setLoading(false);
@@ -80,7 +82,7 @@ export function StaffManager({ businessId }: StaffManagerProps) {
           .eq('id', editingStaff.id);
 
         if (error) throw error;
-        toast.success('Staff member updated successfully');
+        toast.success(t('staff.updateSuccess'));
       } else {
         const { error } = await supabase
           .from('staff')
@@ -90,24 +92,24 @@ export function StaffManager({ businessId }: StaffManagerProps) {
           });
 
         if (error) throw error;
-        toast.success('Staff member added successfully');
+        toast.success(t('staff.createSuccess'));
       }
 
       setDialogOpen(false);
       fetchStaff();
     } catch (error: any) {
-      toast.error(error.message || 'Failed to save staff member');
+      toast.error(error.message || t('staff.saveError'));
       console.error(error);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to remove this staff member?')) return;
+    if (!confirm(t('staff.deleteConfirm'))) return;
 
     try {
       // First get the staff member to check if they have a profile_id
       const staffMember = staff.find(s => s.id === id);
-      
+
       // If staff has a profile_id, remove their role access
       if (staffMember?.profile_id) {
         await supabase
@@ -125,16 +127,16 @@ export function StaffManager({ businessId }: StaffManagerProps) {
         .eq('id', id);
 
       if (error) throw error;
-      toast.success('Staff member removed');
+      toast.success(t('staff.deleteSuccess'));
       fetchStaff();
     } catch (error: any) {
-      toast.error('Failed to remove staff member');
+      toast.error(t('staff.deleteError'));
       console.error(error);
     }
   };
 
   if (loading) {
-    return <div className="animate-pulse space-y-4">Loading staff...</div>;
+    return <div className="animate-pulse space-y-4">{t('common.loading')}</div>;
   }
 
   // If viewing services for a staff member
@@ -155,19 +157,19 @@ export function StaffManager({ businessId }: StaffManagerProps) {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Staff Members</CardTitle>
-              <CardDescription>Manage your team members</CardDescription>
+              <CardTitle>{t('staff.title')}</CardTitle>
+              <CardDescription>{t('staff.subtitle')}</CardDescription>
             </div>
             <Button onClick={() => handleOpenDialog()}>
               <Plus className="h-4 w-4 mr-2" />
-              Add Staff
+              {t('staff.addStaff')}
             </Button>
           </div>
         </CardHeader>
         <CardContent>
           {staff.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              No staff members yet. Add your first team member.
+              {t('staff.noStaff')}
             </div>
           ) : (
             <div className="grid md:grid-cols-2 gap-4">
@@ -194,7 +196,7 @@ export function StaffManager({ businessId }: StaffManagerProps) {
                       variant="outline"
                       size="sm"
                       onClick={() => setServicesStaff(member)}
-                      title="Assign Services"
+                      title={t('staff.assignServices')}
                     >
                       <Briefcase className="h-4 w-4" />
                     </Button>
@@ -224,15 +226,15 @@ export function StaffManager({ businessId }: StaffManagerProps) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingStaff ? 'Edit Staff Member' : 'Add Staff Member'}
+              {editingStaff ? t('staff.editStaff') : t('staff.addStaff')}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name *</Label>
+              <Label htmlFor="name">{t('staff.fullName')} *</Label>
               <Input
                 id="name"
-                placeholder="John Doe"
+                placeholder={t('staff.placeholderName')}
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
@@ -240,20 +242,20 @@ export function StaffManager({ businessId }: StaffManagerProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="title">Title/Role</Label>
+              <Label htmlFor="title">{t('staff.staffTitle')}</Label>
               <Input
                 id="title"
-                placeholder="Senior Stylist"
+                placeholder={t('staff.placeholderTitle')}
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="bio">Bio</Label>
+              <Label htmlFor="bio">{t('staff.staffBio')}</Label>
               <Textarea
                 id="bio"
-                placeholder="Brief bio or description..."
+                placeholder={t('staff.placeholderBio')}
                 rows={3}
                 value={formData.bio}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
@@ -267,10 +269,10 @@ export function StaffManager({ businessId }: StaffManagerProps) {
                 className="flex-1"
                 onClick={() => setDialogOpen(false)}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button type="submit" className="flex-1">
-                {editingStaff ? 'Update' : 'Add'} Staff Member
+                {editingStaff ? t('staff.editStaff') : t('staff.addStaff')}
               </Button>
             </div>
           </form>

@@ -70,7 +70,8 @@
     "logout": "Déconnexion",
     "myBookings": "Mes Réservations",
     "myBusiness": "Mon Entreprise",
-    "createBusiness": "Créer une Entreprise"
+    "createBusiness": "Créer une Entreprise",
+    "subscription": "Abonnement"
   },
   "auth": {
     "welcomeBack": "Bon retour",
@@ -208,7 +209,32 @@
     "contactPhone": "Téléphone",
     "ourTeam": "Notre Équipe",
     "manage": "Gérer votre entreprise et vos réservations",
-    "backToDashboard": "Retour au Tableau de Bord"
+    "backToDashboard": "Retour au Tableau de Bord",
+    "pleaseSignIn": "Veuillez vous connecter pour réserver un rendez-vous",
+    "selectAllDetails": "Veuillez sélectionner tous les détails de réservation",
+    "slotAlreadyBooked": "Ce créneau vient d'être réservé. Veuillez sélectionner un autre créneau.",
+    "businessNotFound": "Entreprise introuvable",
+    "noServicesAvailable": "Aucun service disponible",
+    "selectProfessional": "Sélectionner un Professionnel",
+    "noStaffForService": "Aucun membre du personnel n'est disponible pour ce service.",
+    "selectDate": "Sélectionner la Date",
+    "selectTime": "Sélectionner l'Heure",
+    "staffNotAvailable": "n'est pas disponible à cette date ou tous les créneaux sont réservés.",
+    "beFirstToReview": "Pas encore d'avis. Soyez le premier à donner votre avis !",
+    "totalBookings": "Total des Réservations",
+    "todayBookings": "Réservations d'Aujourd'hui",
+    "activeServices": "Services Actifs",
+    "totalRevenue": "Revenu Total"
+  },
+  "tabs": {
+    "bookings": "Réservations",
+    "mySchedule": "Mon Planning",
+    "myServices": "Mes Services",
+    "services": "Services",
+    "staff": "Personnel",
+    "hours": "Heures",
+    "analytics": "Analytique",
+    "settings": "Paramètres"
   },
   "bookings": {
     "title": "Mes Réservations",
@@ -259,7 +285,19 @@
     "mySchedule": "Mon Horaire",
     "myServices": "Mes Services",
     "hours": "Heures",
-    "manageAppointments": "Gérer vos rendez-vous"
+    "addBusiness": "Ajouter une Entreprise",
+    "staffAccess": "Accès Personnel",
+    "noBookingsTitle": "Pas encore de réservations",
+    "noBookingsDesc": "Commencez par rechercher des services et prendre des rendez-vous",
+    "browseServices": "Parcourir les Services",
+    "businessLimit": "Vous ne pouvez créer que jusqu'à {{limit}} entreprises. Vous avez atteint la limite maximale.",
+    "noBusinessesTitle": "Pas encore d'entreprise",
+    "noBusinessesDesc": "Ajoutez votre entreprise pour commencer à recevoir des réservations",
+    "addAnotherBusiness": "Ajouter une autre entreprise",
+    "manage": "Gérer",
+    "staffAccessTitle": "Accès au Tableau de Bord Personnel",
+    "staffAccessDesc": "Vous avez un accès personnel aux entreprises suivantes. Cliquez pour ouvrir leur tableau de bord.",
+    "openDashboard": "Ouvrir le Tableau de Bord"
   },
   "profile": {
     "title": "Paramètres du Profil",
@@ -297,12 +335,67 @@
     "businessHours": "Heures d'Ouverture",
     "notifications": "Notifications",
     "portfolio": "Portfolio",
-    "dangerZone": "Zone Dangereuse",
+    "deleteAccount": "Supprimer le Compte",
+    "dangerZone": "Zone de Danger",
+    "dangerZoneDesc": "Actions irréversibles qui supprimeront définitivement votre entreprise",
     "deleteBusiness": "Supprimer l'Entreprise",
     "deleteBusinessConfirm": "Êtes-vous sûr de vouloir supprimer cette entreprise ? Cette action est irréversible.",
-    "businessDeleted": "Entreprise supprimée avec succès"
+    "deleteBusinessConfirmTitle": "Êtes-vous absolument sûr ?",
+    "deleteBusinessConfirmDesc": "Cette action est irréversible. Elle supprimera définitivement votre entreprise et toutes les données associées, y compris les réservations, les services, le personnel, les horaires, les avis et les images.",
+    "businessDeleted": "Entreprise supprimée avec succès",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "coverImage": {
+      "title": "Image de Couverture",
+      "description": "Téléchargez une image de couverture pour votre profil professionnel",
+      "noImage": "Aucune image de couverture",
+      "upload": "Télécharger l'Image",
+      "uploading": "Téléchargement...",
+      "recommendation": "Recommandé : 1200x400px, PNG ou JPG jusqu'à 5Mo",
+      "success": "Image de couverture mise à jour avec succès",
+      "error": "Échec du téléchargement de l'image",
+      "typeError": "Veuillez télécharger un fichier image",
+      "sizeError": "L'image doit faire moins de 5Mo"
+    },
+    "portfolioGallery": {
+      "title": "Galerie Portfolio",
+      "description": "Téléchargez des photos présentant votre travail (avant/après, projets finis, etc.)",
+      "upload": "Télécharger des Images",
+      "uploadLabel": "Cliquez pour télécharger des images (max 5Mo chacune)",
+      "uploading": "Téléchargement...",
+      "noImages": "Pas encore d'images dans le portfolio. Téléchargez-en pour montrer votre travail !",
+      "success": "Images téléchargées avec succès",
+      "error": "Échec du téléchargement des images",
+      "deleteSuccess": "Image supprimée",
+      "deleteError": "Échec de la suppression de l'image",
+      "loadError": "Échec du chargement des images du portfolio",
+      "typeError": "{{fileName}} n'est pas une image",
+      "sizeError": "{{fileName}} est trop volumineux (max 5Mo)"
+    }
   },
   "staff": {
+    "access": {
+      "title": "Gestion d'Accès du Personnel",
+      "subtitle": "Accordez aux membres du personnel l'accès pour gérer cette entreprise",
+      "howToTitle": "Comment ajouter des membres du personnel :",
+      "step1": "Demandez à votre membre du personnel de créer un compte (s'ils ne l'ont pas déjà fait)",
+      "step2": "Le membre du personnel doit aller sur sa page de Profil",
+      "step3": "Ils trouveront leur ID Utilisateur en haut de leur profil",
+      "step4": "Copiez et collez cet ID Utilisateur ci-dessous pour leur accorder l'accès",
+      "label": "ID Utilisateur du Personnel",
+      "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "button": "Ajouter Personnel",
+      "buttonLoading": "Ajout en cours...",
+      "helpText": "L'ID Utilisateur est un identifiant unique trouvé sur la page de profil du membre du personnel",
+      "userNotFound": "Utilisateur introuvable. Veuillez vérifier l'ID Utilisateur.",
+      "alreadyStaff": "Cet utilisateur est déjà un membre du personnel",
+      "addSuccess": "{{name}} ajouté comme membre du personnel",
+      "addError": "Échec de l'ajout du membre du personnel",
+      "invalidFormat": "Format d'ID Utilisateur invalide",
+      "currentStaff": "Membres du Personnel Actuels",
+      "removeSuccess": "Membre du personnel retiré",
+      "removeError": "Échec du retrait du membre du personnel"
+    },
     "addStaff": "Ajouter du Personnel",
     "editStaff": "Modifier le Personnel",
     "staffName": "Nom du Personnel",
@@ -317,17 +410,56 @@
     "inviteSuccess": "Membre du personnel invité avec succès",
     "removeStaff": "Retirer le Personnel",
     "removeConfirm": "Êtes-vous sûr de vouloir retirer ce membre du personnel ?",
-    "completedBookings": "Réservations Terminées"
+    "completedBookings": "Réservations Terminées",
+    "title": "Membres du Personnel",
+    "subtitle": "Gérez les membres de votre équipe",
+    "noStaff": "Pas encore de personnel. Ajoutez votre premier membre d'équipe.",
+    "createSuccess": "Membre du personnel ajouté avec succès",
+    "updateSuccess": "Membre du personnel mis à jour avec succès",
+    "deleteSuccess": "Membre du personnel supprimé",
+    "deleteError": "Échec de la suppression du membre du personnel",
+    "loadError": "Échec du chargement du personnel",
+    "saveError": "Échec de l'enregistrement du membre du personnel",
+    "fullName": "Nom Complet",
+    "placeholderName": "Jean Dupont",
+    "placeholderTitle": "Styliste Senior",
+    "placeholderBio": "Brève biographie ou description..."
+  },
+  "hours": {
+    "title": "Heures d'Ouverture",
+    "subtitle": "Définissez vos heures d'ouverture pour chaque jour",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "open": "Ouvert",
+    "closed": "Fermé",
+    "to": "à",
+    "updateSuccess": "Heures mises à jour avec succès",
+    "updateError": "Échec de la mise à jour des heures",
+    "loadError": "Échec du chargement des heures"
   },
   "services": {
+    "title": "Services",
+    "subtitle": "Gérez les services que vous proposez",
     "addService": "Ajouter un Service",
     "editService": "Modifier le Service",
     "serviceName": "Nom du Service",
     "serviceDescription": "Description",
-    "servicePrice": "Prix",
+    "servicePrice": "Prix (DZD)",
     "serviceDuration": "Durée (minutes)",
     "active": "Actif",
-    "inactive": "Inactif"
+    "inactive": "Inactif",
+    "noServices": "Pas encore de services. Ajoutez votre premier service pour commencer.",
+    "createSuccess": "Service créé avec succès",
+    "updateSuccess": "Service mis à jour avec succès",
+    "deleteSuccess": "Service supprimé",
+    "deleteError": "Échec de la suppression du service",
+    "loadError": "Échec du chargement des services",
+    "saveError": "Échec de l'enregistrement du service",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce service ?",
+    "addServiceTitle": "Ajouter un Nouveau Service",
+    "editServiceTitle": "Modifier le Service",
+    "placeholderName": "Coupe & Coiffure",
+    "placeholderDesc": "Décrivez ce service..."
   },
   "languages": {
     "en": "English",
@@ -359,7 +491,10 @@
     "nameTooShort": "Le nom doit contenir au moins 2 caractères",
     "somethingWrong": "Une erreur s'est produite. Veuillez réessayer.",
     "unauthorized": "Vous n'êtes pas autorisé à effectuer cette action",
-    "notFound": "La ressource demandée n'a pas été trouvée"
+    "notFound": "La ressource demandée n'a pas été trouvée",
+    "notFoundTitle": "404",
+    "notFoundMessage": "Oups! Page introuvable",
+    "returnHome": "Retour à l'accueil"
   },
   "howToUse": {
     "badge": "Guide d'Utilisation",
@@ -447,5 +582,73 @@
     "helpCenter": "Centre d'Aide",
     "contactUs": "Nous Contacter",
     "howToUse": "Comment Utiliser"
+  },
+  "payment": {
+    "title": "Choisissez Votre Plan",
+    "subtitle": "Sélectionnez le plan parfait pour votre entreprise. Tous les plans incluent un essai gratuit de 14 jours.",
+    "period": "/mois",
+    "subscribe": "S'abonner Maintenant",
+    "mostPopular": "Le Plus Populaire",
+    "lifetimeAccess": "Accès à Vie",
+    "lifetimeDesc": "Payez une fois, utilisez pour toujours. Obtenez toutes les fonctionnalités Professionnelles.",
+    "oneTimePayment": "paiement unique",
+    "getLifetime": "Obtenir l'Accès à Vie",
+    "needHelp": "Besoin d'aide pour choisir ?",
+    "contactSales": "Contactez notre équipe commerciale",
+    "securePayment": "Tous les paiements sont sécurisés et chiffrés. Annulation à tout moment.",
+    "plans": {
+      "basic": {
+        "name": "Basique",
+        "description": "Parfait pour les petites entreprises qui débutent",
+        "features": {
+          "bookings": "Jusqu'à 50 réservations/mois",
+          "staff": "1 membre du personnel",
+          "analytics": "Analytique de base",
+          "notifications": "Notifications par email",
+          "support": "Support standard"
+        }
+      },
+      "professional": {
+        "name": "Professionnel",
+        "description": "Idéal pour les entreprises en croissance avec plus de besoins",
+        "features": {
+          "bookings": "Réservations illimitées",
+          "staff": "Jusqu'à 5 membres du personnel",
+          "analytics": "Analytique avancée",
+          "notifications": "Notifications SMS & Email",
+          "support": "Support prioritaire",
+          "branding": "Marque personnalisée"
+        }
+      },
+      "enterprise": {
+        "name": "Entreprise",
+        "description": "Pour les grandes entreprises avec des exigences complexes",
+        "features": {
+          "everything": "Tout dans Professionnel",
+          "staff": "Membres du personnel illimités",
+          "api": "Accès API",
+          "accountManager": "Gestionnaire de compte dédié",
+          "integrations": "Intégrations personnalisées",
+          "sla": "Garantie SLA"
+        }
+      }
+    }
+  },
+  "staffAnalytics": {
+    "staffPerformance": "Performance du Personnel",
+    "staffPerformanceDesc": "Réservations complétées par chaque membre du personnel",
+    "bookingsByStaff": "Réservations par Personnel",
+    "bookingsByStaffDesc": "Voir les réservations récentes pour chaque membre du personnel",
+    "selectStaff": "Sélectionner le personnel",
+    "allStaff": "Tout le personnel",
+    "noStaffFound": "Aucun membre du personnel trouvé",
+    "noBookingsFound": "Aucune réservation trouvée",
+    "noBookingsFoundStaff": "Aucune réservation trouvée pour ce membre du personnel",
+    "completed": "Terminé",
+    "confirmed": "Confirmé",
+    "pending": "En attente",
+    "total": "Total",
+    "staffLabel": "Personnel :",
+    "loadError": "Échec du chargement des analytiques du personnel"
   }
 }

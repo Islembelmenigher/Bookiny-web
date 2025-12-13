@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { UserPlus, Mail, Trash2, Copy } from 'lucide-react';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
 
 const userIdSchema = z.string().uuid('Invalid User ID format');
 
@@ -15,6 +16,7 @@ interface StaffInviteManagerProps {
 }
 
 export function StaffInviteManager({ businessId }: StaffInviteManagerProps) {
+  const { t } = useTranslation();
   const [userId, setUserId] = useState('');
   const [loading, setLoading] = useState(false);
   const [staffRoles, setStaffRoles] = useState<any[]>([]);
@@ -53,7 +55,7 @@ export function StaffInviteManager({ businessId }: StaffInviteManagerProps) {
         .single();
 
       if (profileError || !profileData) {
-        toast.error('User not found. Please verify the User ID.');
+        toast.error(t('staff.access.userNotFound'));
         return;
       }
 
@@ -68,7 +70,7 @@ export function StaffInviteManager({ businessId }: StaffInviteManagerProps) {
 
       if (roleError) {
         if (roleError.code === '23505') {
-          toast.error('This user is already a staff member');
+          toast.error(t('staff.access.alreadyStaff'));
         } else {
           throw roleError;
         }
@@ -87,14 +89,14 @@ export function StaffInviteManager({ businessId }: StaffInviteManagerProps) {
 
       if (staffError) throw staffError;
 
-      toast.success(`${profileData.full_name} added as staff member`);
+      toast.success(t('staff.access.addSuccess', { name: profileData.full_name }));
       setUserId('');
       fetchStaffRoles();
     } catch (error: any) {
       if (error instanceof z.ZodError) {
-        toast.error(error.errors[0].message);
+        toast.error(t('staff.access.invalidFormat'));
       } else {
-        toast.error('Failed to add staff member');
+        toast.error(t('staff.access.addError'));
         console.error(error);
       }
     } finally {
@@ -111,10 +113,10 @@ export function StaffInviteManager({ businessId }: StaffInviteManagerProps) {
 
       if (error) throw error;
 
-      toast.success('Staff member removed');
+      toast.success(t('staff.access.removeSuccess'));
       fetchStaffRoles();
     } catch (error: any) {
-      toast.error('Failed to remove staff member');
+      toast.error(t('staff.access.removeError'));
       console.error(error);
     }
   };
@@ -124,47 +126,47 @@ export function StaffInviteManager({ businessId }: StaffInviteManagerProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <UserPlus className="h-5 w-5" />
-          Staff Access Management
+          {t('staff.access.title')}
         </CardTitle>
         <CardDescription>
-          Grant staff members access to manage this business
+          {t('staff.access.subtitle')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="bg-muted/50 p-4 rounded-lg border">
-          <h4 className="font-medium mb-2 text-sm">How to add staff members:</h4>
+          <h4 className="font-medium mb-2 text-sm">{t('staff.access.howToTitle')}</h4>
           <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
-            <li>Ask your staff member to create an account (if they haven't)</li>
-            <li>Staff member should go to their Profile page</li>
-            <li>They'll find their User ID at the top of their profile</li>
-            <li>Copy and paste that User ID below to grant them access</li>
+            <li>{t('staff.access.step1')}</li>
+            <li>{t('staff.access.step2')}</li>
+            <li>{t('staff.access.step3')}</li>
+            <li>{t('staff.access.step4')}</li>
           </ol>
         </div>
 
         <form onSubmit={handleInviteStaff} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="userId">Staff User ID</Label>
+            <Label htmlFor="userId">{t('staff.access.label')}</Label>
             <div className="flex gap-2">
               <Input
                 id="userId"
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
-                placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                placeholder={t('staff.access.placeholder')}
                 required
               />
               <Button type="submit" disabled={loading}>
-                {loading ? 'Adding...' : 'Add Staff'}
+                {loading ? t('staff.access.buttonLoading') : t('staff.access.button')}
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              User ID is a unique identifier found on the staff member's profile page
+              {t('staff.access.helpText')}
             </p>
           </div>
         </form>
 
         {staffRoles.length > 0 && (
           <div className="space-y-2">
-            <h3 className="font-medium">Current Staff Members</h3>
+            <h3 className="font-medium">{t('staff.access.currentStaff')}</h3>
             <div className="space-y-2">
               {staffRoles.map((role) => (
                 <div

@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Upload, Image as ImageIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface BusinessCoverUploadProps {
   businessId: string;
@@ -14,20 +15,21 @@ interface BusinessCoverUploadProps {
 }
 
 export function BusinessCoverUpload({ businessId, currentCoverUrl, onUploadSuccess }: BusinessCoverUploadProps) {
+  const { t } = useTranslation();
   const [uploading, setUploading] = useState(false);
 
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || !e.target.files[0]) return;
 
     const file = e.target.files[0];
-    
+
     if (!file.type.startsWith('image/')) {
-      toast.error('Please upload an image file');
+      toast.error(t('settings.coverImage.typeError'));
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image must be less than 5MB');
+      toast.error(t('settings.coverImage.sizeError'));
       return;
     }
 
@@ -55,9 +57,9 @@ export function BusinessCoverUpload({ businessId, currentCoverUrl, onUploadSucce
       if (updateError) throw updateError;
 
       onUploadSuccess(publicUrl);
-      toast.success('Cover image updated successfully');
+      toast.success(t('settings.coverImage.success'));
     } catch (error: any) {
-      toast.error(error.message || 'Failed to upload image');
+      toast.error(error.message || t('settings.coverImage.error'));
       console.error(error);
     } finally {
       setUploading(false);
@@ -67,13 +69,13 @@ export function BusinessCoverUpload({ businessId, currentCoverUrl, onUploadSucce
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Business Cover Image</CardTitle>
-        <CardDescription>Upload a cover image for your business profile</CardDescription>
+        <CardTitle>{t('settings.coverImage.title')}</CardTitle>
+        <CardDescription>{t('settings.coverImage.description')}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           {/* Preview */}
-          <div 
+          <div
             className="h-48 rounded-lg bg-muted flex items-center justify-center overflow-hidden"
             style={{
               backgroundImage: currentCoverUrl ? `url(${currentCoverUrl})` : undefined,
@@ -84,7 +86,7 @@ export function BusinessCoverUpload({ businessId, currentCoverUrl, onUploadSucce
             {!currentCoverUrl && (
               <div className="text-center text-muted-foreground">
                 <ImageIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No cover image</p>
+                <p className="text-sm">{t('settings.coverImage.noImage')}</p>
               </div>
             )}
           </div>
@@ -95,7 +97,7 @@ export function BusinessCoverUpload({ businessId, currentCoverUrl, onUploadSucce
               <Button type="button" disabled={uploading} asChild>
                 <span>
                   <Upload className="h-4 w-4 mr-2" />
-                  {uploading ? 'Uploading...' : 'Upload Cover Image'}
+                  {uploading ? t('settings.coverImage.uploading') : t('settings.coverImage.upload')}
                 </span>
               </Button>
             </Label>
@@ -108,7 +110,7 @@ export function BusinessCoverUpload({ businessId, currentCoverUrl, onUploadSucce
               disabled={uploading}
             />
             <p className="text-xs text-muted-foreground mt-2">
-              Recommended: 1200x400px, PNG or JPG up to 5MB
+              {t('settings.coverImage.recommendation')}
             </p>
           </div>
         </div>
