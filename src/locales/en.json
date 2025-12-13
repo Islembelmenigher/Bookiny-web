@@ -1,4 +1,22 @@
 {
+  "analytics": {
+    "loading": "Loading analytics...",
+    "last24Hours": "Last 24 Hours",
+    "last7Days": "Last 7 Days",
+    "last30Days": "Last 30 Days",
+    "newBookings": "new bookings",
+    "noShowLast30Days": "No Shows (30 Days)",
+    "totalNoShows": "Total No Shows",
+    "missedAppointments": "missed appointments",
+    "allTime": "all time",
+    "topServices": "Top Services",
+    "mostBookedServices": "Most booked services",
+    "noBookingData": "No booking data available yet",
+    "bookings": "bookings",
+    "recentBookings": "Recent Bookings",
+    "latestActivity": "Latest booking activity",
+    "noRecentBookings": "No recent bookings"
+  },
   "common": {
     "loading": "Loading...",
     "save": "Save",

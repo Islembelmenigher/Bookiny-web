@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { TrendingUp, Calendar, DollarSign, Users, Clock } from 'lucide-react';
+import { TrendingUp, Calendar, DollarSign, Users, Clock, UserX } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { format, subDays, startOfDay } from 'date-fns';
 import { formatDZD } from '@/lib/algeria';
 
@@ -22,9 +23,12 @@ export function BusinessAnalytics({ businessId, stats }: BusinessAnalyticsProps)
     last24Hours: 0,
     last7Days: 0,
     last30Days: 0,
+    noShowLast30Days: 0,
+    noShowTotal: 0,
     topServices: [] as any[],
     recentBookings: [] as any[],
   });
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchAnalytics();
@@ -57,6 +61,21 @@ export function BusinessAnalytics({ businessId, stats }: BusinessAnalyticsProps)
         .select('*', { count: 'exact', head: true })
         .eq('business_id', businessId)
         .gte('created_at', last30d.toISOString());
+
+      // No-shows in last 30 days
+      const { count: noShow30d } = await supabase
+        .from('bookings')
+        .select('*', { count: 'exact', head: true })
+        .eq('business_id', businessId)
+        .eq('status', 'no_show')
+        .gte('created_at', last30d.toISOString());
+
+      // Total no-shows
+      const { count: noShowTotal } = await supabase
+        .from('bookings')
+        .select('*', { count: 'exact', head: true })
+        .eq('business_id', businessId)
+        .eq('status', 'no_show');
 
       // Top services (most booked)
       const { data: bookingsData } = await supabase
@@ -97,6 +116,8 @@ export function BusinessAnalytics({ businessId, stats }: BusinessAnalyticsProps)
         last24Hours: count24h || 0,
         last7Days: count7d || 0,
         last30Days: count30d || 0,
+        noShowLast30Days: noShow30d || 0,
+        noShowTotal: noShowTotal || 0,
         topServices,
         recentBookings: recentBookings || [],
       });
@@ -109,7 +130,7 @@ export function BusinessAnalytics({ businessId, stats }: BusinessAnalyticsProps)
   };
 
   if (loading) {
-    return <div className="animate-pulse space-y-4">Loading analytics...</div>;
+    return <div className="animate-pulse space-y-4">{t('analytics.loading')}</div>;
   }
 
   return (
@@ -120,9 +141,9 @@ export function BusinessAnalytics({ businessId, stats }: BusinessAnalyticsProps)
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Last 24 Hours</p>
+                <p className="text-sm text-muted-foreground mb-1">{t('analytics.last24Hours')}</p>
                 <p className="text-3xl font-bold">{analytics.last24Hours}</p>
-                <p className="text-xs text-muted-foreground mt-1">new bookings</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('analytics.newBookings')}</p>
               </div>
               <Clock className="h-10 w-10 text-primary" />
             </div>
@@ -133,9 +154,9 @@ export function BusinessAnalytics({ businessId, stats }: BusinessAnalyticsProps)
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Last 7 Days</p>
+                <p className="text-sm text-muted-foreground mb-1">{t('analytics.last7Days')}</p>
                 <p className="text-3xl font-bold">{analytics.last7Days}</p>
-                <p className="text-xs text-muted-foreground mt-1">new bookings</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('analytics.newBookings')}</p>
               </div>
               <TrendingUp className="h-10 w-10 text-accent" />
             </div>
@@ -146,11 +167,40 @@ export function BusinessAnalytics({ businessId, stats }: BusinessAnalyticsProps)
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Last 30 Days</p>
+                <p className="text-sm text-muted-foreground mb-1">{t('analytics.last30Days')}</p>
                 <p className="text-3xl font-bold">{analytics.last30Days}</p>
-                <p className="text-xs text-muted-foreground mt-1">new bookings</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('analytics.newBookings')}</p>
               </div>
               <Calendar className="h-10 w-10 text-green-500" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* No Show Stats */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <Card className="border-destructive/20">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">{t('analytics.noShowLast30Days')}</p>
+                <p className="text-3xl font-bold text-destructive">{analytics.noShowLast30Days}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('analytics.missedAppointments')}</p>
+              </div>
+              <UserX className="h-10 w-10 text-destructive" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-destructive/20">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">{t('analytics.totalNoShows')}</p>
+                <p className="text-3xl font-bold text-destructive">{analytics.noShowTotal}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('analytics.allTime')}</p>
+              </div>
+              <UserX className="h-10 w-10 text-destructive/60" />
             </div>
           </CardContent>
         </Card>
@@ -159,13 +209,13 @@ export function BusinessAnalytics({ businessId, stats }: BusinessAnalyticsProps)
       {/* Top Services */}
       <Card>
         <CardHeader>
-          <CardTitle>Top Services</CardTitle>
-          <CardDescription>Most booked services</CardDescription>
+          <CardTitle>{t('analytics.topServices')}</CardTitle>
+          <CardDescription>{t('analytics.mostBookedServices')}</CardDescription>
         </CardHeader>
         <CardContent>
           {analytics.topServices.length === 0 ? (
             <p className="text-center text-muted-foreground py-4">
-              No booking data available yet
+              {t('analytics.noBookingData')}
             </p>
           ) : (
             <div className="space-y-3">
@@ -185,7 +235,7 @@ export function BusinessAnalytics({ businessId, stats }: BusinessAnalyticsProps)
                   </div>
                   <div className="text-right">
                     <p className="font-bold text-lg">{service.count}</p>
-                    <p className="text-xs text-muted-foreground">bookings</p>
+                    <p className="text-xs text-muted-foreground">{t('analytics.bookings')}</p>
                   </div>
                 </div>
               ))}
@@ -197,13 +247,13 @@ export function BusinessAnalytics({ businessId, stats }: BusinessAnalyticsProps)
       {/* Recent Activity */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Bookings</CardTitle>
-          <CardDescription>Latest booking activity</CardDescription>
+          <CardTitle>{t('analytics.recentBookings')}</CardTitle>
+          <CardDescription>{t('analytics.latestActivity')}</CardDescription>
         </CardHeader>
         <CardContent>
           {analytics.recentBookings.length === 0 ? (
             <p className="text-center text-muted-foreground py-4">
-              No recent bookings
+              {t('analytics.noRecentBookings')}
             </p>
           ) : (
             <div className="space-y-3">

@@ -1,4 +1,22 @@
 {
+  "analytics": {
+    "loading": "جاري تحميل التحليلات...",
+    "last24Hours": "آخر 24 ساعة",
+    "last7Days": "آخر 7 أيام",
+    "last30Days": "آخر 30 يوماً",
+    "newBookings": "حجوزات جديدة",
+    "noShowLast30Days": "الغياب (30 يوم)",
+    "totalNoShows": "إجمالي الغياب",
+    "missedAppointments": "مواعيد فائتة",
+    "allTime": "منذ البداية",
+    "topServices": "أهم الخدمات",
+    "mostBookedServices": "الخدمات الأكثر حجزاً",
+    "noBookingData": "لا توجد بيانات حجز متاحة",
+    "bookings": "حجوزات",
+    "recentBookings": "الحجوزات الأخيرة",
+    "latestActivity": "آخر نشاط الحجوزات",
+    "noRecentBookings": "لا توجد حجوزات حديثة"
+  },
   "common": {
     "loading": "جاري التحميل...",
     "save": "حفظ",
