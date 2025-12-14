@@ -87,6 +87,7 @@
     "enterPhone": "أدخل رقم هاتفك",
     "phoneFormat": "الصيغة الجزائرية: 05/06/07 متبوعة بـ 8 أرقام",
     "accountType": "نوع الحساب",
+    "iAmA": "أنا",
     "client": "عميل",
     "clientDesc": "حجز الخدمات",
     "business": "نشاط تجاري",
@@ -97,7 +98,9 @@
     "haveAccount": "لديك حساب بالفعل؟",
     "signInSuccess": "تم تسجيل الدخول بنجاح",
     "signUpSuccess": "تم إنشاء الحساب بنجاح! تحقق من بريدك الإلكتروني للتأكيد.",
-    "signOutSuccess": "تم تسجيل الخروج بنجاح"
+    "signOutSuccess": "تم تسجيل الخروج بنجاح",
+    "continueWithGoogle": "المتابعة مع Google",
+    "orContinueWith": "أو المتابعة بالبريد الإلكتروني"
   },
   "address": {
     "wilaya": "الولاية",

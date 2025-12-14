@@ -87,6 +87,7 @@
     "enterPhone": "Entrez votre numéro de téléphone",
     "phoneFormat": "Format algérien: 05/06/07 suivi de 8 chiffres",
     "accountType": "Type de compte",
+    "iAmA": "Je suis un(e)",
     "client": "Client",
     "clientDesc": "Réserver des services",
     "business": "Entreprise",
@@ -97,7 +98,9 @@
     "haveAccount": "Vous avez déjà un compte ?",
     "signInSuccess": "Connexion réussie",
     "signUpSuccess": "Compte créé avec succès ! Vérifiez votre email pour confirmer.",
-    "signOutSuccess": "Déconnexion réussie"
+    "signOutSuccess": "Déconnexion réussie",
+    "continueWithGoogle": "Continuer avec Google",
+    "orContinueWith": "ou continuer avec email"
   },
   "address": {
     "wilaya": "Wilaya",
