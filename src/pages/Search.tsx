@@ -185,8 +185,8 @@ export default function SearchPage() {
     { label: t('categories.barber_men'), value: 'barber_men' },
     { label: t('categories.barber_women'), value: 'barber_women' },
     { label: t('categories.nail_salon'), value: 'nail_salon' },
-    { label: t('categories.doctor'), value: 'doctor' },
-    { label: t('categories.dentist'), value: 'dentist' },
+    // { label: t('categories.doctor'), value: 'doctor' },
+    // { label: t('categories.dentist'), value: 'dentist' },
   ];
 
   const currentCategory = searchParams.get('category') || '';

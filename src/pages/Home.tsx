@@ -48,16 +48,16 @@ export default function Home() {
       category: 'nail_salon',
       image: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=300&fit=crop'
     },
-    { 
-      name: t('categories.doctor'), 
-      category: 'doctor',
-      image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=300&fit=crop'
-    },
-    { 
-      name: t('categories.dentist'), 
-      category: 'dentist',
-      image: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=400&h=300&fit=crop'
-    },
+    // { 
+    //   name: t('categories.doctor'), 
+    //   category: 'doctor',
+    //   image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=300&fit=crop'
+    // },
+    // { 
+    //   name: t('categories.dentist'), 
+    //   category: 'dentist',
+    //   image: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=400&h=300&fit=crop'
+    // },
   ];
 
   const clientBenefits = [
