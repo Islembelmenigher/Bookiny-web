@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { CalendarIcon, MapPin, Star, Clock, User, Phone, Copy, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { Tables } from '@/integrations/supabase/types';
 import { useAuth } from '@/lib/auth';
 import { toast } from 'sonner';
 import { Calendar } from '@/components/ui/calendar';
@@ -16,29 +17,33 @@ import { ReviewForm } from '@/components/business/ReviewForm';
 import { PortfolioGallery } from '@/components/business/PortfolioGallery';
 import { formatDZD } from '@/lib/algeria';
 
+export type ReviewWithProfile = Tables<'reviews'> & {
+  profiles: Pick<Tables<'profiles'>, 'full_name' | 'avatar_url'> | null;
+};
+
 export default function Business() {
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const [business, setBusiness] = useState<any>(null);
-  const [services, setServices] = useState<any[]>([]);
-  const [staff, setStaff] = useState<any[]>([]);
-  const [businessHours, setBusinessHours] = useState<any[]>([]);
-  const [reviews, setReviews] = useState<any[]>([]);
+  const [business, setBusiness] = useState<Tables<'businesses'> | null>(null);
+  const [services, setServices] = useState<Tables<'services'>[]>([]);
+  const [staff, setStaff] = useState<Tables<'staff'>[]>([]);
+  const [businessHours, setBusinessHours] = useState<Tables<'business_hours'>[]>([]);
+  const [reviews, setReviews] = useState<ReviewWithProfile[]>([]);
   const [averageRating, setAverageRating] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
   const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
-  const [selectedService, setSelectedService] = useState<any>(null);
-  const [selectedStaff, setSelectedStaff] = useState<any>(null);
+  const [selectedService, setSelectedService] = useState<Tables<'services'> | null>(null);
+  const [selectedStaff, setSelectedStaff] = useState<Tables<'staff'> | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState<string>('');
-  const [existingBookings, setExistingBookings] = useState<any[]>([]);
-  const [staffServices, setStaffServices] = useState<any[]>([]);
-  const [staffHours, setStaffHours] = useState<any[]>([]);
-  const [filteredStaff, setFilteredStaff] = useState<any[]>([]);
+  const [existingBookings, setExistingBookings] = useState<Pick<Tables<'bookings'>, 'start_time' | 'end_time' | 'staff_id'>[]>([]);
+  const [staffServices, setStaffServices] = useState<Tables<'staff_services'>[]>([]);
+  const [staffHours, setStaffHours] = useState<Tables<'staff_hours'>[]>([]);
+  const [filteredStaff, setFilteredStaff] = useState<Tables<'staff'>[]>([]);
   const [phoneCopied, setPhoneCopied] = useState(false);
 
   useEffect(() => {
@@ -179,7 +184,7 @@ export default function Business() {
     setExistingBookings(data || []);
   };
 
-  const handleBookService = (service: any) => {
+  const handleBookService = (service: Tables<'services'>) => {
     if (!user) {
       toast.error(t('business.pleaseSignIn'));
       navigate('/auth');
