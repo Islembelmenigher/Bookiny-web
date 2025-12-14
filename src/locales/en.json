@@ -87,6 +87,7 @@
     "enterPhone": "Enter your phone number",
     "phoneFormat": "Algerian format: 05/06/07 followed by 8 digits",
     "accountType": "Account Type",
+    "iAmA": "I am a",
     "client": "Client",
     "clientDesc": "Book services",
     "business": "Business",
@@ -97,7 +98,9 @@
     "haveAccount": "Already have an account?",
     "signInSuccess": "Signed in successfully",
     "signUpSuccess": "Account created successfully! Check your email to confirm.",
-    "signOutSuccess": "Signed out successfully"
+    "signOutSuccess": "Signed out successfully",
+    "continueWithGoogle": "Continue with Google",
+    "orContinueWith": "or continue with email"
   },
   "address": {
     "wilaya": "Wilaya",
