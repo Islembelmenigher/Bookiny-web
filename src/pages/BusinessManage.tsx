@@ -24,13 +24,15 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { formatDZD } from '@/lib/algeria';
 import { format } from 'date-fns';
 
+import { Tables } from '@/integrations/supabase/types';
+
 export default function BusinessManage() {
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const [business, setBusiness] = useState<any>(null);
+  const [business, setBusiness] = useState<Tables<'businesses'> | null>(null);
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState<'owner' | 'staff' | null>(null);
   const [phoneCopied, setPhoneCopied] = useState(false);
@@ -95,7 +97,7 @@ export default function BusinessManage() {
       // Calculate total revenue from completed bookings
       let totalRevenue = 0;
       if (revenueRes.data) {
-        totalRevenue = revenueRes.data.reduce((sum: number, booking: any) => {
+        totalRevenue = revenueRes.data.reduce((sum: number, booking: { services: { price: number | null } | null }) => {
           return sum + (booking.services?.price || 0);
         }, 0);
       }
@@ -108,7 +110,7 @@ export default function BusinessManage() {
         totalRevenue: totalRevenue,
         activeServices: servicesCountRes.count || 0,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(t('errors.somethingWrong'));
       console.error(error);
     } finally {
@@ -127,7 +129,7 @@ export default function BusinessManage() {
 
       toast.success(t('business.deleteSuccess'));
       navigate('/dashboard');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error deleting business:', error);
       toast.error(t('errors.deleteFailed'));
     }
