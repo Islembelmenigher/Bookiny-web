@@ -1,3 +1,4 @@
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -56,6 +57,7 @@ const App = () => (
       <AuthProvider>
         <Toaster />
         <Sonner />
+        <SpeedInsights />
         <AppContent />
       </AuthProvider>
     </TooltipProvider>
