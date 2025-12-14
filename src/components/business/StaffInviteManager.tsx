@@ -15,11 +15,19 @@ interface StaffInviteManagerProps {
   businessId: string;
 }
 
+interface StaffRole {
+  id: string;
+  profiles: {
+    full_name: string | null;
+    avatar_url: string | null;
+  } | null;
+}
+
 export function StaffInviteManager({ businessId }: StaffInviteManagerProps) {
   const { t } = useTranslation();
   const [userId, setUserId] = useState('');
   const [loading, setLoading] = useState(false);
-  const [staffRoles, setStaffRoles] = useState<any[]>([]);
+  const [staffRoles, setStaffRoles] = useState<StaffRole[]>([]);
 
   useEffect(() => {
     fetchStaffRoles();
@@ -34,8 +42,8 @@ export function StaffInviteManager({ businessId }: StaffInviteManagerProps) {
         .eq('role', 'staff');
 
       if (error) throw error;
-      setStaffRoles(data || []);
-    } catch (error: any) {
+      setStaffRoles((data as unknown as StaffRole[]) || []);
+    } catch (error: unknown) {
       console.error('Failed to load staff roles:', error);
     }
   };

@@ -650,5 +650,29 @@
     "total": "Total",
     "staffLabel": "Personnel :",
     "loadError": "Échec du chargement des analytiques du personnel"
+  },
+  "businessCreate": {
+    "title": "Créez votre entreprise",
+    "subtitle": "Commencez à accepter des réservations en configurant votre profil d'entreprise",
+    "limitReached": {
+      "title": "Limite d'entreprise atteinte",
+      "description": "Vous ne pouvez créer que jusqu'à 3 entreprises. Veuillez gérer vos entreprises existantes ou en supprimer une pour en créer une nouvelle.",
+      "checking": "Vérification de la limite d'entreprise..."
+    },
+    "form": {
+      "title": "Informations sur l'entreprise",
+      "description": "Dites-nous en plus sur votre entreprise pour que les clients puissent vous trouver",
+      "name": "Nom de l'entreprise",
+      "namePlaceholder": "Salon de coiffure Élite",
+      "category": "Catégorie",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Décrivez votre entreprise, vos services et ce qui vous rend unique...",
+      "email": "Email",
+      "emailPlaceholder": "contact@entreprise.com",
+      "website": "Site web (Optionnel)",
+      "websitePlaceholder": "https://votreentreprise.com",
+      "submit": "Créer l'entreprise",
+      "creating": "Création..."
+    }
   }
 }

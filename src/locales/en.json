@@ -650,5 +650,29 @@
     "total": "Total",
     "staffLabel": "Staff:",
     "loadError": "Failed to load staff analytics"
+  },
+  "businessCreate": {
+    "title": "Create Your Business",
+    "subtitle": "Start accepting bookings by setting up your business profile",
+    "limitReached": {
+      "title": "Business Limit Reached",
+      "description": "You can only create up to 3 businesses. Please manage your existing businesses or delete one to create a new one.",
+      "checking": "Checking business limit..."
+    },
+    "form": {
+      "title": "Business Information",
+      "description": "Tell us about your business so customers can find you",
+      "name": "Business Name",
+      "namePlaceholder": "Elite Hair Salon",
+      "category": "Category",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Describe your business, services, and what makes you unique...",
+      "email": "Email",
+      "emailPlaceholder": "contact@business.com",
+      "website": "Website (Optional)",
+      "websitePlaceholder": "https://yourbusiness.com",
+      "submit": "Create Business",
+      "creating": "Creating..."
+    }
   }
 }

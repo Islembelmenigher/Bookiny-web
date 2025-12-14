@@ -162,11 +162,11 @@ export default function BusinessCreate() {
   };
 
   const categories = [
-    { value: 'barber_men', label: 'Barber for Men' },
-    { value: 'barber_women', label: 'Barber for Women' },
-    { value: 'nail_salon', label: 'Nail Salon' },
-    { value: 'doctor', label: 'Doctor' },
-    { value: 'dentist', label: 'Dentist' },
+    { value: 'barber_men', label: t('categories.barber_men') },
+    { value: 'barber_women', label: t('categories.barber_women') },
+    { value: 'nail_salon', label: t('categories.nail_salon') },
+    // { value: 'doctor', label: t('categories.doctor') }, to be returned after lunching the project in the marked
+    // { value: 'dentist', label: t('categories.dentist') },
   ];
 
   return (
@@ -177,9 +177,9 @@ export default function BusinessCreate() {
             <div className="h-16 w-16 rounded-full bg-gradient-primary mx-auto mb-4 flex items-center justify-center">
               <Building2 className="h-8 w-8 text-primary-foreground" />
             </div>
-            <h1 className="text-3xl font-bold mb-2">Create Your Business</h1>
+            <h1 className="text-3xl font-bold mb-2">{t('businessCreate.title')}</h1>
             <p className="text-muted-foreground">
-              Start accepting bookings by setting up your business profile
+              {t('businessCreate.subtitle')}
             </p>
           </div>
 
@@ -187,7 +187,7 @@ export default function BusinessCreate() {
             <Card>
               <CardContent className="py-12 text-center">
                 <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
-                <p className="text-muted-foreground">Checking business limit...</p>
+                <p className="text-muted-foreground">{t('businessCreate.limitReached.checking')}</p>
               </CardContent>
             </Card>
           ) : businessCount >= 3 ? (
@@ -196,12 +196,12 @@ export default function BusinessCreate() {
                 <div className="h-16 w-16 rounded-full bg-destructive/10 mx-auto mb-4 flex items-center justify-center">
                   <Building2 className="h-8 w-8 text-destructive" />
                 </div>
-                <h2 className="text-xl font-semibold mb-2">Business Limit Reached</h2>
+                <h2 className="text-xl font-semibold mb-2">{t('businessCreate.limitReached.title')}</h2>
                 <p className="text-muted-foreground mb-4">
-                  You can only create up to 3 businesses. Please manage your existing businesses or delete one to create a new one.
+                  {t('businessCreate.limitReached.description')}
                 </p>
                 <Button onClick={() => navigate('/dashboard')}>
-                  Go to Dashboard
+                   {t('business.backToDashboard')}
                 </Button>
               </CardContent>
             </Card>
@@ -209,18 +209,18 @@ export default function BusinessCreate() {
           <form onSubmit={handleSubmit}>
             <Card>
               <CardHeader>
-                <CardTitle>Business Information</CardTitle>
+                <CardTitle>{t('businessCreate.form.title')}</CardTitle>
                 <CardDescription>
-                  Tell us about your business so customers can find you
+                  {t('businessCreate.form.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Business Name *</Label>
+                    <Label htmlFor="name">{t('businessCreate.form.name')} *</Label>
                     <Input
                       id="name"
-                      placeholder="Elite Hair Salon"
+                      placeholder={t('businessCreate.form.namePlaceholder')}
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
@@ -228,7 +228,7 @@ export default function BusinessCreate() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="category">Category *</Label>
+                    <Label htmlFor="category">{t('businessCreate.form.category')} *</Label>
                     <Select
                       value={formData.category}
                       onValueChange={(value) => setFormData({ ...formData, category: value })}
@@ -248,10 +248,10 @@ export default function BusinessCreate() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description">Description *</Label>
+                  <Label htmlFor="description">{t('businessCreate.form.descriptionLabel')} *</Label>
                   <Textarea
                     id="description"
-                    placeholder="Describe your business, services, and what makes you unique..."
+                    placeholder={t('businessCreate.form.descriptionPlaceholder')}
                     rows={4}
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -359,11 +359,11 @@ export default function BusinessCreate() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email *</Label>
+                    <Label htmlFor="email">{t('businessCreate.form.email')} *</Label>
                     <Input
                       id="email"
                       type="email"
-                      placeholder="contact@business.com"
+                      placeholder={t('businessCreate.form.emailPlaceholder')}
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       required
@@ -372,11 +372,11 @@ export default function BusinessCreate() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="website">Website (Optional)</Label>
+                  <Label htmlFor="website">{t('businessCreate.form.website')}</Label>
                   <Input
                     id="website"
                     type="url"
-                    placeholder="https://yourbusiness.com"
+                    placeholder={t('businessCreate.form.websitePlaceholder')}
                     value={formData.website}
                     onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                   />
@@ -389,16 +389,16 @@ export default function BusinessCreate() {
                     className="flex-1"
                     onClick={() => navigate('/dashboard')}
                   >
-                    Cancel
+                    {t('common.cancel')}
                   </Button>
                   <Button type="submit" className="flex-1" disabled={loading}>
-                    {loading ? (
+                      {loading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Creating...
+                        {t('businessCreate.form.creating')}
                       </>
                     ) : (
-                      'Create Business'
+                      t('businessCreate.form.submit')
                     )}
                   </Button>
                 </div>
