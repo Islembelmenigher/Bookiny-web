@@ -120,7 +120,17 @@
     "signUpSuccess": "Account created successfully! Check your email to confirm.",
     "signOutSuccess": "Signed out successfully",
     "continueWithGoogle": "Continue with Google",
-    "orContinueWith": "or continue with email"
+    "orContinueWith": "or continue with email",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "resetPasswordDescription": "Enter your email address and we'll send you a link to reset your password.",
+    "passwordResetEmailSent": "Password reset email sent! Please check your inbox.",
+    "sending": "Sending...",
+    "sendResetLink": "Send Reset Link",
+    "setNewPassword": "Set a new password for your account",
+    "updatePassword": "Update Password",
+    "passwordMinLength": "Password must be at least 6 characters",
+    "backToSignIn": "Back to Sign In"
   },
   "address": {
     "wilaya": "Wilaya",
