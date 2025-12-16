@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,6 +24,7 @@ const newPasswordSchema = z.object({
 
 export default function ResetPassword() {
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { resetPassword } = useAuth();
   const [resetPasswordEmail, setResetPasswordEmail] = useState('');
@@ -32,56 +33,89 @@ export default function ResetPassword() {
   const [loading, setLoading] = useState(false);
   const [isRecoveryMode, setIsRecoveryMode] = useState(false);
   const [checkingRecovery, setCheckingRecovery] = useState(true);
+  const [tokenError, setTokenError] = useState(false);
 
   useEffect(() => {
     let mounted = true;
 
-    const checkRecoverySession = async () => {
-      // Check for existing recovery session
-      const { data: { session } } = await supabase.auth.getSession();
-      
+    const checkRecoveryMode = async () => {
+      // Check query params for ?type=recovery
+      const typeFromQuery = searchParams.get('type');
+      const isRecoveryFromQuery = typeFromQuery === 'recovery';
+
+      // Check hash for #access_token=...&type=recovery or just #access_token=...
+      const hash = window.location.hash;
+      let isRecoveryFromHash = false;
+      let hasAccessToken = false;
+      let typeFromHash: string | null = null;
+
+      if (hash) {
+        try {
+          const hashParams = new URLSearchParams(hash.substring(1));
+          typeFromHash = hashParams.get('type');
+          hasAccessToken = hashParams.has('access_token');
+          isRecoveryFromHash = typeFromHash === 'recovery' || hasAccessToken;
+        } catch (e) {
+          // Fallback: check if hash contains access_token
+          hasAccessToken = hash.includes('access_token');
+          isRecoveryFromHash = hasAccessToken;
+        }
+      }
+
+      // Check Supabase session for recovery
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      const hasRecoverySession = !!session;
+
+      // Recovery mode detected if:
+      // 1. type=recovery in query params (mobile fallback)
+      // 2. access_token in hash (desktop)
+      // 3. type=recovery in hash (desktop)
+      // 4. Valid Supabase session exists (Supabase processes token automatically)
+      const isRecovery = isRecoveryFromQuery || isRecoveryFromHash || hasRecoverySession;
+
       if (mounted) {
-        // If session exists, we're in recovery mode (Supabase creates session when recovery token is processed)
-        setIsRecoveryMode(!!session);
+        setIsRecoveryMode(isRecovery);
+        setTokenError(sessionError !== null && !isRecovery);
         setCheckingRecovery(false);
       }
     };
 
-    // Set up auth state change listener for PASSWORD_RECOVERY event
+    // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
 
       if (event === 'PASSWORD_RECOVERY') {
-        // Supabase fires this event when recovery token is processed
         setIsRecoveryMode(true);
+        setTokenError(false);
         setCheckingRecovery(false);
       } else if (event === 'SIGNED_IN' && session) {
-        // If user signs in normally, not recovery mode
-        setIsRecoveryMode(false);
+        // Check if this is a recovery session by checking session type
+        // Recovery sessions are temporary and allow password updates
+        setIsRecoveryMode(true);
+        setTokenError(false);
         setCheckingRecovery(false);
       } else if (event === 'SIGNED_OUT') {
-        // If signed out, not recovery mode
         setIsRecoveryMode(false);
-        setCheckingRecovery(false);
-      } else if (session && checkingRecovery) {
-        // If we have a session and still checking, it might be recovery
-        setIsRecoveryMode(true);
-        setCheckingRecovery(false);
-      } else if (!session && checkingRecovery) {
-        // No session, not recovery mode
-        setIsRecoveryMode(false);
+        setTokenError(false);
         setCheckingRecovery(false);
       }
     });
 
     // Initial check
-    checkRecoverySession();
+    checkRecoveryMode();
+
+    // Listen for hash changes (in case Supabase processes hash asynchronously)
+    const handleHashChange = () => {
+      checkRecoveryMode();
+    };
+    window.addEventListener('hashchange', handleHashChange);
 
     return () => {
       mounted = false;
       subscription.unsubscribe();
+      window.removeEventListener('hashchange', handleHashChange);
     };
-  }, []);
+  }, [searchParams]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,15 +138,24 @@ export default function ResetPassword() {
     } else {
       toast.success(t('auth.passwordResetEmailSent'));
       setResetPasswordEmail('');
+      setTokenError(false);
     }
   };
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setTokenError(false);
 
     try {
       const validatedData = newPasswordSchema.parse(newPasswordData);
+
+      // Verify we still have a valid session before updating
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        throw new Error('Invalid or expired recovery token. Please request a new password reset email.');
+      }
 
       const { error } = await supabase.auth.updateUser({
         password: validatedData.newPassword,
@@ -127,7 +170,9 @@ export default function ResetPassword() {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
       } else {
-        toast.error(error.message || t('errors.somethingWrong'));
+        const errorMessage = error.message || t('errors.somethingWrong');
+        toast.error(errorMessage);
+        setTokenError(true);
         console.error(error);
       }
     } finally {
@@ -186,6 +231,13 @@ export default function ResetPassword() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {tokenError && (
+              <div className="mb-4 p-3 rounded-md bg-destructive/10 border border-destructive/20">
+                <p className="text-sm text-destructive">
+                  {t('auth.invalidOrExpiredToken', { defaultValue: 'Invalid or expired recovery token. Please request a new password reset email.' })}
+                </p>
+              </div>
+            )}
             <form onSubmit={handleUpdatePassword} className="space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="newPassword" className="text-sm font-medium">
@@ -230,6 +282,22 @@ export default function ResetPassword() {
                   t('auth.updatePassword')
                 )}
               </Button>
+
+              {tokenError && (
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTokenError(false);
+                      setIsRecoveryMode(false);
+                      setNewPasswordData({ newPassword: '', confirmPassword: '' });
+                    }}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    {t('auth.requestNewResetLink', { defaultValue: 'Request a new password reset email' })}
+                  </button>
+                </div>
+              )}
 
               <div className="text-center mt-4">
                 <button
