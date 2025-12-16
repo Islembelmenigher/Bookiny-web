@@ -120,7 +120,17 @@
     "signUpSuccess": "تم إنشاء الحساب بنجاح! تحقق من بريدك الإلكتروني للتأكيد.",
     "signOutSuccess": "تم تسجيل الخروج بنجاح",
     "continueWithGoogle": "المتابعة مع Google",
-    "orContinueWith": "أو المتابعة بالبريد الإلكتروني"
+    "orContinueWith": "أو المتابعة بالبريد الإلكتروني",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "resetPasswordDescription": "أدخل عنوان بريدك الإلكتروني وسنرسل لك رابطاً لإعادة تعيين كلمة المرور.",
+    "passwordResetEmailSent": "تم إرسال بريد إعادة تعيين كلمة المرور! يرجى التحقق من صندوق الوارد.",
+    "sending": "جاري الإرسال...",
+    "sendResetLink": "إرسال رابط إعادة التعيين",
+    "setNewPassword": "تعيين كلمة مرور جديدة لحسابك",
+    "updatePassword": "تحديث كلمة المرور",
+    "passwordMinLength": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
+    "backToSignIn": "العودة لتسجيل الدخول"
   },
   "address": {
     "wilaya": "الولاية",

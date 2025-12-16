@@ -10,6 +10,7 @@ import '@/lib/i18n';
 import { getCurrentLanguage } from '@/lib/i18n';
 import Home from "./pages/Home";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import Search from "./pages/Search";
 import Business from "./pages/Business";
 import Dashboard from "./pages/Dashboard";
@@ -35,6 +36,7 @@ function AppContent() {
       <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/search" element={<Search />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/payment" element={<Payment />} />

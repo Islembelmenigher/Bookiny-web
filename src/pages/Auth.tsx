@@ -19,6 +19,7 @@ const passwordSchema = z.string().min(6, 'Password must be at least 6 characters
 const nameSchema = z.string().min(2, 'Name must be at least 2 characters');
 const phoneSchema = z.string().refine(validateAlgerianPhone, 'Phone must be Algerian format (05/06/07XXXXXXXX)');
 
+
 export default function Auth() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
@@ -233,6 +234,16 @@ export default function Auth() {
                     t('auth.signIn')
                   )}
                 </Button>
+                
+                <div className="text-center mt-4">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/reset-password')}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    {t('auth.forgotPassword')}
+                  </button>
+                </div>
               </form>
             </TabsContent>
 

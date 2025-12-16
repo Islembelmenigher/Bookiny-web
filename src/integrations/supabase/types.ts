@@ -630,8 +630,8 @@ export type Database = {
         | "barber_men"
         | "barber_women"
         | "nail_salon"
-        | "doctor"
-        | "dentist"
+        // | "doctor"   to be returned after lunching the project in the marked
+        // | "dentist"
       user_role: "client" | "business_owner" | "staff"
     }
     CompositeTypes: {
