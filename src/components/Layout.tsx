@@ -58,7 +58,7 @@ export function Layout({ children }: LayoutProps) {
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center space-x-2">
               <Calendar className="h-6 w-6 text-primary" />
-              <span className="font-display font-bold text-xl text-foreground">BookEase</span>
+              <span className="font-display font-bold text-xl text-foreground">Rondivous</span>
             </Link>
 
             {/* Desktop Nav */}
@@ -194,7 +194,7 @@ export function Layout({ children }: LayoutProps) {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <Calendar className="h-5 w-5 text-primary" />
-                <span className="font-display font-bold text-lg">BookEase</span>
+                <span className="font-display font-bold text-lg">Rondivous</span>
               </div>
               <p className="text-sm text-muted-foreground">
                 {t('auth.signInToContinue')}
@@ -223,7 +223,7 @@ export function Layout({ children }: LayoutProps) {
             </div>
           </div>
           <div className="mt-10 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-            © 2024 BookEase. All rights reserved.
+            © 2025 Rondivous. All rights reserved.
           </div>
         </div>
       </footer>
