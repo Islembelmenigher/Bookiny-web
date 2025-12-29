@@ -1,4 +1,4 @@
-# Booksy Clone - Service Booking Platform
+# Service Booking Platform
 
 ## 📄 License & Legal Notice
 
