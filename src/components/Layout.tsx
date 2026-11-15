@@ -223,7 +223,7 @@ export function Layout({ children }: LayoutProps) {
             </div>
           </div>
           <div className="mt-10 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-            © 2025 Rondivous. All rights reserved.
+            © 2027 Rondivous. All rights reserved.
           </div>
         </div>
       </footer>
