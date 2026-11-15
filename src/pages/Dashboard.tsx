@@ -15,7 +15,7 @@ import { DemoDataSeeder } from '@/components/DemoDataSeeder';
 import { RescheduleDialog } from '@/components/business/RescheduleDialog';
 import { formatDZD } from '@/lib/algeria';
 
-const MAX_BUSINESSES = 3;
+const MAX_BUSINESSES = 1;
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -135,9 +135,9 @@ export default function Dashboard() {
               <p className="text-muted-foreground">{t('auth.welcomeBack')}, {profile?.full_name || 'User'}</p>
             </div>
             <div className="flex gap-2">
-              {isBusinessOwner && canCreateMoreBusinesses && (
+              {isBusinessOwner && businesses.length === 0 && (
                 <>
-                  {businesses.length === 0 && <DemoDataSeeder />}
+                  <DemoDataSeeder />
                   <Button asChild>
                     <Link to="/business/new">
                       <Plus className="h-4 w-4 mr-2" />
@@ -240,17 +240,6 @@ export default function Dashboard() {
 
             {isBusinessOwner && (
               <TabsContent value="businesses" className="space-y-4">
-                {/* Business Limit Message */}
-                {hasReachedLimit && (
-                  <Card className="border-accent/50 bg-accent/5">
-                    <CardContent className="p-4 flex items-center gap-3">
-                      <AlertCircle className="h-5 w-5 text-accent shrink-0" />
-                      <p className="text-sm text-muted-foreground">
-                        {t('dashboard.businessLimit', { limit: MAX_BUSINESSES })}
-                      </p>
-                    </CardContent>
-                  </Card>
-                )}
 
                 {businesses.length === 0 ? (
                   <Card>
@@ -270,17 +259,6 @@ export default function Dashboard() {
                   </Card>
                 ) : (
                   <>
-                    {/* Add Business Button when under limit */}
-                    {canCreateMoreBusinesses && (
-                      <div className="flex justify-end">
-                        <Button asChild>
-                          <Link to="/business/new">
-                            <Plus className="h-4 w-4 mr-2" />
-                            {t('dashboard.addAnotherBusiness')} ({businesses.length}/{MAX_BUSINESSES})
-                          </Link>
-                        </Button>
-                      </div>
-                    )}
 
                     <div className="grid md:grid-cols-2 gap-4">
                       {businesses.map((business) => (

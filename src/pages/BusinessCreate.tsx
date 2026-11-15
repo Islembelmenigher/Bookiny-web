@@ -36,7 +36,7 @@ export default function BusinessCreate() {
   const [communes, setCommunes] = useState<string[]>([]);
   const [businessCount, setBusinessCount] = useState(0);
   const [checkingLimit, setCheckingLimit] = useState(true);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -55,16 +55,16 @@ export default function BusinessCreate() {
   useEffect(() => {
     const checkBusinessCount = async () => {
       if (!user?.id) return;
-      
+
       const { count } = await supabase
         .from('businesses')
         .select('*', { count: 'exact', head: true })
         .eq('owner_id', user.id);
-      
+
       setBusinessCount(count || 0);
       setCheckingLimit(false);
     };
-    
+
     checkBusinessCount();
   }, [user]);
 
@@ -72,20 +72,20 @@ export default function BusinessCreate() {
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!user?.id) return;
-      
+
       const { data } = await supabase
         .from('profiles')
         .select('phone')
         .eq('id', user.id)
         .single();
-      
+
       setFormData(prev => ({
         ...prev,
         phone: data?.phone || '',
         email: user.email || '',
       }));
     };
-    
+
     fetchUserProfile();
   }, [user]);
 
@@ -104,7 +104,7 @@ export default function BusinessCreate() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       businessSchema.parse(formData);
     } catch (error) {
@@ -184,227 +184,221 @@ export default function BusinessCreate() {
           </div>
 
           {checkingLimit ? (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
-                <p className="text-muted-foreground">{t('businessCreate.limitReached.checking')}</p>
-              </CardContent>
-            </Card>
-          ) : businessCount >= 3 ? (
+            <div className="py-12 text-center">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
+            </div>
+          ) : businessCount >= 1 ? (
             <Card>
               <CardContent className="py-12 text-center">
                 <div className="h-16 w-16 rounded-full bg-destructive/10 mx-auto mb-4 flex items-center justify-center">
                   <Building2 className="h-8 w-8 text-destructive" />
                 </div>
                 <h2 className="text-xl font-semibold mb-2">{t('businessCreate.limitReached.title')}</h2>
-                <p className="text-muted-foreground mb-4">
-                  {t('businessCreate.limitReached.description')}
-                </p>
                 <Button onClick={() => navigate('/dashboard')}>
-                   {t('business.backToDashboard')}
+                  {t('business.backToDashboard')}
                 </Button>
               </CardContent>
             </Card>
           ) : (
-          <form onSubmit={handleSubmit}>
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('businessCreate.form.title')}</CardTitle>
-                <CardDescription>
-                  {t('businessCreate.form.description')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">{t('businessCreate.form.name')} *</Label>
-                    <Input
-                      id="name"
-                      placeholder={t('businessCreate.form.namePlaceholder')}
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      required
-                    />
-                  </div>
+            <form onSubmit={handleSubmit}>
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t('businessCreate.form.title')}</CardTitle>
+                  <CardDescription>
+                    {t('businessCreate.form.description')}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">{t('businessCreate.form.name')} *</Label>
+                      <Input
+                        id="name"
+                        placeholder={t('businessCreate.form.namePlaceholder')}
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        required
+                      />
+                    </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="category">{t('businessCreate.form.category')} *</Label>
-                    <Select
-                      value={formData.category}
-                      onValueChange={(value) => setFormData({ ...formData, category: value })}
-                    >
-                      <SelectTrigger id="category">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((cat) => (
-                          <SelectItem key={cat.value} value={cat.value}>
-                            {cat.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="description">{t('businessCreate.form.descriptionLabel')} *</Label>
-                  <Textarea
-                    id="description"
-                    placeholder={t('businessCreate.form.descriptionPlaceholder')}
-                    rows={4}
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    required
-                  />
-                </div>
-
-                {/* Algerian Address Fields */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="wilaya">{t('address.wilaya')} *</Label>
-                    <Select
-                      value={formData.wilaya}
-                      onValueChange={(value) => setFormData({ ...formData, wilaya: value })}
-                    >
-                      <SelectTrigger id="wilaya">
-                        <SelectValue placeholder={t('address.selectWilaya')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {WILAYAS.map((wilaya) => (
-                          <SelectItem key={wilaya.code} value={wilaya.code}>
-                            {wilaya.code} - {wilaya.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="city">{t('address.city')} *</Label>
-                    {communes.length > 0 ? (
+                    <div className="space-y-2">
+                      <Label htmlFor="category">{t('businessCreate.form.category')} *</Label>
                       <Select
-                        value={formData.city}
-                        onValueChange={(value) => setFormData({ ...formData, city: value })}
+                        value={formData.category}
+                        onValueChange={(value) => setFormData({ ...formData, category: value })}
                       >
-                        <SelectTrigger id="city">
-                          <SelectValue placeholder={t('address.selectCity')} />
+                        <SelectTrigger id="category">
+                          <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {communes.map((commune) => (
-                            <SelectItem key={commune} value={commune}>
-                              {commune}
+                          {categories.map((cat) => (
+                            <SelectItem key={cat.value} value={cat.value}>
+                              {cat.label}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
-                    ) : (
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="description">{t('businessCreate.form.descriptionLabel')} *</Label>
+                    <Textarea
+                      id="description"
+                      placeholder={t('businessCreate.form.descriptionPlaceholder')}
+                      rows={4}
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  {/* Algerian Address Fields */}
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="wilaya">{t('address.wilaya')} *</Label>
+                      <Select
+                        value={formData.wilaya}
+                        onValueChange={(value) => setFormData({ ...formData, wilaya: value })}
+                      >
+                        <SelectTrigger id="wilaya">
+                          <SelectValue placeholder={t('address.selectWilaya')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {WILAYAS.map((wilaya) => (
+                            <SelectItem key={wilaya.code} value={wilaya.code}>
+                              {wilaya.code} - {wilaya.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="city">{t('address.city')} *</Label>
+                      {communes.length > 0 ? (
+                        <Select
+                          value={formData.city}
+                          onValueChange={(value) => setFormData({ ...formData, city: value })}
+                        >
+                          <SelectTrigger id="city">
+                            <SelectValue placeholder={t('address.selectCity')} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {communes.map((commune) => (
+                              <SelectItem key={commune} value={commune}>
+                                {commune}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <Input
+                          id="city"
+                          placeholder={t('address.city')}
+                          value={formData.city}
+                          onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                          required
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="postal_code">{t('address.postalCode')} *</Label>
                       <Input
-                        id="city"
-                        placeholder={t('address.city')}
-                        value={formData.city}
-                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                        id="postal_code"
+                        placeholder="16000"
+                        value={formData.postal_code}
+                        onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
                         required
                       />
-                    )}
-                  </div>
-                </div>
+                    </div>
 
-                <div className="grid md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="street_name">{t('address.streetName')} *</Label>
+                      <Input
+                        id="street_name"
+                        placeholder={t('address.streetName')}
+                        value={formData.street_name}
+                        onChange={(e) => setFormData({ ...formData, street_name: e.target.value })}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="street_number">{t('address.streetNumber')}</Label>
+                      <Input
+                        id="street_number"
+                        placeholder="12"
+                        value={formData.street_number}
+                        onChange={(e) => setFormData({ ...formData, street_number: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">{t('common.phone')} *</Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        placeholder="05XXXXXXXX"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        required
+                      />
+                      <p className="text-xs text-muted-foreground">{t('auth.phoneFormat')}</p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="email">{t('businessCreate.form.email')} *</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder={t('businessCreate.form.emailPlaceholder')}
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
-                    <Label htmlFor="postal_code">{t('address.postalCode')} *</Label>
+                    <Label htmlFor="website">{t('businessCreate.form.website')}</Label>
                     <Input
-                      id="postal_code"
-                      placeholder="16000"
-                      value={formData.postal_code}
-                      onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
-                      required
+                      id="website"
+                      type="url"
+                      placeholder={t('businessCreate.form.websitePlaceholder')}
+                      value={formData.website}
+                      onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="street_name">{t('address.streetName')} *</Label>
-                    <Input
-                      id="street_name"
-                      placeholder={t('address.streetName')}
-                      value={formData.street_name}
-                      onChange={(e) => setFormData({ ...formData, street_name: e.target.value })}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="street_number">{t('address.streetNumber')}</Label>
-                    <Input
-                      id="street_number"
-                      placeholder="12"
-                      value={formData.street_number}
-                      onChange={(e) => setFormData({ ...formData, street_number: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">{t('common.phone')} *</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="05XXXXXXXX"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      required
-                    />
-                    <p className="text-xs text-muted-foreground">{t('auth.phoneFormat')}</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email">{t('businessCreate.form.email')} *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder={t('businessCreate.form.emailPlaceholder')}
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="website">{t('businessCreate.form.website')}</Label>
-                  <Input
-                    id="website"
-                    type="url"
-                    placeholder={t('businessCreate.form.websitePlaceholder')}
-                    value={formData.website}
-                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                  />
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => navigate('/dashboard')}
-                  >
-                    {t('common.cancel')}
-                  </Button>
-                  <Button type="submit" className="flex-1" disabled={loading}>
+                  <div className="flex gap-3 pt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => navigate('/dashboard')}
+                    >
+                      {t('common.cancel')}
+                    </Button>
+                    <Button type="submit" className="flex-1" disabled={loading}>
                       {loading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {t('businessCreate.form.creating')}
-                      </>
-                    ) : (
-                      t('businessCreate.form.submit')
-                    )}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </form>
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {t('businessCreate.form.creating')}
+                        </>
+                      ) : (
+                        t('businessCreate.form.submit')
+                      )}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </form>
           )}
         </div>
       </div>
