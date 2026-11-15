@@ -2,17 +2,17 @@
 
 ## 📄 License & Legal Notice
 
-**© 2024 All Rights Reserved.**
+**© 2026 All Rights Reserved.**
 
 This software and associated documentation files (the "Software") are the proprietary property of the owner.
 
 **STRICTLY PROHIBITED ACTS:**
 
-- Unauthorized copying of this Software, via any medium, is strictly prohibited.
+- Unauthorized copying of this Software, via any medium, is strictly prohibited without a confirmation from the owner.
 - Redistribution, modification, or commercial use of this codebase, in whole or in part, without express written permission is not allowed.
 - This codebase is provided for the sole purpose of the intended assignment or usage as authorized by the owner.
-
-Any violation of these terms will result in legal action.
+- you can use this code for learning purposes from architecture behind complex booking platforms and staff management .
+- if you want the full right to use this codebase for any other purposes please contact me via islem.belmenigher@gmail.com or simoagency.com
 
 ---
 
